@@ -6,44 +6,23 @@
 #include <filesystem>
 #include <utility>
 
-namespace fs = std::filesystem;
-
 
 namespace cg3d
 {
 
-std::shared_ptr<Model> Model::Create(const std::string& file, std::shared_ptr<Material> material, const std::shared_ptr<Movable>& parent)
-{
-    std::string name = fs::path(file).filename().stem().generic_string();
-    return Create(name, file, std::move(material), parent);
-}
+namespace fs = std::filesystem;
 
-std::shared_ptr<Model>
-Model::Create(std::string name, const std::string& file, std::shared_ptr<Material> material, const std::shared_ptr<Movable>& parent)
-{
-    auto model{ObjLoader::ModelFromObj(std::move(name), file, std::move(material))};
-    model->SetParent(parent);
-    return std::move(model);
-}
+Model::Model(const std::string& file, std::shared_ptr<Material> material)
+        : Model{fs::path(file).filename().stem().generic_string(), file, std::move(material)} {}
 
-std::shared_ptr<Model> Model::Create(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material, const std::shared_ptr<Movable>& parent)
-{
-    std::string name = mesh->name + "_model"; // construct the name separately to avoid warnings
-    return Create(std::move(name), std::move(mesh), std::move(material), parent);
-}
+Model::Model(std::string name, const std::string& file, std::shared_ptr<Material> material)
+        : Model{*ObjLoader::ModelFromObj(std::move(name), file, std::move(material))} {}
 
-std::shared_ptr<Model> Model::Create(std::string name, std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material, const std::shared_ptr<Movable>& parent)
-{
-    return Create(std::move(name), std::vector<std::shared_ptr<Mesh>>{{std::move(mesh)}}, std::move(material), parent);
-}
+Model::Model(std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material)
+        : Model{mesh->name + "_model", std::move(mesh), std::move(material)} {};
 
-std::shared_ptr<Model>
-Model::Create(std::string name, std::vector<std::shared_ptr<Mesh>> meshList, std::shared_ptr<Material> material, const std::shared_ptr<Movable>& parent)
-{
-    auto model = std::shared_ptr<Model>(new Model(std::move(name), std::move(meshList), std::move(material)));
-    model->SetParent(parent);
-    return std::move(model);
-}
+Model::Model(std::string name, std::shared_ptr<Mesh> mesh, std::shared_ptr<Material> material)
+        : Model{std::move(name), std::vector<std::shared_ptr<Mesh>>{{std::move(mesh)}}, std::move(material)} {}
 
 Model::Model(std::string name, std::vector<std::shared_ptr<Mesh>> meshList, std::shared_ptr<Material> material)
         : Movable(std::move(name)), material(std::move(material))
@@ -99,11 +78,22 @@ void Model::SetMeshList(std::vector<std::shared_ptr<Mesh>> _meshList)
         viewerDataListPerMesh.emplace_back(CreateViewerData(mesh));
 }
 
-void Model::Accept(Visitor* visitor)
-{
-    Movable::Accept(visitor);
 
-    visitor->Visit(this);
+    void Model::AddDataToMEsh(int mesh_index,Eigen::MatrixXd &OV,Eigen::MatrixXi &OF,Eigen::MatrixXd &vertexNormals,const Eigen::MatrixXd textureCoords)
+{
+    igl::opengl::ViewerData viewerData;
+    viewerData.set_mesh(OV, OF);
+    viewerData.set_uv(textureCoords);
+    viewerData.set_normals(vertexNormals);
+    viewerData.line_width = 1.0f;
+    viewerData.uniform_colors(Eigen::Vector3d(1.0, 1.0, 1.0), Eigen::Vector3d(1.0, 1.0, 1.0), Eigen::Vector3d(1.0, 1.0, 1.0)); // todo: implement colors
+    viewerData.compute_normals(); // todo: implement (this overwrites both face and vertex normals even if either is already present)
+    if (viewerData.V_uv.rows() == 0)
+        viewerData.grid_texture();
+    viewerData.is_visible = 1;
+    viewerData.show_overlay = 0;
+    viewerDataListPerMesh[mesh_index].push_back(viewerData);
 }
+
 
 } // namespace cg3d
