@@ -29,7 +29,7 @@ public:
     int Simp();
     void reset();
     void evalQ();
-    void caculateCostAndPlacment(int edge);
+    void calculateEdgesCost(int edge);
 
 private:
     std::vector <Eigen::Matrix4d> QPerVertex;
@@ -47,7 +47,7 @@ private:
     Eigen::MatrixXd V,IV, C;
     igl::min_heap< std::tuple<double,int,int> > Q;
     typedef std::set<std::pair<double, int> > PriorityQueue;
-    std::vector<PriorityQueue::iterator > Qit;
+    std::vector<PriorityQueue::iterator > QtIterator;
     int num_collapsed;
     //priority queue for each edge
     PriorityQueue Qt;

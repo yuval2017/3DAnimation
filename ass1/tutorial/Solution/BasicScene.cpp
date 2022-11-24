@@ -145,11 +145,11 @@ void BasicScene::reset(){
 
 
     //add this functionality
-    Qit.resize(E.rows()); //number of edges
+    QtIterator.resize(E.rows()); //number of edges
     evalQ();
     Qt.clear();
     for (int j = 0; j < E.rows(); j++) {
-        caculateCostAndPlacment(j);
+        calculateEdgesCost(j);
     }
 }
 
@@ -219,7 +219,7 @@ void BasicScene::evalQ() {
 
     }
 }
-void BasicScene:: caculateCostAndPlacment(int edge){
+void BasicScene:: calculateEdgesCost(int edge){
     //vertexes of the edge
     int v1 = E(edge, 0);
     int v2 = E(edge, 1);
@@ -240,7 +240,7 @@ void BasicScene:: caculateCostAndPlacment(int edge){
         cost = VHat.transpose() * QPerEdge * VHat;
     }
     else {
-        //find min error from v1 v2 v1+v2/2
+        //min error from v1 v2 v1+v2/2
         Eigen::Vector4d p1;
         p1 << V.row(v1), 1;
         double cost1 = p1.transpose() * QPerEdge * p1;
@@ -254,7 +254,7 @@ void BasicScene:: caculateCostAndPlacment(int edge){
 
         //threshold parameter
         double cost3 = p12.transpose() * QPerEdge * p12;
-        //check if v1 and v2 are valid pair
+        //
         if (cost1 < cost2 && cost1 < cost3) {
             VHat = p1;
             cost = cost1;
@@ -276,52 +276,53 @@ void BasicScene:: caculateCostAndPlacment(int edge){
     //the new edge
     C.row(edge) = new_pos;
     //every edge the first the first one to remove
-    Qit[edge] = Qt.insert(std::pair<double, int>(cost, edge)).first;
+    QtIterator[edge] = Qt.insert(std::pair<double, int>(cost, edge)).first;
 }
 bool BasicScene::collapse_edge(){
-    PriorityQueue&  curr_Q = Qt;
-    std::vector<PriorityQueue::iterator >& curr_Qit = Qit;
-    int e1, e2, f1, f2; //be used in the igl collapse_edge function
-    if (curr_Q.empty())
+    //for igl function
+    int e1, e2, f1, f2;
+
+    //no edges to collapse
+    if (Qt.empty())
     {
-        // no edges to collapse
         return false;
     }
-    std::pair<double, int> pair = *(curr_Q.begin());
+    std::pair<double, int> pair = *(Qt.begin());
     if (pair.first == std::numeric_limits<double>::infinity())
     {
-        // min cost edge is infinite cost
         return false;
     }
-    curr_Q.erase(curr_Q.begin()); //delete from the queue
-    int e = pair.second; //the lowest cost edge in the queue
-    //the 2 vertix of the edge
+    //delete lowest edge in the queue
+    Qt.erase(Qt.begin());
+    //min age cost
+    int e = pair.second;
+    //two vertices of the edge
     int v1 = E.row(e)[0];
     int v2 = E.row(e)[1];
 
-    curr_Qit[e] = curr_Q.end();
+    QtIterator[e] = Qt.end();
 
     //get the  list of faces around the end point the edge
     std::vector<int> N = igl::circulation(e, true, EMAP, EF, EI);
     std::vector<int> Nd = igl::circulation(e, false, EMAP, EF, EI);
     N.insert(N.begin(), Nd.begin(), Nd.end());
 
-    //collapse the edge
+    //collapse the edge and return the two edges
     bool is_collapsed = igl::collapse_edge(e, C.row(e), V, F, E, EMAP, EF, EI, e1, e2, f1, f2);
     if(is_collapsed){
 
-        // Erase the two, other collapsed edges
-        curr_Q.erase(curr_Qit[e1]);
-        curr_Qit[e1] = curr_Q.end();
-        curr_Q.erase(curr_Qit[e2]);
-        curr_Qit[e2] = curr_Q.end();
+        // Erase the edges we need to coppa[s
+        Qt.erase(QtIterator[e1]);
+        QtIterator[e1] = Qt.end();
+        Qt.erase(QtIterator[e2]);
+        QtIterator[e2] = Qt.end();
 
         //update the Q matrix for the 2 veterixes we collapsed
         QPerVertex[v1] = QPerVertex[v1] + QPerVertex[v2];
         QPerVertex[v2] = QPerVertex[v1] + QPerVertex[v2];
 
-        Eigen::VectorXd newPosition;
-        // update local neighbors
+        Eigen::VectorXd newAdgesPosition;
+        // update  neighbors
         // loop over original face neighbors
         for (auto n : N)
         {
@@ -331,36 +332,28 @@ bool BasicScene::collapse_edge(){
             {
                 for (int v = 0; v < 3; v++)
                 {
-                    // get edge id
+                    //edge id
                     const  int ei = EMAP(v * F.rows() + n);
                     // erase old entry
-                    curr_Q.erase(curr_Qit[ei]);
+                    Qt.erase(QtIterator[ei]);
                     // compute cost and potential placement and place in queue
-                    caculateCostAndPlacment(ei);
-                    newPosition = C.row(ei);
+                    calculateEdgesCost(ei);
                 }
             }
+            newAdgesPosition = C.row(e);
         }
-        std::cout << "edge " << e << ",cost " << pair.first << ",new position (" << newPosition[0] << ","
-                  << newPosition[1] << "," << newPosition[2] << ")" << std::endl;
+        std::cout << "edge " << e << ",cost " << pair.first << ",new position (" << newAdgesPosition[0] << ","
+                  << newAdgesPosition[1] << "," << newAdgesPosition[2] << ")" << std::endl;
     }
     else
     {
-        // reinsert with infinite weight (the provided cost function must **not**
-        // have given this un-collapsable edge inf cost already)
+        // if not collapse it infinity we wont collps it anymore...
         pair.first = std::numeric_limits<double>::infinity();
-        curr_Qit[e] = curr_Q.insert(pair).first;
+        QtIterator[e] = Qt.insert(pair).first;
     }
     return is_collapsed;
 
 }
 void BasicScene::set_mesh(Eigen::MatrixXd OV,Eigen::MatrixXi OF,Eigen::MatrixXd vertexNormals) {
-
     curr_mesh->AddDataToMEsh(0,OV,OF,vertexNormals,curr_mesh->GetMeshList()[0]->data[0].textureCoords);
-
-   // std::vector <shared_ptr<Mesh >> new_mesh_list;
-   // new_mesh_list = curr_mesh->GetMeshList();
-   // new_mesh_list[0]->data.push_back({OV,OF,vertexNormals,curr_mesh->GetMeshList()[0]->data[0].textureCoords});
-   // curr_mesh->SetMeshList(new_mesh_list);
-
 }
