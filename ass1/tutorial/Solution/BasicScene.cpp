@@ -146,6 +146,11 @@ void BasicScene::reset(){
 
     //add this functionality
     QtIterator.resize(E.rows()); //number of edges
+
+    //insert junk edge with  weight
+    std::pair<double,int> p = std::pair<double, int>(std::numeric_limits<double>::infinity(),E.rows());
+    inf = Qt.insert(p).first;
+    //eval Q
     evalQ();
     Qt.clear();
     for (int j = 0; j < E.rows(); j++) {
@@ -161,7 +166,7 @@ int BasicScene::Simp(){
     {
         if(!done_collaps[curr_collaps_index]) {
             bool something_collapsed = false;
-            const int max_iter = std::ceil(0.01 * Qt.size());
+            const int max_iter = std::ceil(0.1 * Qt.size());
             for (int j = 0; j < max_iter; j++) {
                 if (!collapse_edge()) {
                     break;
@@ -300,7 +305,7 @@ bool BasicScene::collapse_edge(){
     int v1 = E.row(e)[0];
     int v2 = E.row(e)[1];
 
-    QtIterator[e] = Qt.end();
+    QtIterator[e] = inf;
 
     //get the  list of faces around the end point the edge
     std::vector<int> N = igl::circulation(e, true, EMAP, EF, EI);
@@ -311,11 +316,13 @@ bool BasicScene::collapse_edge(){
     bool is_collapsed = igl::collapse_edge(e, C.row(e), V, F, E, EMAP, EF, EI, e1, e2, f1, f2);
     if(is_collapsed){
 
-        // Erase the edges we need to coppa[s
+        // Erase the edges we need to collapse
         Qt.erase(QtIterator[e1]);
-        QtIterator[e1] = Qt.end();
+        QtIterator[e1] = inf;
+
+
         Qt.erase(QtIterator[e2]);
-        QtIterator[e2] = Qt.end();
+        QtIterator[e2] = inf;
 
         //update the Q matrix for the 2 veterixes we collapsed
         QPerVertex[v1] = QPerVertex[v1] + QPerVertex[v2];

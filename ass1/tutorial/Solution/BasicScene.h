@@ -42,7 +42,6 @@ private:
     Eigen::VectorXi EMAP;
     Eigen::MatrixXi F,IF,E,EF,EI;
     Eigen::VectorXi EQ;
-
     //C - position of the new vertex after collapsing corresponding edge
     Eigen::MatrixXd V,IV, C;
     igl::min_heap< std::tuple<double,int,int> > Q;
@@ -51,6 +50,8 @@ private:
     int num_collapsed;
     //priority queue for each edge
     PriorityQueue Qt;
+    PriorityQueue::iterator inf;
+
     int curr_collaps_index = 0;
     int max;
     std::vector <bool> done_collaps;
