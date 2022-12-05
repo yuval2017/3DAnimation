@@ -1,0 +1,1 @@
+/usr/bin/libtool -c -static -o ../libimguizmo.a CMakeFiles/imguizmo.dir/__/external/imguizmo/ImGuizmo.cpp.o 
