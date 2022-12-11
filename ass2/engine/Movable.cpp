@@ -46,13 +46,17 @@ void Movable::AddChild(std::shared_ptr<Movable> child)
     // calling this method when already attached to the parent will push the child to the end
     RemoveChild(child);
     child->parent = shared_from_this();
+
+
+
     children.emplace_back(std::move(child));
 }
 
 void Movable::AddChildren(const std::vector<std::shared_ptr<Movable>>& _children)
 {
-    for (const auto& child: _children)
+    for (const auto& child: _children) {
         AddChild(child);
+    }
 }
 
 void Movable::RemoveChild(const std::shared_ptr<Movable>& child)

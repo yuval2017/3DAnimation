@@ -32,7 +32,7 @@ int main()
 }
 
 
-//#include "BasicScene.h"
+//#include "Solution.h"
 //#include "SimpleScene.h"
 //
 //using namespace cg3d;
@@ -49,7 +49,7 @@ int main()
 //    Display display("Demo", DISPLAY_WIDTH, DISPLAY_HEIGHT, &renderer);
 //    std::cout.setstate(std::ios_base::failbit); // suppress junk output to console from igl::opengl::glfw::Viewer
 //    auto scene1 = std::make_shared<SimpleScene>("SimpleScene", &display);
-//    auto scene2 = std::make_shared<BasicScene>("BasicScene", &display);
+//    auto scene2 = std::make_shared<Solution>("Solution", &display);
 //    std::cout.clear(); // re-enable output to console
 //    scene1->Init(CAMERA_ANGLE, DISPLAY_WIDTH / 2, DISPLAY_HEIGHT, NEAR, FAR);
 //    scene2->Init(CAMERA_ANGLE, DISPLAY_WIDTH / 2, DISPLAY_HEIGHT, NEAR, FAR);
