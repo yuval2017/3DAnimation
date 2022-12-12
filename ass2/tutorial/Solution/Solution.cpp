@@ -1,6 +1,4 @@
 #include "Solution.h"
-#include <read_triangle_mesh.h>
-#include <utility>
 #include <AABB.h>
 #include "ObjLoader.h"
 #include "IglMeshLoader.h"

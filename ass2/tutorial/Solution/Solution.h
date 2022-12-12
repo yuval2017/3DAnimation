@@ -21,8 +21,8 @@ private:
     igl::AABB<Eigen::MatrixXd, 3> treeA1;
     igl::AABB<Eigen::MatrixXd, 3> treeB1;
     std::shared_ptr<cg3d::Material> material;
-    int scaleMesh1 = 1;
-    int scaleMesh2 = 1;
+    float scaleMesh1 = 1;
+    float scaleMesh2 = 1;
     bool is_intersec;
 
 
