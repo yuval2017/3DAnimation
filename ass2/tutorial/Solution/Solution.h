@@ -15,6 +15,7 @@ public:
     bool isBoxesIntersect(Eigen::AlignedBox<double, 3>& boxA, Eigen::AlignedBox<double, 3>& boxB);
     std::shared_ptr<cg3d::Model> createBox(Eigen::AlignedBox<double, 3>& box);
     cg3d::MeshData createDataFromBox(Eigen::AlignedBox<double, 3>& box);
+    void KeyCallback(cg3d::Viewport* _viewport, int x, int y, int key, int scancode, int action, int mods) override;
 private:
     std::shared_ptr<Movable> root;
     std::shared_ptr<cg3d::Model> cyl, sphere1 ,cube1,cube2, sphere2;
@@ -24,6 +25,15 @@ private:
     float scaleMesh1 = 1;
     float scaleMesh2 = 1;
     bool is_intersec;
+    bool d_key = false;
+    bool a_key = false;
+    bool w_key = false;
+    bool s_key = false;
+    bool left_key = false;
+    bool right_key = false;
+    bool down_key = false;
+    bool up_key = false;
+
 
 
     void setCube(auto mesh, Eigen::AlignedBox<double, 3> &box, bool showWireframe, bool showFaces,bool showTextures);

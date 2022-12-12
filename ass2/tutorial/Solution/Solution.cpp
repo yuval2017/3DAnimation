@@ -32,13 +32,13 @@ void Solution::Init(float fov, int width, int height, float near, float far)
     auto sphereMesh1{IglLoader::MeshFromFiles("bunny_igl", "data/bunny.off")};
     //auto sphereMesh1{IglLoader::MeshFromFiles("sphere_igl","data/sphere.obj")};
 
-    auto sphereMesh2{IglLoader::MeshFromFiles("sphere_igl","data/sphere.obj")};
+    auto sphereMesh2{IglLoader::MeshFromFiles("bunny_igl", "data/bunny.off")};
 
     sphere1 = Model::Create( "sphere1",sphereMesh1, material);
     sphere2 = Model::Create( "sphere2",sphereMesh2, material);
 
     scaleMesh1 = 20;
-    scaleMesh2 = 2;
+    scaleMesh2 = 20;
     sphere1->Scale(scaleMesh1);
     sphere2->Scale(scaleMesh2);
 
@@ -84,7 +84,7 @@ void Solution::Init(float fov, int width, int height, float near, float far)
 
     //then we can translate
     sphere1->Translate({-2,-2,0});
-    sphere2->Translate({2,0,0});
+    sphere2->Translate({2,-2,0});
 
 }
 
@@ -95,7 +95,38 @@ void Solution::Update(const Program& program, const Eigen::Matrix4f& proj, const
     program.SetUniform4f("Kai", 1.0f, 1.0f, 1.0f, 1.0f);
 
     if(!is_intersec && !isMeshCollision(sphere1, sphere2, &treeA1, &treeB1)){
-        sphere1->Translate(0.001,Axis::X);
+        if(a_key){
+            sphere1->Translate(-0.01,Axis::X);
+            a_key = false;
+        }
+        if(d_key){
+            sphere1->Translate(0.01,Axis::X);
+            d_key = false;
+        }
+        if(s_key){
+            sphere1->Translate(-0.01,Axis::Y);
+            s_key = false;
+        }
+        if(w_key){
+            sphere1->Translate(0.01,Axis::Y);
+            w_key = false;
+        }
+        if(left_key){
+            sphere2->Translate(-0.01,Axis::X);
+            left_key = false;
+        }
+        if(right_key){
+            sphere2->Translate(0.01,Axis::X);
+            right_key = false;
+        }
+        if(up_key){
+            sphere2->Translate(0.01,Axis::Y);
+            up_key = false;
+        }
+        if(down_key){
+            sphere2->Translate(-0.01,Axis::Y);
+            down_key = false;
+        }
         //sphere2->Translate(-0.001,Axis::X);
 
     }else{
@@ -112,21 +143,16 @@ bool Solution::isMeshCollision(auto mesh1, auto mesh2, igl::AABB<Eigen::MatrixXd
     if (!isBoxesIntersect(treeA->m_box, treeB->m_box)) {
         return false;
     }
-    if (treeA->is_leaf() && treeB->is_leaf()) {
-        //if the smallest box intersect so draw the boxes on each mesh
-        if (isBoxesIntersect(treeA->m_box, treeB->m_box)) {
-            std::cout << "collapse" << std::endl;
-
-            setCube(mesh1 ,treeA->m_box,true,true,true);
-            setCube(mesh2 ,treeB->m_box,true,true,true);
-
-            return true;
-        }
-        else {
-            return false;
-        }
+if (treeA->is_leaf() && treeB->is_leaf()) {
+    //if the smallest box intersect so draw the boxes on each mesh
+        std::cout << "collapse" << std::endl;
+        setCube(mesh1 ,treeA->m_box,true,true,true);
+        setCube(mesh2 ,treeB->m_box,true,true,true);
+        return true;
     }
+
     if (treeA->is_leaf() && !treeB->is_leaf()) {
+
         return isMeshCollision(mesh1, mesh2, treeA, treeB->m_right) ||
                isMeshCollision(mesh1, mesh2, treeA, treeB->m_left);
     }
@@ -134,9 +160,9 @@ bool Solution::isMeshCollision(auto mesh1, auto mesh2, igl::AABB<Eigen::MatrixXd
         return isMeshCollision(mesh1, mesh2, treeA->m_right, treeB) ||
                isMeshCollision(mesh1, mesh2, treeA->m_left, treeB);
     }
-    return isMeshCollision(mesh1, mesh2, treeA->m_left, treeB->m_left) ||
-           isMeshCollision(mesh1, mesh2, treeA->m_left, treeB->m_right) ||
-           isMeshCollision(mesh1, mesh2, treeA->m_right, treeB->m_left) ||
+    return isMeshCollision(mesh1, mesh2, treeA->m_left, treeB->m_left) |
+           isMeshCollision(mesh1, mesh2, treeA->m_left, treeB->m_right) |
+           isMeshCollision(mesh1, mesh2, treeA->m_right, treeB->m_left) |
            isMeshCollision(mesh1, mesh2, treeA->m_right, treeB->m_right);
 }
 
@@ -345,3 +371,37 @@ void Solution::setCube(auto mesh, Eigen::AlignedBox<double, 3>& box, bool showWi
     cube->showFaces = showTextures;
     cube->showTextures = showTextures;
 }
+
+void Solution::KeyCallback(cg3d::Viewport *_viewport, int x, int y, int key, int scancode, int action, int mods) {
+    if (action == GLFW_PRESS || action == GLFW_REPEAT){
+        if(key == GLFW_KEY_W){
+            w_key = true;
+        }
+        if(key == GLFW_KEY_A){
+            a_key = true;
+        }
+        if(key == GLFW_KEY_S){
+            s_key = true;
+        }
+        if(key == GLFW_KEY_D){
+            d_key = true;
+        }if(key == GLFW_KEY_RIGHT){
+            right_key = true;
+        }if(key == GLFW_KEY_DOWN){
+            down_key = true;
+        }if(key == GLFW_KEY_LEFT){
+            left_key = true;
+        }if(key == GLFW_KEY_UP){
+            up_key = true;
+        }
+    }
+}
+
+//void KeyCallback(cg3d::Viewport* _viewport, int x, int y, int key, int scancode, int action, int mods) {
+//    if (action == GLFW_PRESS || action == GLFW_REPEAT){
+//        if(key == GLFW_KEY_LEFT){
+//            int i = 1;
+//              sphere1->Translate(0.001,Axis::X);
+//        }
+//    }
+//}
