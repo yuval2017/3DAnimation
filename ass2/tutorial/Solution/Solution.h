@@ -33,6 +33,8 @@ private:
     bool right_key = false;
     bool down_key = false;
     bool up_key = false;
+    bool only_move = true;
+    float movement_speed = 0.01;
 
 
 

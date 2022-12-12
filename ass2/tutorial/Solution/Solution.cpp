@@ -95,36 +95,39 @@ void Solution::Update(const Program& program, const Eigen::Matrix4f& proj, const
     program.SetUniform4f("Kai", 1.0f, 1.0f, 1.0f, 1.0f);
 
     if(!is_intersec && !isMeshCollision(sphere1, sphere2, &treeA1, &treeB1)){
+        if(only_move){
+            sphere1->Translate(movement_speed,Axis::X);
+        }
         if(a_key){
-            sphere1->Translate(-0.01,Axis::X);
+            sphere1->Translate(-movement_speed,Axis::X);
             a_key = false;
         }
         if(d_key){
-            sphere1->Translate(0.01,Axis::X);
+            sphere1->Translate(movement_speed,Axis::X);
             d_key = false;
         }
         if(s_key){
-            sphere1->Translate(-0.01,Axis::Y);
+            sphere1->Translate(-movement_speed,Axis::Y);
             s_key = false;
         }
         if(w_key){
-            sphere1->Translate(0.01,Axis::Y);
+            sphere1->Translate(movement_speed,Axis::Y);
             w_key = false;
         }
         if(left_key){
-            sphere2->Translate(-0.01,Axis::X);
+            sphere2->Translate(-movement_speed,Axis::X);
             left_key = false;
         }
         if(right_key){
-            sphere2->Translate(0.01,Axis::X);
+            sphere2->Translate(movement_speed,Axis::X);
             right_key = false;
         }
         if(up_key){
-            sphere2->Translate(0.01,Axis::Y);
+            sphere2->Translate(movement_speed,Axis::Y);
             up_key = false;
         }
         if(down_key){
-            sphere2->Translate(-0.01,Axis::Y);
+            sphere2->Translate(-movement_speed,Axis::Y);
             down_key = false;
         }
         //sphere2->Translate(-0.001,Axis::X);
@@ -374,6 +377,15 @@ void Solution::setCube(auto mesh, Eigen::AlignedBox<double, 3>& box, bool showWi
 
 void Solution::KeyCallback(cg3d::Viewport *_viewport, int x, int y, int key, int scancode, int action, int mods) {
     if (action == GLFW_PRESS || action == GLFW_REPEAT){
+        if(key == GLFW_KEY_0){
+            only_move = !only_move;
+        }
+        if(key == GLFW_KEY_I){
+            movement_speed = movement_speed * 2;
+        }
+        if(key == GLFW_KEY_L){
+            movement_speed = movement_speed / 2;
+        }
         if(key == GLFW_KEY_W){
             w_key = true;
         }
