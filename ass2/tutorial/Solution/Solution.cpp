@@ -85,7 +85,7 @@ void Solution::Init(float fov, int width, int height, float near, float far)
 
 
     //then we can translate
-    sphere1->Translate({-2,0,0});
+    sphere1->Translate({-2,-2,0});
     sphere2->Translate({2,0,0});
 
 }
@@ -119,8 +119,8 @@ bool Solution::isMeshCollision(auto mesh1, auto mesh2, igl::AABB<Eigen::MatrixXd
         if (isBoxesIntersect(treeA->m_box, treeB->m_box)) {
             std::cout << "collapse" << std::endl;
 
-            setCube(sphere1 ,treeA->m_box,true,true,true);
-            setCube(sphere2 ,treeB->m_box,true,true,true);
+            setCube(mesh1 ,treeA->m_box,true,true,true);
+            setCube(mesh2 ,treeB->m_box,true,true,true);
 
             return true;
         }
@@ -171,6 +171,10 @@ bool Solution::isBoxesIntersect(Eigen::AlignedBox<double, 3>& boxA, Eigen::Align
     Eigen::Vector4d CB = Eigen::Vector4d(boxB.center()[0], boxB.center()[1], boxB.center()[2], 1);
     Eigen::Vector4d DOfVector4d = sphere2->GetTransform().cast<double>() * CB - sphere1->GetTransform().cast<double>() * CA;
     Eigen::Vector3d D = DOfVector4d.head(3);
+//    Eigen::Vector3d CA = Eigen::Vector3d(boxA.center()[0], boxA.center()[1], boxA.center()[2]);
+//    Eigen::Vector3d CB = Eigen::Vector3d(boxB.center()[0], boxB.center()[1], boxB.center()[2]);
+//    Eigen::Vector3d D = sphere2->Tout.cast<double>() * CB - sphere1->Tout.cast<double>()*CA;
+
 
     double left, right, R;
 
