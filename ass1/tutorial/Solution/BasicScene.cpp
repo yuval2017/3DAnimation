@@ -41,14 +41,14 @@ void BasicScene::Init(float fov, int width, int height, float near, float far) {
 //    SetNamedObject(cube, Model::Create, Mesh::Cube(), material, shared_from_this());
 
     material->AddTexture(0, "textures/box0.bmp", 2);
-    auto sphereMesh{IglLoader::MeshFromFiles("sphere_igl", "data/sphere.obj")};
+    auto sphereMesh{IglLoader::MeshFromFiles("sphere_igl", "data/bunny.off")};
     auto sphere{Model::Create("sphere", sphereMesh, material)};
     auto morphFunc = [this](Model* model, cg3d::Visitor* visitor) {
         return Simp();
     };
 
     sphere1 = AutoMorphingModel::Create(*sphere, morphFunc);
-    sphere1->Scale(7);
+    sphere1->Scale(40);
     sphere1->showWireframe = true;
     sphere1->Translate({-3, 0, 0});
     root->AddChild(sphere1);
