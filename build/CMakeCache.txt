@@ -186,11 +186,11 @@ CMAKE_OSX_ARCHITECTURES:STRING=
 
 //Minimum OS X version to target for deployment (at runtime); newer
 // APIs weak linked. Set to empty string for default value.
-CMAKE_OSX_DEPLOYMENT_TARGET:STRING=12.6
+CMAKE_OSX_DEPLOYMENT_TARGET:STRING=
 
 //The product will be built against the headers and libraries located
 // inside the indicated SDK.
-CMAKE_OSX_SYSROOT:PATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.0.sdk
+CMAKE_OSX_SYSROOT:PATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk
 
 //Value Computed by CMake
 CMAKE_PROJECT_DESCRIPTION:STATIC=
@@ -285,7 +285,7 @@ Demo_BINARY_DIR:STATIC=/Users/ywblhytr/Desktop/תואר/סמסטר ז/3DAnimatio
 Demo_IS_TOP_LEVEL:STATIC=OFF
 
 //Value Computed by CMake
-Demo_SOURCE_DIR:STATIC=/Users/ywblhytr/Desktop/תואר/סמסטר ז/3DAnimation/ass1/tutorial/Demo
+Demo_SOURCE_DIR:STATIC=/Users/ywblhytr/Desktop/תואר/סמסטר ז/3DAnimation/ass3/tutorial/Demo
 
 //Value Computed by CMake
 EngineRework_BINARY_DIR:STATIC=/Users/ywblhytr/Desktop/תואר/סמסטר ז/3DAnimation/build
@@ -294,7 +294,7 @@ EngineRework_BINARY_DIR:STATIC=/Users/ywblhytr/Desktop/תואר/סמסטר ז/3D
 EngineRework_IS_TOP_LEVEL:STATIC=ON
 
 //Value Computed by CMake
-EngineRework_SOURCE_DIR:STATIC=/Users/ywblhytr/Desktop/תואר/סמסטר ז/3DAnimation/ass1
+EngineRework_SOURCE_DIR:STATIC=/Users/ywblhytr/Desktop/תואר/סמסטר ז/3DAnimation/ass3
 
 //Value Computed by CMake
 Example1_BINARY_DIR:STATIC=/Users/ywblhytr/Desktop/תואר/סמסטר ז/3DAnimation/build/tutorial/Example1
@@ -303,7 +303,7 @@ Example1_BINARY_DIR:STATIC=/Users/ywblhytr/Desktop/תואר/סמסטר ז/3DAnim
 Example1_IS_TOP_LEVEL:STATIC=OFF
 
 //Value Computed by CMake
-Example1_SOURCE_DIR:STATIC=/Users/ywblhytr/Desktop/תואר/סמסטר ז/3DAnimation/ass1/tutorial/Example1
+Example1_SOURCE_DIR:STATIC=/Users/ywblhytr/Desktop/תואר/סמסטר ז/3DAnimation/ass3/tutorial/Example1
 
 //Value Computed by CMake
 GLFW_BINARY_DIR:STATIC=/Users/ywblhytr/Desktop/תואר/סמסטר ז/3DAnimation/build/tutorial/glfw
@@ -324,7 +324,7 @@ GLFW_INSTALL:BOOL=OFF
 GLFW_IS_TOP_LEVEL:STATIC=OFF
 
 //Value Computed by CMake
-GLFW_SOURCE_DIR:STATIC=/Users/ywblhytr/Desktop/תואר/סמסטר ז/3DAnimation/ass1/external/glfw
+GLFW_SOURCE_DIR:STATIC=/Users/ywblhytr/Desktop/תואר/סמסטר ז/3DAnimation/ass3/external/glfw
 
 //Use OSMesa for offscreen context creation
 GLFW_USE_OSMESA:BOOL=OFF
@@ -411,13 +411,13 @@ LIBIGL_WITH_TRIANGLE:BOOL=OFF
 LIBIGL_WITH_XML:BOOL=OFF
 
 //Include for OpenGL on OS X
-OPENGL_INCLUDE_DIR:PATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.0.sdk/System/Library/Frameworks/OpenGL.framework
+OPENGL_INCLUDE_DIR:PATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk/System/Library/Frameworks/OpenGL.framework
 
 //OpenGL library for OS X
-OPENGL_gl_LIBRARY:FILEPATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.0.sdk/System/Library/Frameworks/OpenGL.framework
+OPENGL_gl_LIBRARY:FILEPATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk/System/Library/Frameworks/OpenGL.framework
 
 //GLU library for OS X (usually same as OpenGL library)
-OPENGL_glu_LIBRARY:FILEPATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.0.sdk/System/Library/Frameworks/OpenGL.framework
+OPENGL_glu_LIBRARY:FILEPATH=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk/System/Library/Frameworks/OpenGL.framework
 
 //Value Computed by CMake
 engine_BINARY_DIR:STATIC=/Users/ywblhytr/Desktop/תואר/סמסטר ז/3DAnimation/build/tutorial
@@ -429,7 +429,7 @@ engine_IS_TOP_LEVEL:STATIC=OFF
 engine_LIB_DEPENDS:STATIC=general;igl;general;igl_opengl;general;igl_opengl_glfw;general;igl_opengl_glfw_imgui;
 
 //Value Computed by CMake
-engine_SOURCE_DIR:STATIC=/Users/ywblhytr/Desktop/תואר/סמסטר ז/3DAnimation/ass1/tutorial
+engine_SOURCE_DIR:STATIC=/Users/ywblhytr/Desktop/תואר/סמסטר ז/3DAnimation/ass3/tutorial
 
 //Value Computed by CMake
 glad_BINARY_DIR:STATIC=/Users/ywblhytr/Desktop/תואר/סמסטר ז/3DAnimation/build/tutorial/glad
@@ -438,7 +438,7 @@ glad_BINARY_DIR:STATIC=/Users/ywblhytr/Desktop/תואר/סמסטר ז/3DAnimatio
 glad_IS_TOP_LEVEL:STATIC=OFF
 
 //Value Computed by CMake
-glad_SOURCE_DIR:STATIC=/Users/ywblhytr/Desktop/תואר/סמסטר ז/3DAnimation/ass1/external/glad
+glad_SOURCE_DIR:STATIC=/Users/ywblhytr/Desktop/תואר/סמסטר ז/3DAnimation/ass3/external/glad
 
 //Dependencies for the target
 igl_opengl_LIB_DEPENDS:STATIC=general;igl;general;OpenGL::GL;general;glad;
@@ -459,7 +459,7 @@ igl_stb_image_BINARY_DIR:STATIC=/Users/ywblhytr/Desktop/תואר/סמסטר ז/3
 igl_stb_image_IS_TOP_LEVEL:STATIC=OFF
 
 //Value Computed by CMake
-igl_stb_image_SOURCE_DIR:STATIC=/Users/ywblhytr/Desktop/תואר/סמסטר ז/3DAnimation/ass1/external/stb
+igl_stb_image_SOURCE_DIR:STATIC=/Users/ywblhytr/Desktop/תואר/סמסטר ז/3DAnimation/ass3/external/stb
 
 //Dependencies for the target
 imgui_LIB_DEPENDS:STATIC=general;glad;general;glfw;
@@ -474,7 +474,7 @@ libigl_tutorials_BINARY_DIR:STATIC=/Users/ywblhytr/Desktop/תואר/סמסטר �
 libigl_tutorials_IS_TOP_LEVEL:STATIC=OFF
 
 //Value Computed by CMake
-libigl_tutorials_SOURCE_DIR:STATIC=/Users/ywblhytr/Desktop/תואר/סמסטר ז/3DAnimation/ass1/tutorial
+libigl_tutorials_SOURCE_DIR:STATIC=/Users/ywblhytr/Desktop/תואר/סמסטר ז/3DAnimation/ass3/tutorial
 
 
 ########################
@@ -559,7 +559,7 @@ CMAKE_GENERATOR_TOOLSET:INTERNAL=
 CMAKE_HAVE_LIBC_PTHREAD:INTERNAL=1
 //Source directory with the top level CMakeLists.txt file for this
 // project
-CMAKE_HOME_DIRECTORY:INTERNAL=/Users/ywblhytr/Desktop/תואר/סמסטר ז/3DAnimation/ass1
+CMAKE_HOME_DIRECTORY:INTERNAL=/Users/ywblhytr/Desktop/תואר/סמסטר ז/3DAnimation/ass3
 //ADVANCED property for variable: CMAKE_INSTALL_BINDIR
 CMAKE_INSTALL_BINDIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_INSTALL_DATADIR
@@ -663,7 +663,7 @@ COMPILER_HAS_HIDDEN_INLINE_VISIBILITY:INTERNAL=1
 //Test COMPILER_HAS_HIDDEN_VISIBILITY
 COMPILER_HAS_HIDDEN_VISIBILITY:INTERNAL=1
 //Details about finding OpenGL
-FIND_PACKAGE_MESSAGE_DETAILS_OpenGL:INTERNAL=[/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.0.sdk/System/Library/Frameworks/OpenGL.framework][/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.0.sdk/System/Library/Frameworks/OpenGL.framework][c ][v()]
+FIND_PACKAGE_MESSAGE_DETAILS_OpenGL:INTERNAL=[/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk/System/Library/Frameworks/OpenGL.framework][/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk/System/Library/Frameworks/OpenGL.framework][c ][v()]
 //Details about finding Threads
 FIND_PACKAGE_MESSAGE_DETAILS_Threads:INTERNAL=[TRUE][v()]
 //ADVANCED property for variable: OPENGL_INCLUDE_DIR
