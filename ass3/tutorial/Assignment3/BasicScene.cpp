@@ -51,7 +51,7 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
 //    SetNamedObject(cube, Model::Create, Mesh::Cube(), material, shared_from_this());
     material->AddTexture(0, "textures/box0.bmp", 2);
     auto sphereMesh{IglLoader::MeshFromFiles("sphere_igl", "data/sphere.obj")};
-    auto cylMesh{IglLoader::MeshFromFiles("cyl_igl","data/xcylinder.obj")};
+    auto cylMesh{IglLoader::MeshFromFiles("cyl_igl","data/zcylinder.obj")};
     auto cubeMesh{IglLoader::MeshFromFiles("cube_igl","data/cube_old.obj")};
     sphere1 = Model::Create( "sphere",sphereMesh, material);    
     cube = Model::Create( "cube", cubeMesh, material);
@@ -81,19 +81,20 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     parents.resize(num);
     children.resize(num);
     cyls.push_back( Model::Create("cyl",cylMesh, material));
-    cyls[0]->Scale(scaleFactor,Axis::X);
-    cyls[0]->SetCenter(Eigen::Vector3f(-0.8f*scaleFactor,0,0));
+    cyls[0]->Scale(scaleFactor,Axis::Z);
+    cyls[0]->SetCenter(Eigen::Vector3f(0,0,-0.8f*scaleFactor));
     root->AddChild(cyls[0]);
    
     for(int i = 1;i < 3; i++)
     { 
         cyls.push_back( Model::Create("cyl", cylMesh, material));
-        cyls[i]->Scale(scaleFactor,Axis::X);   
-        cyls[i]->Translate(1.6f*scaleFactor,Axis::X);
-        cyls[i]->SetCenter(Eigen::Vector3f(-0.8f*scaleFactor,0,0));
+        cyls[i]->Scale(scaleFactor,Axis::Z);
+        cyls[i]->Translate(1.6f*scaleFactor,Axis::Z);
+        cyls[i]->SetCenter(Eigen::Vector3f(0,0,-0.8f*scaleFactor));
         cyls[i-1]->AddChild(cyls[i]);
 
     }
+    //cyls[0]->Rotate(3.141592654/2, Axis::Z);
     for (int i =0 ; i < num; i++ ){
         //set parent/children values in vectors
         if (i == 0)
@@ -105,7 +106,7 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
         else
             children[i] = -1;
     }
-    cyls[0]->Translate({0.8f*scaleFactor,0,0});
+    cyls[0]->Translate({0,0,0});
 
     auto morphFunc = [](Model* model, cg3d::Visitor* visitor) {
       return model->meshIndex;//(model->GetMeshList())[0]->data.size()-1;
@@ -116,7 +117,7 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     sphere1->showWireframe = true;
     autoCube->Translate({-6,0,0});
     autoCube->Scale(1.5f);
-    sphere1->Translate({2,0,0});
+    sphere1->Translate({1.5,0,0});
     link_len = cyls[2]->GetMeshList()[0]->data[cyls[2]->meshIndex].vertices.colwise().maxCoeff()[2]*2;
     autoCube->showWireframe = true;
     camera->Translate(22, Axis::Z);
@@ -158,13 +159,13 @@ void BasicScene::IKFabric(){
             Eigen::Vector3f p1 = ikGetPosition(firstLinkIndex, 0);
 
             //Set disjoint positions
-            //p1 is first disjoin
+            //p1 is first disjoint
             int curr = lastLinkIndex;
             while (curr != -1) {
                 p[curr] = ikGetPosition(curr, 0);
                 curr = parents[curr];
             }
-            p[lastLinkIndex + 1] = ikGetPosition(lastLinkIndex, link_len);
+             p[lastLinkIndex + 1] = ikGetPosition(lastLinkIndex, link_len);
             std::vector<double> ris_Array;
             std::vector<double> lambdaI_Array;
 
@@ -228,11 +229,11 @@ void BasicScene::IKFabric(){
                             child = children[child];
                         }
 
-                   //     ris_Array[lastLinkIndex] = (p[lastLinkIndex + 1] - p[lastLinkIndex]).norm();
-                   //     lambdaI_Array[lastLinkIndex] = link_len / ris_Array[lastLinkIndex];
+                        ris_Array[lastLinkIndex] = (p[lastLinkIndex + 1] - p[lastLinkIndex]).norm();
+                        lambdaI_Array[lastLinkIndex] = link_len / ris_Array[lastLinkIndex];
                    //1.27
-                   //     p[lastLinkIndex + 1] = (1 - lambdaI_Array[lastLinkIndex]) * p[lastLinkIndex] +
-                   //                            lambdaI_Array[lastLinkIndex] * p[lastLinkIndex + 1];
+                        p[lastLinkIndex + 1] = (1 - lambdaI_Array[lastLinkIndex]) * p[lastLinkIndex] +
+                                               lambdaI_Array[lastLinkIndex] * p[lastLinkIndex + 1];
                   diffA = (p[lastLinkIndex + 1] - target).norm();
                     }
                     //rotate
@@ -372,9 +373,10 @@ void BasicScene::fix_rotate(){
 }
 
 Eigen::Vector3f BasicScene::ikGetPosition(int id, float length){
+
     Eigen::Vector3f CrotationCurr = -(cyls[id]->Tin.translation());
     Eigen::Vector4f rCenter(CrotationCurr[0], CrotationCurr[1], CrotationCurr[2] + length, 1);
-    Eigen::Vector3f r = (cyls[id]->GetAggregatedTransform() * MakeTransd(cyls[id]) * rCenter).head<3>();
+    Eigen::Vector3f r = (CalcParentTransWithOutRoot(id) * MakeTransd(cyls[id]) * rCenter).head<3>();
     return r;
 }
 
