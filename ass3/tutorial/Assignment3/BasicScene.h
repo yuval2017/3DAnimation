@@ -16,6 +16,7 @@ public:
     void CursorPosCallback(cg3d::Viewport* viewport, int x, int y, bool dragging, int* buttonState)  override;
     void KeyCallback(cg3d::Viewport* viewport, int x, int y, int key, int scancode, int action, int mods) override;
      Eigen::Vector3f GetSpherePos();
+     void IKCoordinateDecent();
 private:
     std::shared_ptr<Movable> root;
     std::shared_ptr<cg3d::Model> sphere1 ,cube;
@@ -28,4 +29,25 @@ private:
     Eigen::VectorXi EQ;
   // If an edge were collapsed, we'd collapse it to these points:
     Eigen::MatrixXd V, C, N, T, points,edges,colors;
+    float link_len;
+    bool shouldAnimateCCD= false;
+    int lastLinkIndex ;
+    int firstLinkIndex ;
+    bool ikSolverConstrainDegree = false;
+    bool shouldAnimateFabrik = false;
+    int num_of_cyls;
+    std::vector<int> parents ;
+    std::vector<int> children;
+
+    Eigen::Vector3f ikGetPosition(int id, float length);
+
+    Eigen::Matrix4f MakeTransd(std::shared_ptr<cg3d::Model> shape);
+
+    void fix_rotate();
+
+    void ikSolverHelper(int id, Eigen::Vector3f t);
+
+    void IKFabric();
+
+    Eigen::Matrix4f CalcParentTransWithOutRoot(int index);
 };

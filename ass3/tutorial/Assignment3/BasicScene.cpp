@@ -44,22 +44,18 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     background->Scale(120, Axis::XYZ);
     background->SetPickable(false);
     background->SetStatic();
-
- 
     auto program = std::make_shared<Program>("shaders/phongShader");
     auto program1 = std::make_shared<Program>("shaders/pickingShader");
-    
     auto material{ std::make_shared<Material>("material", program)}; // empty material
     auto material1{ std::make_shared<Material>("material", program1)}; // empty material
 //    SetNamedObject(cube, Model::Create, Mesh::Cube(), material, shared_from_this());
- 
     material->AddTexture(0, "textures/box0.bmp", 2);
     auto sphereMesh{IglLoader::MeshFromFiles("sphere_igl", "data/sphere.obj")};
     auto cylMesh{IglLoader::MeshFromFiles("cyl_igl","data/xcylinder.obj")};
     auto cubeMesh{IglLoader::MeshFromFiles("cube_igl","data/cube_old.obj")};
     sphere1 = Model::Create( "sphere",sphereMesh, material);    
     cube = Model::Create( "cube", cubeMesh, material);
-    
+
     //Axis
     Eigen::MatrixXd vertices(6,3);
     vertices << -1,0,0,1,0,0,0,-1,0,0,1,0,0,0,-1,0,0,1;
@@ -73,7 +69,17 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     axis[0]->Scale(4,Axis::XYZ);
     // axis[0]->lineWidth = 5;
     root->AddChild(axis[0]);
-    float scaleFactor = 1; 
+    float scaleFactor = 1;
+    parents = *new std::vector<int>(1);
+    children = *new std::vector<int>(1);
+    //set parents and children vectors to number of cylinders.
+
+    num_of_cyls = 3;
+    lastLinkIndex = 2;
+    firstLinkIndex = 0 ;
+    int num = lastLinkIndex+1 ;
+    parents.resize(num);
+    children.resize(num);
     cyls.push_back( Model::Create("cyl",cylMesh, material));
     cyls[0]->Scale(scaleFactor,Axis::X);
     cyls[0]->SetCenter(Eigen::Vector3f(-0.8f*scaleFactor,0,0));
@@ -86,6 +92,18 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
         cyls[i]->Translate(1.6f*scaleFactor,Axis::X);
         cyls[i]->SetCenter(Eigen::Vector3f(-0.8f*scaleFactor,0,0));
         cyls[i-1]->AddChild(cyls[i]);
+
+    }
+    for (int i =0 ; i < num; i++ ){
+        //set parent/children values in vectors
+        if (i == 0)
+            parents[i] = -1;
+        else
+            parents[i] = i - 1; //set parent
+        if (i  < lastLinkIndex)
+            children[i] = i+1 ;
+        else
+            children[i] = -1;
     }
     cyls[0]->Translate({0.8f*scaleFactor,0,0});
 
@@ -98,12 +116,11 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     sphere1->showWireframe = true;
     autoCube->Translate({-6,0,0});
     autoCube->Scale(1.5f);
-//    sphere1->Translate({-2,0,0});
-
+    sphere1->Translate({2,0,0});
+    link_len = cyls[2]->GetMeshList()[0]->data[cyls[2]->meshIndex].vertices.colwise().maxCoeff()[2]*2;
     autoCube->showWireframe = true;
     camera->Translate(22, Axis::Z);
     root->AddChild(sphere1);
-//    root->AddChild(cyl);
     root->AddChild(autoCube);
     // points = Eigen::MatrixXd::Ones(1,3);
     // edges = Eigen::MatrixXd::Ones(1,3);
@@ -132,6 +149,240 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
 
 }
 
+void BasicScene::IKFabric(){
+    {
+        if (shouldAnimateFabrik) {
+            std::vector<Eigen::Vector3f> p; //joint positions
+            p.resize(num_of_cyls + 1 );
+            Eigen::Vector3f target = MakeTransd(sphere1).col(3).head(3);
+            Eigen::Vector3f p1 = ikGetPosition(firstLinkIndex, 0);
+
+            //Set disjoint positions
+            //p1 is first disjoin
+            int curr = lastLinkIndex;
+            while (curr != -1) {
+                p[curr] = ikGetPosition(curr, 0);
+                curr = parents[curr];
+            }
+            p[lastLinkIndex + 1] = ikGetPosition(lastLinkIndex, link_len);
+            std::vector<double> ris_Array;
+            std::vector<double> lambdaI_Array;
+
+            ris_Array.resize(num_of_cyls + 1 );
+            lambdaI_Array.resize(num_of_cyls + 1);
+            //if unreachable
+            if ((target - p1).norm() > link_len * float(num_of_cyls)) {
+                std::cout << "cannot reach" << std::endl;
+                shouldAnimateFabrik = false;
+                return;
+            }
+            else
+            {
+                //1.10 : Target Is Reachable
+                //the target is reachable; thus set as b the initial position of joint p0
+                Eigen::Vector3f b = p[firstLinkIndex];
+                //Check weather the distance between the end effector Pn and the
+                //target is greater than a tolerance.
+                Eigen::Vector3f endEffector = p[lastLinkIndex +1];
+                float tolerance = 0.05;
+
+                float diffA = (endEffector - target).norm();
+                if (diffA < tolerance) {
+                    std::cout << "distance : " << diffA << "\n" << std::endl;
+                    shouldAnimateFabrik = false;
+                    return;
+                }
+                else {
+                    while (diffA > tolerance) {
+                        //	1.19 Stage1 Forward Reaching
+                        p[lastLinkIndex + 1] = target;
+                        int parent = lastLinkIndex;
+                        int child = lastLinkIndex + 1;
+                        while (parent != -1) {
+
+                            // Find the distance ri between the new joint position pi+1 and the joint pi
+                            //steps 1.24-1.25
+                            ris_Array[parent] = (p[child] - p[parent]).norm();
+                            lambdaI_Array[parent] = link_len / ris_Array[parent];
+
+                            //find the new joint position. step 1.27
+                            p[parent] = (1 - lambdaI_Array[parent]) * p[child] + lambdaI_Array[parent] * p[parent];
+                            child = parent;
+                            parent = parents[parent];
+
+                        }
+
+                        //Stage 2: Backward reaching (1.29)
+                        //Set the p1 p0 its initial position*/
+                        p[firstLinkIndex] = b;
+                        parent = firstLinkIndex;
+                        child = children[firstLinkIndex];
+                        while (child != -1) {
+
+                            //1.33-1.36 Find the distance ri between the new joint position pi and the joint pi+1
+                            ris_Array[parent] = (p[child] - p[parent]).norm();
+                            lambdaI_Array[parent] = link_len / ris_Array[parent];
+                            //1.37
+                            p[child] = (1 - lambdaI_Array[parent]) * p[parent] + lambdaI_Array[parent] * p[child];
+                            parent = child;
+                            child = children[child];
+                        }
+
+                   //     ris_Array[lastLinkIndex] = (p[lastLinkIndex + 1] - p[lastLinkIndex]).norm();
+                   //     lambdaI_Array[lastLinkIndex] = link_len / ris_Array[lastLinkIndex];
+                   //1.27
+                   //     p[lastLinkIndex + 1] = (1 - lambdaI_Array[lastLinkIndex]) * p[lastLinkIndex] +
+                   //                            lambdaI_Array[lastLinkIndex] * p[lastLinkIndex + 1];
+                  diffA = (p[lastLinkIndex + 1] - target).norm();
+                    }
+                    //rotate
+                    int currLink = firstLinkIndex;
+                    int target_id = children[firstLinkIndex];
+                    while (target_id != -1) {
+                        ikSolverHelper(currLink, p[target_id]);
+                        currLink = target_id;
+                        target_id = children[target_id];
+                    }
+                    ikSolverHelper(lastLinkIndex, p[lastLinkIndex + 1]);
+                    double distance = (target - ikGetPosition(lastLinkIndex, link_len)).norm();
+                    if (distance < tolerance) {
+                        fix_rotate();
+                        shouldAnimateFabrik = false;
+                        std::cout << "distance: " << distance << std::endl;
+
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+void BasicScene::ikSolverHelper(int id, Eigen::Vector3f t){
+    Eigen::Vector3f r = ikGetPosition(id, 0);
+    Eigen::Vector3f e = ikGetPosition(id, link_len);
+    Eigen::Vector3f rd = t - r;
+    Eigen::Vector3f re = e - r;
+    Eigen::Vector3f normal = re.normalized().cross(rd.normalized());
+    double dot = rd.normalized().dot(re.normalized());//get dot
+    if (dot > 1)
+        dot = 1;
+    if (dot < -1)
+        dot = 1;
+    double angle = acos(dot)/10 ;
+    Eigen::Vector3f rotationVec = (CalcParentTransWithOutRoot(id) * MakeTransd(cyls[id])).block<3, 3>(0, 0).inverse() * normal;
+    int parent = parents[id];
+    //bonus
+    if (ikSolverConstrainDegree && parent != -1) {
+        cyls[id]->Rotate(angle, rotationVec);
+        e= ikGetPosition(id, link_len); //get new position after rotation
+        re = e - r;
+        Eigen::Vector3f r_parent= ikGetPosition(parent, 0);
+        rd = r_parent - r;
+        //find angle between parent and link
+        double constrain = 0.5235987756;
+        double parentDot = rd.normalized().dot(re.normalized());//get dot
+        if (parentDot > 1)
+            parentDot = 1;
+        if (parentDot < -1)
+            parentDot = 1;
+        double parentAngle = acos(parentDot);
+        cyls[id]->Rotate(-angle, rotationVec);//rotate back
+        if (parentAngle < constrain) {//fix angle
+            angle = angle - (constrain - parentAngle);
+        }
+    }
+    cyls[id]->Rotate(angle, rotationVec);
+}
+
+void BasicScene::IKCoordinateDecent(){
+    int num = lastLinkIndex;
+    if (shouldAnimateCCD) {
+        Eigen::Vector3f target_des = MakeTransd(sphere1).col(3).head(3);
+        Eigen::Vector3f first_link_pos = ikGetPosition(firstLinkIndex, 0);
+        if ((target_des - first_link_pos).norm() > link_len * num) {
+            std::cout << "cannot reach" << std::endl;
+            shouldAnimateCCD = false;
+            return;
+        }
+        int currLink = lastLinkIndex;
+        while (currLink != -1) {
+            Eigen::Vector3f r = ikGetPosition(currLink, 0);
+            Eigen::Vector3f e = ikGetPosition(lastLinkIndex, link_len);
+            Eigen::Vector3f rd = target_des - r;
+            Eigen::Vector3f re = e - r;
+            Eigen::Vector3f normal = re.normalized().cross(rd.normalized());//returns the plane normal
+            double distance = (target_des - e).norm();
+            if (distance < 0.05) {
+                std::cout << "distance: " << distance << std::endl;
+                fix_rotate();
+                shouldAnimateCCD = false;
+                return;
+            }
+            double dot = rd.normalized().dot(re.normalized());
+            //check that it is beetween -1 to 1
+            if (dot > 1)
+                dot = 1;
+            if (dot < -1)
+                dot = -1;
+            double angle = acosf(dot) / 10;
+            Eigen::Vector3f rotationVec = (CalcParentTransWithOutRoot(currLink)  *MakeTransd(cyls[currLink])).block<3, 3>(0, 0).inverse() * normal;
+            int parent = parents[currLink];
+            if (ikSolverConstrainDegree && parent != -1) {
+                cyls[currLink]->Rotate(angle, rotationVec);
+                e = ikGetPosition(lastLinkIndex, link_len); //get new position after rotation
+                re = e - r;
+                Eigen::Vector3f r_parent = ikGetPosition(parent, 0);
+                rd = r_parent - r;
+                //find angle between parent and link
+                double constrain = 0.5235987756;
+                double parentDot = rd.normalized().dot(re.normalized());//get dot
+                if (parentDot > 1)
+                    parentDot = 1;
+                if (parentDot < -1)
+                    parentDot = 1;
+                double parentAngle = acos(parentDot);
+                cyls[currLink]->Rotate(-angle,rotationVec);//rotate back
+                if (parentAngle < constrain) {//fix angle
+                    angle = angle - (constrain - parentAngle);
+                }
+
+            }
+            cyls[currLink]->Rotate(angle,rotationVec);
+            currLink = parents[currLink];
+
+        }
+    }
+}
+
+void BasicScene::fix_rotate(){
+    Eigen::Vector3f Z(0, 0, 1);
+    int currLink = firstLinkIndex;
+    while (currLink != -1) {
+        Eigen::Matrix3f R =cyls[currLink]->GetRotation();
+        Eigen::Vector3f ea = R.eulerAngles(2, 0, 2);//get the rotation angles
+        float angleZ = ea[2];
+       cyls[currLink]->Rotate( -angleZ,Axis::Z);
+        currLink = currLink+1;
+        if (currLink != -1) {
+            auto system = camera->GetRotation().transpose();
+            cyls[currLink]->RotateInSystem(system, angleZ, Axis::Z);
+        }
+    }
+}
+
+Eigen::Vector3f BasicScene::ikGetPosition(int id, float length){
+    Eigen::Vector3f CrotationCurr = -(cyls[id]->Tin.translation());
+    Eigen::Vector4f rCenter(CrotationCurr[0], CrotationCurr[1], CrotationCurr[2] + length, 1);
+    Eigen::Vector3f r = (cyls[id]->GetAggregatedTransform() * MakeTransd(cyls[id]) * rCenter).head<3>();
+    return r;
+}
+
+Eigen::Matrix4f BasicScene::MakeTransd(std::shared_ptr<cg3d::Model> shape){
+    Eigen::Matrix4f mat = Eigen::Matrix4f::Identity();
+    mat.col(3)<<sphere1->Tin.translation(),1 ;
+    return shape->Tout.matrix()*mat;
+}
 void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, const Eigen::Matrix4f& view, const Eigen::Matrix4f& model)
 {
     Scene::Update(program, proj, view, model);
@@ -142,6 +393,12 @@ void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, con
     program.SetUniform4f("light_position", 0.0, 15.0f, 0.0, 1.0f);
 //    cyl->Rotate(0.001f, Axis::Y);
     cube->Rotate(0.1f, Axis::XYZ);
+    if (shouldAnimateCCD) {
+        IKCoordinateDecent();
+    }
+    else if (shouldAnimateFabrik) {
+        IKFabric();
+    }
 }
 
 void BasicScene::MouseCallback(Viewport* viewport, int x, int y, int button, int action, int mods, int buttonState[])
@@ -231,6 +488,9 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
             case GLFW_KEY_ESCAPE:
                 glfwSetWindowShouldClose(window, GLFW_TRUE);
                 break;
+            case GLFW_KEY_SPACE:
+                shouldAnimateFabrik= !shouldAnimateFabrik;
+                break;
             case GLFW_KEY_UP:
                 cyls[pickedIndex]->RotateInSystem(system, 0.1f, Axis::X);
                 break;
@@ -297,4 +557,12 @@ Eigen::Vector3f BasicScene::GetSpherePos()
       Eigen::Vector3f res;
       res = cyls[tipIndex]->GetRotation()*l;   
       return res;  
+}
+
+Eigen::Matrix4f BasicScene::CalcParentTransWithOutRoot(int index){
+    Eigen::Matrix4f prevTrans = Eigen::Matrix4f::Identity();
+    for (int i = index  ; parents[i] > -1 ; i= parents[i]) {
+        prevTrans = MakeTransd(cyls[parents[i]])*prevTrans;
+    }
+    return prevTrans;
 }
