@@ -17,6 +17,7 @@ public:
     void KeyCallback(cg3d::Viewport* viewport, int x, int y, int key, int scancode, int action, int mods) override;
      Eigen::Vector3f GetSpherePos();
      void IKCoordinateDecent();
+    void ikSolverHelper(int id, const Eigen::Vector3f& t);
 private:
     std::shared_ptr<Movable> root;
     std::shared_ptr<cg3d::Model> sphere1 ,cube;
@@ -33,21 +34,14 @@ private:
     bool shouldAnimateCCD= false;
     int lastLinkIndex ;
     int firstLinkIndex ;
-    bool ikSolverConstrainDegree = false;
     bool shouldAnimateFabrik = false;
     int num_of_cyls;
     std::vector<int> parents ;
     std::vector<int> children;
+    bool decent = true;
 
     Eigen::Vector3f ikGetPosition(int id, float length);
-
-    Eigen::Matrix4f MakeTransd(std::shared_ptr<cg3d::Model> shape);
-
     void fix_rotate();
-
-    void ikSolverHelper(int id, Eigen::Vector3f t);
-
     void IKFabric();
 
-    Eigen::Matrix4f CalcParentTransWithOutRoot(int index);
 };

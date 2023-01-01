@@ -47,6 +47,7 @@ public:
     virtual void CharCallback(Viewport* viewport, int x, int y, unsigned int codepoint);
     virtual void ViewportSizeCallback(Viewport* viewport);
     virtual void AddViewportCallback(Viewport* viewport) {};
+    bool animate = false;
 
 protected:
     Renderer* renderer; // required for picking

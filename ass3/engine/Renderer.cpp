@@ -3,6 +3,7 @@
 #include "DrawVisitor.h"
 #include "Scene.h"
 #include "GLFW/glfw3.h"
+#include "../tutorial/Assignment3/BasicScene.h"
 
 
 namespace cg3d
@@ -45,6 +46,9 @@ void Renderer::RenderViewportAtPos(int x, int y, Visitor* visitor)
 void Renderer::RenderAllViewports()
 {
     defaultVisitor.Init();
+    viewports[0]->scene->animate = true;
+
+
 
     for (auto& viewport: viewports)
         RenderViewport(viewport.get());

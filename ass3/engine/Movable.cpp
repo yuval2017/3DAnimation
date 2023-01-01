@@ -134,6 +134,13 @@ void Movable::Rotate(const Eigen::Matrix3f& rot)
     PropagateTransform();
 }
 
+void Movable::Rotate(const Eigen::Quaternionf& rot)
+{
+    if (isStatic) return;
+    Tout.rotate(rot);
+    PropagateTransform();
+}
+
 void Movable::Rotate(float angle, Axis axis)
 {
     Rotate(angle, AxisVec(axis).normalized());

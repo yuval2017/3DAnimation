@@ -90,6 +90,8 @@ public:
     std::vector<std::shared_ptr<Movable>> children;
     std::weak_ptr<Movable> parent;
     std::weak_ptr<Movable> scene;
+
+    void Rotate(const Eigen::Quaternionf &rot);
 };
 
 } // namespace cg3d
