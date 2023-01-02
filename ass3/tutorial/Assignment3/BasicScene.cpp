@@ -12,7 +12,6 @@
 #include "Renderer.h"
 #include "ObjLoader.h"
 #include "IglMeshLoader.h"
-
 #include "igl/per_vertex_normals.h"
 #include "igl/per_face_normals.h"
 #include "igl/unproject_onto_mesh.h"
@@ -27,8 +26,6 @@
 #include "igl/collapse_edge.h"
 #include "igl/edge_collapse_is_valid.h"
 #include "igl/write_triangle_mesh.h"
-
-// #include "AutoMorphingModel.h"
 
 using namespace cg3d;
 
@@ -75,18 +72,14 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     children = *new std::vector<int>(1);
     //set parents and children vectors to number of cylinders.
 
-    num_of_cyls = 3;
-    lastLinkIndex = 2;
-    firstLinkIndex = 0 ;
-    int num = lastLinkIndex+1 ;
-    parents.resize(num);
-    children.resize(num);
+    parents.resize(num_of_cyls);
+    children.resize(num_of_cyls);
     cyls.push_back( Model::Create("cyl",cylMesh, material));
     cyls[0]->Scale(scaleFactor,Axis::Z);
     cyls[0]->SetCenter(Eigen::Vector3f(0,0,-0.8f*scaleFactor));
     root->AddChild(cyls[0]);
    
-    for(int i = 1;i < 3; i++)
+    for(int i = 1;i < num_of_cyls; i++)
     { 
         cyls.push_back( Model::Create("cyl", cylMesh, material));
         cyls[i]->Scale(scaleFactor,Axis::Z);
@@ -101,7 +94,7 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
 
     }
     //cyls[0]->Rotate(3.141592654/2, Axis::Z);
-    for (int i =0 ; i < num; i++ ){
+    for (int i =0 ; i < num_of_cyls; i++ ){
         //set parent/children values in vectors
         if (i == 0)
             parents[i] = -1;
@@ -161,7 +154,7 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
 void BasicScene::IKFabric(){
     {
         if (animate&&shouldAnimateFabrik) {
-            std::cout<< "in fabrikkkkk \n" << std::endl;
+            std::cout<< "in Fabrik \n" << std::endl;
             std::vector<Eigen::Vector3f> p; //joint positions
             p.resize(num_of_cyls + 1 );
             Eigen::Vector3f target = sphere1->GetAggregatedTransform().col(3).head(3);
@@ -174,7 +167,7 @@ void BasicScene::IKFabric(){
                 p[curr] = ikGetPosition(curr, -link_len/2);
                 curr = parents[curr];
             }
-             p[lastLinkIndex + 1] = ikGetPosition(lastLinkIndex, link_len/2);
+            p[lastLinkIndex + 1] = ikGetPosition(lastLinkIndex, link_len/2);
             std::vector<double> ris_Array;
             std::vector<double> lambdaI_Array;
 
@@ -325,10 +318,9 @@ void BasicScene::IKCoordinateDecent(){
                 dot = 1;
             if (dot < -1)
                 dot = -1;
-            double angle = acosf(dot) / 10;
+            double angle = acosf(dot) / 100;
             Eigen::Vector3f rotationVec = cyls[currLink]->GetAggregatedTransform().block<3, 3>(0, 0).inverse() * normal;
             int parent = parents[currLink];
-
             cyls[currLink]->Rotate(angle,rotationVec);
             currLink = parents[currLink];
         }
@@ -371,11 +363,13 @@ void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, con
     cube->Rotate(0.1f, Axis::XYZ);
 
 
-    IKCoordinateDecent();
-    IKFabric();
-
 }
 
+
+void BasicScene::Draw_changes() {
+    IKCoordinateDecent();
+    IKFabric();
+}
 void BasicScene::MouseCallback(Viewport* viewport, int x, int y, int button, int action, int mods, int buttonState[])
 {
     // note: there's a (small) chance the button state here precedes the mouse press/release event
@@ -528,6 +522,7 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
                 //TODO tips
             case GLFW_KEY_T:
                 camera->TranslateInSystem(system, {0, 0.1f, 0});
+                print_positions();
                 break;
                 //TODO p
             case GLFW_KEY_P:
@@ -585,5 +580,20 @@ Eigen::Vector3f BasicScene::GetSpherePos()
       Eigen::Vector3f res;
       res = cyls[tipIndex]->GetRotation()*l;   
       return res;  
+}
+
+void BasicScene::print_positions() {
+
+    int currLink = lastLinkIndex;
+    int counter =0;
+    Eigen::Vector3f e = ikGetPosition(lastLinkIndex, link_len/2);
+    printf("Tip %d position: (%f, %f , %f)\n",num_of_cyls-counter,e.data()[0],e.data()[1],e.data()[2]);
+    counter++;
+    while (currLink != -1) {
+        Eigen::Vector3f r = ikGetPosition(currLink, -link_len / 2);
+        printf("Tip %d position: (%f, %f , %f)\n",num_of_cyls-counter,r.data()[0],r.data()[1],r.data()[2]);
+        currLink = parents[currLink];
+        counter++;
+    }
 }
 

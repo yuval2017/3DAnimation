@@ -5,7 +5,6 @@
 #include "GLFW/glfw3.h"
 #include "../tutorial/Assignment3/BasicScene.h"
 
-
 namespace cg3d
 {
 
@@ -33,6 +32,12 @@ void Renderer::RenderViewport(Viewport* viewport, Visitor* visitor)
 
     viewport->Bind();
     visitor->Run(viewport->scene.get(), viewport->camera.get());
+}
+
+void Renderer::Draw() {
+
+    RenderAllViewports();
+    viewports[0]->scene->Draw_changes();
 }
 
 void Renderer::RenderViewportAtPos(int x, int y, Visitor* visitor)

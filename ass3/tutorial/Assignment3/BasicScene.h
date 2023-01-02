@@ -8,16 +8,18 @@
 class BasicScene : public cg3d::Scene
 {
 public:
-    explicit BasicScene(std::string name, cg3d::Display* display) : Scene(std::move(name), display) {};
-    void Init(float fov, int width, int height, float near, float far);
-    void Update(const cg3d::Program& program, const Eigen::Matrix4f& proj, const Eigen::Matrix4f& view, const Eigen::Matrix4f& model) override;
-    void MouseCallback(cg3d::Viewport* viewport, int x, int y, int button, int action, int mods, int buttonState[]) override;
-    void ScrollCallback(cg3d::Viewport* viewport, int x, int y, int xoffset, int yoffset, bool dragging, int buttonState[]) override;
-    void CursorPosCallback(cg3d::Viewport* viewport, int x, int y, bool dragging, int* buttonState)  override;
-    void KeyCallback(cg3d::Viewport* viewport, int x, int y, int key, int scancode, int action, int mods) override;
+     explicit BasicScene(std::string name, cg3d::Display* display) : Scene(std::move(name), display) {};
+     void Init(float fov, int width, int height, float near, float far);
+     void Update(const cg3d::Program& program, const Eigen::Matrix4f& proj, const Eigen::Matrix4f& view, const Eigen::Matrix4f& model) override;
+     void MouseCallback(cg3d::Viewport* viewport, int x, int y, int button, int action, int mods, int buttonState[]) override;
+     void ScrollCallback(cg3d::Viewport* viewport, int x, int y, int xoffset, int yoffset, bool dragging, int buttonState[]) override;
+     void CursorPosCallback(cg3d::Viewport* viewport, int x, int y, bool dragging, int* buttonState)  override;
+     void KeyCallback(cg3d::Viewport* viewport, int x, int y, int key, int scancode, int action, int mods) override;
      Eigen::Vector3f GetSpherePos();
+     void Draw_changes() override;
      void IKCoordinateDecent();
-    void ikSolverHelper(int id, const Eigen::Vector3f& t);
+
+     void ikSolverHelper(int id, const Eigen::Vector3f& t);
 private:
     std::shared_ptr<Movable> root;
     std::shared_ptr<cg3d::Model> sphere1 ,cube;
@@ -32,10 +34,10 @@ private:
     Eigen::MatrixXd V, C, N, T, points,edges,colors;
     float link_len;
     bool shouldAnimateCCD= false;
-    int lastLinkIndex ;
-    int firstLinkIndex ;
+    int lastLinkIndex = 4 ;
+    int firstLinkIndex = 0 ;
     bool shouldAnimateFabrik = false;
-    int num_of_cyls;
+    int num_of_cyls = lastLinkIndex + 1;
     std::vector<int> parents ;
     std::vector<int> children;
     bool decent = true;
@@ -44,4 +46,5 @@ private:
     void fix_rotate();
     void IKFabric();
 
+    void print_positions();
 };
