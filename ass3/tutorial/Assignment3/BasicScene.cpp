@@ -483,49 +483,61 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
                 int index = 0;
                 if (!found) {
                     pickedModel = cyls[index];
+                    pickedIndex = index;
                 } else {
                     index = (i+1) % cyls.size();
                     pickedModel = cyls[index];
+                    pickedIndex = index;
                 }
                 std::cout<< "num of cyl is: \n" << (index) <<std::endl;
 
                 break;
             }
             case GLFW_KEY_UP:
+
                 if(pickedModel) {
-                    pickedModel->RotateInSystem(system, -0.1f, Axis::X);
+                    Eigen::Vector3f acEuler = cyls[pickedIndex]->GetRotation().eulerAngles(2,0,2);
+                    Eigen::Matrix3f Rnew = create_new_Rotation(acEuler.data()[0],acEuler.data()[1]+angle,acEuler.data()[2]);
+                    pickedModel->Rotate( Rnew * cyls[pickedIndex]->GetRotation().transpose() );
                 } else{
-                    root->RotateInSystem(system, -0.1f, Axis::X);
+
+                    root->RotateInSystem(system, angle, Axis::X);
                 }
                 break;
             case GLFW_KEY_DOWN:
                 if (pickedModel) {
-                    pickedModel->RotateInSystem(system, 0.1f, Axis::X);
+                    Eigen::Vector3f acEuler = cyls[pickedIndex]->GetRotation().eulerAngles(2,0,2);
+                    Eigen::Matrix3f Rnew = create_new_Rotation(acEuler.data()[0],acEuler.data()[1]-angle,acEuler.data()[2]);
+                    pickedModel->Rotate( Rnew * cyls[pickedIndex]->GetRotation().transpose() );
                 } else{
-                    root->RotateInSystem(system, 0.1f, Axis::X);
+                    root->RotateInSystem(system, -angle, Axis::X);
                 }
                 break;
             case GLFW_KEY_LEFT:
                 if (pickedModel) {
-                    pickedModel->RotateInSystem(system, -0.1f, Axis::Y);
+                    Eigen::Vector3f acEuler = cyls[pickedIndex]->GetRotation().eulerAngles(2,0,2);
+                    Eigen::Matrix3f Rnew = create_new_Rotation(acEuler.data()[0],acEuler.data()[1],acEuler.data()[2]+angle);
+                    pickedModel->Rotate(  Rnew * cyls[pickedIndex]->GetRotation().transpose());
                 } else{
-                    root->RotateInSystem(system, -0.1f, Axis::Y);
+                    root->RotateInSystem(system, angle, Axis::Y);
                 }
                 break;
             case GLFW_KEY_RIGHT:
                 if (pickedModel) {
-                    pickedModel->RotateInSystem(system, 0.1f, Axis::Y);
+                    Eigen::Vector3f acEuler = cyls[pickedIndex]->GetRotation().eulerAngles(2,0,2);
+                    Eigen::Matrix3f Rnew = create_new_Rotation(acEuler.data()[0],acEuler.data()[1],acEuler.data()[2]-angle);
+                    pickedModel->Rotate(Rnew  * cyls[pickedIndex]->GetRotation().transpose() );
                 } else{
-                    root->RotateInSystem(system, 0.1f, Axis::Y);
+                    root->RotateInSystem(system, -angle, Axis::Y);
                 }
                 break;
-                //TODO tips
             case GLFW_KEY_T:
                 camera->TranslateInSystem(system, {0, 0.1f, 0});
                 print_positions();
                 break;
                 //TODO p
             case GLFW_KEY_P:
+                print_rotation();
                 camera->TranslateInSystem(system, {0, 0.1f, 0});
                 break;
 
@@ -594,6 +606,41 @@ void BasicScene::print_positions() {
         printf("Tip %d position: (%f, %f , %f)\n",num_of_cyls-counter,r.data()[0],r.data()[1],r.data()[2]);
         currLink = parents[currLink];
         counter++;
+    }
+}
+
+Eigen::Matrix3f BasicScene::create_new_Rotation(float phi, float theta, float psi){
+    Eigen::Matrix3f A,B,C,D;
+    A << cos(phi), -sin(phi), 0,
+         sin(phi), cos(phi), 0,
+         0 ,             0 ,             1;
+    B<< 1, 0,                   0,
+        0, cos(theta) , -sin(theta),
+        0, sin(theta), cos(theta);
+    C<< cos(psi), -sin(psi), 0,
+        sin(psi), cos(psi),  0,
+        0             ,0              ,   1;
+    D= A*B*C;
+    return D;
+}
+
+void BasicScene::print_rotation() {
+
+    if (pickedModel) {
+        Eigen::Vector3f acEuler = cyls[pickedIndex]->GetRotation().eulerAngles(2, 0, 2);
+        Eigen::Matrix3f R = create_new_Rotation(acEuler.data()[0], acEuler.data()[1], acEuler.data()[2]);
+        printf("Rotation matrix for the %d cylinder is:\n"
+               "%f ,    %f ,    %f\n%f ,    %f ,    %f\n%f ,    %f ,    %f\n",
+               pickedIndex, R.data()[0], R.data()[1], R.data()[2], R.data()[3], R.data()[4], R.data()[5],
+               R.data()[6], R.data()[7], R.data()[8]);
+    }
+    else{
+        Eigen::Vector3f acEuler = root->GetRotation().eulerAngles(2, 0, 2);
+        Eigen::Matrix3f R = create_new_Rotation(acEuler.data()[0], acEuler.data()[1], acEuler.data()[2]);
+        printf("Rotation matrix for the system is:\n"
+               "%f ,    %f ,    %f\n%f ,    %f ,    %f\n%f ,    %f ,    %f\n",
+               pickedIndex, R.data()[0], R.data()[1], R.data()[2], R.data()[3], R.data()[4], R.data()[5],
+               R.data()[6], R.data()[7], R.data()[8]);
     }
 }
 

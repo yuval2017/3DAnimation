@@ -34,17 +34,20 @@ private:
     Eigen::MatrixXd V, C, N, T, points,edges,colors;
     float link_len;
     bool shouldAnimateCCD= false;
-    int lastLinkIndex = 4 ;
+    int lastLinkIndex = 2 ;
     int firstLinkIndex = 0 ;
     bool shouldAnimateFabrik = false;
     int num_of_cyls = lastLinkIndex + 1;
     std::vector<int> parents ;
     std::vector<int> children;
     bool decent = true;
-
+    float angle= 1;
+    Eigen::Matrix3f create_new_Rotation(float phi, float theta, float epsilon);
     Eigen::Vector3f ikGetPosition(int id, float length);
     void fix_rotate();
     void IKFabric();
 
     void print_positions();
+
+    void print_rotation();
 };
