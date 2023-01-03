@@ -498,7 +498,7 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
                 if(pickedModel) {
                     Eigen::Vector3f acEuler = cyls[pickedIndex]->GetRotation().eulerAngles(2,0,2);
                     Eigen::Matrix3f Rnew = create_new_Rotation(acEuler.data()[0],acEuler.data()[1]+angle,acEuler.data()[2]);
-                    pickedModel->Rotate( Rnew * cyls[pickedIndex]->GetRotation().transpose() );
+                    pickedModel->Rotate( cyls[pickedIndex]->GetRotation().transpose() * Rnew);
                 } else{
 
                     root->RotateInSystem(system, angle, Axis::X);
@@ -508,7 +508,7 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
                 if (pickedModel) {
                     Eigen::Vector3f acEuler = cyls[pickedIndex]->GetRotation().eulerAngles(2,0,2);
                     Eigen::Matrix3f Rnew = create_new_Rotation(acEuler.data()[0],acEuler.data()[1]-angle,acEuler.data()[2]);
-                    pickedModel->Rotate( Rnew * cyls[pickedIndex]->GetRotation().transpose() );
+                    pickedModel->Rotate(  cyls[pickedIndex]->GetRotation().transpose() * Rnew );
                 } else{
                     root->RotateInSystem(system, -angle, Axis::X);
                 }
@@ -517,7 +517,7 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
                 if (pickedModel) {
                     Eigen::Vector3f acEuler = cyls[pickedIndex]->GetRotation().eulerAngles(2,0,2);
                     Eigen::Matrix3f Rnew = create_new_Rotation(acEuler.data()[0],acEuler.data()[1],acEuler.data()[2]+angle);
-                    pickedModel->Rotate(  Rnew * cyls[pickedIndex]->GetRotation().transpose());
+                    pickedModel->Rotate(    cyls[pickedIndex]->GetRotation().transpose()* Rnew);
                 } else{
                     root->RotateInSystem(system, angle, Axis::Y);
                 }
@@ -526,7 +526,7 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
                 if (pickedModel) {
                     Eigen::Vector3f acEuler = cyls[pickedIndex]->GetRotation().eulerAngles(2,0,2);
                     Eigen::Matrix3f Rnew = create_new_Rotation(acEuler.data()[0],acEuler.data()[1],acEuler.data()[2]-angle);
-                    pickedModel->Rotate(Rnew  * cyls[pickedIndex]->GetRotation().transpose() );
+                    pickedModel->Rotate(   cyls[pickedIndex]->GetRotation().transpose() * Rnew);
                 } else{
                     root->RotateInSystem(system, -angle, Axis::Y);
                 }
