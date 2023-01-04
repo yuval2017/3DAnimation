@@ -152,6 +152,10 @@ void Scene::CharCallback(Viewport* viewport, int x, int y, unsigned int codepoin
     debug("char codepoint input: ", codepoint, " ('", (char) codepoint, "')");
 }
 
+
+void Scene:: Draw_changes(){
+
+}
 void Scene::ViewportSizeCallback(Viewport* viewport)
 {
     camera->SetProjection(float(viewport->width) / float(viewport->height));

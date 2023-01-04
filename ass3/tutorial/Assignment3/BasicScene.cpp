@@ -75,16 +75,18 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     children = *new std::vector<int>(1);
     //set parents and children vectors to number of cylinders.
 
-    num_of_cyls = 7;
-    lastLinkIndex = num_of_cyls - 1;
+    num_of_cyls = 3;
+    lastLinkIndex = 2;
     firstLinkIndex = 0 ;
-    parents.resize(num_of_cyls);
-    children.resize(num_of_cyls);
+    int num = lastLinkIndex+1 ;
+    parents.resize(num);
+    children.resize(num);
     cyls.push_back( Model::Create("cyl",cylMesh, material));
     cyls[0]->Scale(scaleFactor,Axis::Z);
     cyls[0]->SetCenter(Eigen::Vector3f(0,0,-0.8f*scaleFactor));
     root->AddChild(cyls[0]);
-    for(int i = 1;i < num_of_cyls; i++)
+   
+    for(int i = 1;i < 3; i++)
     { 
         cyls.push_back( Model::Create("cyl", cylMesh, material));
         cyls[i]->Scale(scaleFactor,Axis::Z);
@@ -133,7 +135,7 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     // edges = Eigen::MatrixXd::Ones(1,3);
     // colors = Eigen::MatrixXd::Ones(1,3);
 
-    
+
     // cyl->AddOverlay({points,edges,colors},true);
     cube->mode =1;
     auto mesh = cube->GetMeshList();
@@ -161,7 +163,7 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
 void BasicScene::IKFabric(){
     {
         if (animate&&shouldAnimateFabrik) {
-            std::cout<< "in fabrikkkkk \n" << std::endl;
+            std::cout<< "in Fabrik \n" << std::endl;
             std::vector<Eigen::Vector3f> p; //joint positions
             p.resize(num_of_cyls + 1 );
             Eigen::Vector3f target = sphere1->GetAggregatedTransform().col(3).head(3);
@@ -325,7 +327,7 @@ void BasicScene::IKCoordinateDecent(){
                 dot = 1;
             if (dot < -1)
                 dot = -1;
-            double angle = acosf(dot) / 10;
+            double angle = acosf(dot) / 100;
             Eigen::Vector3f rotationVec = cyls[currLink]->GetAggregatedTransform().block<3, 3>(0, 0).inverse() * normal;
             int parent = parents[currLink];
 
@@ -371,6 +373,10 @@ void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, con
     cube->Rotate(0.1f, Axis::XYZ);
 
 
+}
+
+
+void BasicScene::Draw_changes() {
     IKCoordinateDecent();
     IKFabric();
 
@@ -489,48 +495,61 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
                 int index = 0;
                 if (!found) {
                     pickedModel = cyls[index];
+                    pickedIndex = index;
                 } else {
                     index = (i+1) % cyls.size();
                     pickedModel = cyls[index];
+                    pickedIndex = index;
                 }
                 std::cout<< "num of cyl is: \n" << (index) <<std::endl;
 
                 break;
             }
             case GLFW_KEY_UP:
+
                 if(pickedModel) {
-                    pickedModel->RotateInSystem(system, -0.1f, Axis::X);
+                    Eigen::Vector3f acEuler = cyls[pickedIndex]->GetRotation().eulerAngles(2,0,2);
+                    Eigen::Matrix3f Rnew = create_new_Rotation(acEuler.data()[0],acEuler.data()[1]+angle,acEuler.data()[2]);
+                    pickedModel->Rotate( cyls[pickedIndex]->GetRotation().transpose() * Rnew);
                 } else{
-                    root->RotateInSystem(system, -0.1f, Axis::X);
+
+                    root->RotateInSystem(system, angle, Axis::X);
                 }
                 break;
             case GLFW_KEY_DOWN:
                 if (pickedModel) {
-                    pickedModel->RotateInSystem(system, 0.1f, Axis::X);
+                    Eigen::Vector3f acEuler = cyls[pickedIndex]->GetRotation().eulerAngles(2,0,2);
+                    Eigen::Matrix3f Rnew = create_new_Rotation(acEuler.data()[0],acEuler.data()[1]-angle,acEuler.data()[2]);
+                    pickedModel->Rotate(  cyls[pickedIndex]->GetRotation().transpose() * Rnew );
                 } else{
-                    root->RotateInSystem(system, 0.1f, Axis::X);
+                    root->RotateInSystem(system, -angle, Axis::X);
                 }
                 break;
             case GLFW_KEY_LEFT:
                 if (pickedModel) {
-                    pickedModel->RotateInSystem(system, -0.1f, Axis::Y);
+                    Eigen::Vector3f acEuler = cyls[pickedIndex]->GetRotation().eulerAngles(2,0,2);
+                    Eigen::Matrix3f Rnew = create_new_Rotation(acEuler.data()[0],acEuler.data()[1],acEuler.data()[2]+angle);
+                    pickedModel->Rotate(    cyls[pickedIndex]->GetRotation().transpose()* Rnew);
                 } else{
-                    root->RotateInSystem(system, -0.1f, Axis::Y);
+                    root->RotateInSystem(system, angle, Axis::Y);
                 }
                 break;
             case GLFW_KEY_RIGHT:
                 if (pickedModel) {
-                    pickedModel->RotateInSystem(system, 0.1f, Axis::Y);
+                    Eigen::Vector3f acEuler = cyls[pickedIndex]->GetRotation().eulerAngles(2,0,2);
+                    Eigen::Matrix3f Rnew = create_new_Rotation(acEuler.data()[0],acEuler.data()[1],acEuler.data()[2]-angle);
+                    pickedModel->Rotate(   cyls[pickedIndex]->GetRotation().transpose() * Rnew);
                 } else{
-                    root->RotateInSystem(system, 0.1f, Axis::Y);
+                    root->RotateInSystem(system, -angle, Axis::Y);
                 }
                 break;
-                //TODO tips
             case GLFW_KEY_T:
                 camera->TranslateInSystem(system, {0, 0.1f, 0});
+                print_positions();
                 break;
                 //TODO p
             case GLFW_KEY_P:
+                print_rotation();
                 camera->TranslateInSystem(system, {0, 0.1f, 0});
                 break;
 
@@ -587,3 +606,53 @@ Eigen::Vector3f BasicScene::GetSpherePos()
       return res;  
 }
 
+
+void BasicScene::print_positions() {
+
+    int currLink = lastLinkIndex;
+    int counter =0;
+    Eigen::Vector3f e = ikGetPosition(lastLinkIndex, link_len/2);
+    printf("Tip %d position: (%f, %f , %f)\n",num_of_cyls-counter,e.data()[0],e.data()[1],e.data()[2]);
+    counter++;
+    while (currLink != -1) {
+        Eigen::Vector3f r = ikGetPosition(currLink, -link_len / 2);
+        printf("Tip %d position: (%f, %f , %f)\n",num_of_cyls-counter,r.data()[0],r.data()[1],r.data()[2]);
+        currLink = parents[currLink];
+        counter++;
+    }
+}
+
+Eigen::Matrix3f BasicScene::create_new_Rotation(float phi, float theta, float psi){
+    Eigen::Matrix3f A,B,C,D;
+    A << cos(phi), -sin(phi), 0,
+            sin(phi), cos(phi), 0,
+            0 ,             0 ,             1;
+    B<< 1, 0,                   0,
+            0, cos(theta) , -sin(theta),
+            0, sin(theta), cos(theta);
+    C<< cos(psi), -sin(psi), 0,
+            sin(psi), cos(psi),  0,
+            0             ,0              ,   1;
+    D= A*B*C;
+    return D;
+}
+
+void BasicScene::print_rotation() {
+
+    if (pickedModel) {
+        Eigen::Vector3f acEuler = cyls[pickedIndex]->GetRotation().eulerAngles(2, 0, 2);
+        Eigen::Matrix3f R = create_new_Rotation(acEuler.data()[0], acEuler.data()[1], acEuler.data()[2]);
+        printf("Rotation matrix for the %d cylinder is:\n"
+               "%f ,    %f ,    %f\n%f ,    %f ,    %f\n%f ,    %f ,    %f\n",
+               pickedIndex, R.data()[0], R.data()[1], R.data()[2], R.data()[3], R.data()[4], R.data()[5],
+               R.data()[6], R.data()[7], R.data()[8]);
+    }
+    else{
+        Eigen::Vector3f acEuler = root->GetRotation().eulerAngles(2, 0, 2);
+        Eigen::Matrix3f R = create_new_Rotation(acEuler.data()[0], acEuler.data()[1], acEuler.data()[2]);
+        printf("Rotation matrix for the system is:\n"
+               "%f ,    %f ,    %f\n%f ,    %f ,    %f\n%f ,    %f ,    %f\n",
+               pickedIndex, R.data()[0], R.data()[1], R.data()[2], R.data()[3], R.data()[4], R.data()[5],
+               R.data()[6], R.data()[7], R.data()[8]);
+    }
+}

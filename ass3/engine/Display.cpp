@@ -151,6 +151,7 @@ void Display::LaunchRendering(bool loop) const
     }
 }
 
+
 void Display::SwapBuffers() const
 {
     glfwSwapBuffers(window);

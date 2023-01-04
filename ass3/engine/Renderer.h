@@ -20,7 +20,7 @@ public:
     void RenderViewport(Viewport* viewport, Visitor* visitor);
     void RenderViewportAtPos(int x, int y, Visitor* visitor = nullptr);
     void RenderAllViewports();
-    void Draw() { RenderAllViewports(); } // for clarity
+    void Draw() ; // for clarity
 
     void MouseCallback(int x, int y, int button, int action, int mods, int buttonState[]);
     void ScrollCallback(int x, int y, int xoffset, int yoffset, int buttonState[]);
