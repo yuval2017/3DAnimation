@@ -74,8 +74,7 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     parents = *new std::vector<int>(1);
     children = *new std::vector<int>(1);
     //set parents and children vectors to number of cylinders.
-
-    num_of_cyls = 7;
+    num_of_cyls = 3;
     lastLinkIndex = num_of_cyls -1;
     firstLinkIndex = 0 ;
     parents.resize(num_of_cyls);
@@ -84,18 +83,17 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     cyls[0]->Scale(scaleFactor,Axis::Z);
     cyls[0]->SetCenter(Eigen::Vector3f(0,0,-0.8f*scaleFactor));
     root->AddChild(cyls[0]);
-   
     for(int i = 1;i < num_of_cyls; i++)
     { 
         cyls.push_back( Model::Create("cyl", cylMesh, material));
         cyls[i]->Scale(scaleFactor,Axis::Z);
-        cyls[i]->Translate(1.6f*scaleFactor,Axis::Z);
+        cyls[i]->Translate(1.6f*scaleFactor,Axis::X);
         cyls[i]->SetCenter(Eigen::Vector3f(0,0,-0.8f*scaleFactor));
         cyls[i-1]->AddChild(cyls[i]);
         axis.push_back(Model::Create("axis",coordsys,material1));
         axis[i]->mode = 1;
         axis[i]->Scale(4,Axis::XYZ);
-        axis[i]->Translate(0.8f*scaleFactor,Axis::Z);
+        axis[i]->Translate(0.8f*scaleFactor,Axis::X);
         cyls[i-1]->AddChild(axis[i]);
 
     }
@@ -113,7 +111,8 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
         else
             children[i] = -1;
     }
-    cyls[0]->Translate({0,0,0.8f*scaleFactor});
+    cyls[0]->Translate({0,0, 0.8f*scaleFactor});
+    root->RotateByDegree(90,Eigen::Vector3f(-1,0,0));
 
     auto morphFunc = [](Model* model, cg3d::Visitor* visitor) {
       return model->meshIndex;//(model->GetMeshList())[0]->data.size()-1;
@@ -143,8 +142,7 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     // mesh[0]->data.push_back({V,F,V,E});
     int num_collapsed;
 
-    //root->RotateByDegree(90,Eigen::Vector3f(-1,0,0));
-    cyls[0]->RotateInSystem(camera->GetRotation().transpose(),-M_PI/2,Axis::X);
+
     // Function to reset original mesh and data structures
     V = mesh[0]->data[0].vertices;
     F = mesh[0]->data[0].faces;
@@ -523,7 +521,7 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
                 break;
             case GLFW_KEY_LEFT:
                 if (pickedModel) {
-                    pickedModel->Rotate(  pickedModel->GetRotation().transpose() * create_new_Rotation_q(pickedModel,2, +angle) );
+                    pickedModel->Rotate(  pickedModel->GetRotation().transpose() * create_new_Rotation_q(pickedModel,1, +angle) );
 
                 } else{
                     root->RotateInSystem(system, angle, Axis::Y);
@@ -531,7 +529,7 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
                 break;
             case GLFW_KEY_RIGHT:
                 if (pickedModel) {
-                    pickedModel->Rotate(  pickedModel->GetRotation().transpose() * create_new_Rotation_q(pickedModel,2, -angle) );
+                    pickedModel->Rotate(  pickedModel->GetRotation().transpose() * create_new_Rotation_q(pickedModel,1, -angle) );
                 } else{
                     root->RotateInSystem(system, -angle, Axis::Y);
                 }
@@ -614,9 +612,10 @@ void BasicScene::print_positions() {
         counter++;
     }
 }
+//secne = cyls[id]
 Eigen::Quaternionf BasicScene::create_new_Rotation_q(std::shared_ptr<Model> scene, int xyz, float add_angle) {
     Eigen::Matrix3f rot_from_euler_t;
-    Eigen::Vector3f euler_t = scene->GetRotation().eulerAngles(2, 1, 0);
+    Eigen::Vector3f euler_t = (root->GetRotation().inverse()*scene->GetRotation()).eulerAngles(2, 1, 0);
     Eigen::AngleAxis<float>::Scalar z = euler_t(0);
     Eigen::AngleAxis<float>::Scalar y = euler_t(1);
     Eigen::AngleAxis<float>::Scalar x = euler_t(2);
