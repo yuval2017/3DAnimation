@@ -56,7 +56,7 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     sphere1 = Model::Create( "sphere",sphereMesh, material);    
     cube = Model::Create( "cube", cubeMesh, material);
     decent = true;
-
+    angle = 0.1f;
     //Axis
     Eigen::MatrixXd vertices(6,3);
     vertices << -1,0,0,1,0,0,0,-1,0,0,1,0,0,0,-1,0,0,1;
@@ -75,18 +75,17 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     children = *new std::vector<int>(1);
     //set parents and children vectors to number of cylinders.
 
-    num_of_cyls = 3;
-    lastLinkIndex = 2;
+    num_of_cyls = 7;
+    lastLinkIndex = num_of_cyls -1;
     firstLinkIndex = 0 ;
-    int num = lastLinkIndex+1 ;
-    parents.resize(num);
-    children.resize(num);
+    parents.resize(num_of_cyls);
+    children.resize(num_of_cyls);
     cyls.push_back( Model::Create("cyl",cylMesh, material));
     cyls[0]->Scale(scaleFactor,Axis::Z);
     cyls[0]->SetCenter(Eigen::Vector3f(0,0,-0.8f*scaleFactor));
     root->AddChild(cyls[0]);
    
-    for(int i = 1;i < 3; i++)
+    for(int i = 1;i < num_of_cyls; i++)
     { 
         cyls.push_back( Model::Create("cyl", cylMesh, material));
         cyls[i]->Scale(scaleFactor,Axis::Z);
@@ -509,7 +508,7 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
 
                 if(pickedModel) {
                     Eigen::Vector3f acEuler = cyls[pickedIndex]->GetRotation().eulerAngles(2,0,2);
-                    Eigen::Matrix3f Rnew = create_new_Rotation(acEuler.data()[0],acEuler.data()[1]+angle,acEuler.data()[2]);
+                    Eigen::Matrix3f Rnew = create_new_Rotation(acEuler.data()[0],acEuler.data()[1]+(-1*angle),acEuler.data()[2]);
                     pickedModel->Rotate( cyls[pickedIndex]->GetRotation().transpose() * Rnew);
                 } else{
 
@@ -519,16 +518,17 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
             case GLFW_KEY_DOWN:
                 if (pickedModel) {
                     Eigen::Vector3f acEuler = cyls[pickedIndex]->GetRotation().eulerAngles(2,0,2);
-                    Eigen::Matrix3f Rnew = create_new_Rotation(acEuler.data()[0],acEuler.data()[1]-angle,acEuler.data()[2]);
+                    Eigen::Matrix3f Rnew = create_new_Rotation(acEuler.data()[0],acEuler.data()[1]+angle,acEuler.data()[2]);
                     pickedModel->Rotate(  cyls[pickedIndex]->GetRotation().transpose() * Rnew );
                 } else{
-                    root->RotateInSystem(system, -angle, Axis::X);
+                    root->RotateInSystem(system, angle, Axis::X);
                 }
                 break;
             case GLFW_KEY_LEFT:
                 if (pickedModel) {
+                    //cyls[pickedIndex]->RotateInSystem(system,angle,Axis::Z);
                     Eigen::Vector3f acEuler = cyls[pickedIndex]->GetRotation().eulerAngles(2,0,2);
-                    Eigen::Matrix3f Rnew = create_new_Rotation(acEuler.data()[0],acEuler.data()[1],acEuler.data()[2]+angle);
+                    Eigen::Matrix3f Rnew = create_new_Rotation(acEuler.data()[0] + angle,acEuler.data()[1],acEuler.data()[2]+angle);
                     pickedModel->Rotate(    cyls[pickedIndex]->GetRotation().transpose()* Rnew);
                 } else{
                     root->RotateInSystem(system, angle, Axis::Y);
@@ -536,8 +536,9 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
                 break;
             case GLFW_KEY_RIGHT:
                 if (pickedModel) {
+                    cyls[pickedIndex]->RotateInSystem(system,-angle,Axis::Z);
                     Eigen::Vector3f acEuler = cyls[pickedIndex]->GetRotation().eulerAngles(2,0,2);
-                    Eigen::Matrix3f Rnew = create_new_Rotation(acEuler.data()[0],acEuler.data()[1],acEuler.data()[2]-angle);
+                    Eigen::Matrix3f Rnew = create_new_Rotation(acEuler.data()[0]-angle,acEuler.data()[1]-angle,acEuler.data()[2]-angle);
                     pickedModel->Rotate(   cyls[pickedIndex]->GetRotation().transpose() * Rnew);
                 } else{
                     root->RotateInSystem(system, -angle, Axis::Y);
@@ -600,7 +601,7 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
 
 Eigen::Vector3f BasicScene::GetSpherePos()
 {
-      Eigen::Vector3f l = Eigen::Vector3f(1.6f,0,0);
+      Eigen::Vector3f l = Eigen::Vector3f(0.8f,0,0);
       Eigen::Vector3f res;
       res = cyls[tipIndex]->GetRotation()*l;   
       return res;  

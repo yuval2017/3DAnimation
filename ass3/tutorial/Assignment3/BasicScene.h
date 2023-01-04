@@ -41,7 +41,7 @@ private:
     std::vector<int> parents ;
     std::vector<int> children;
     bool decent = true;
-    float angle= 1;
+    float angle= 0.1f;
     Eigen::Matrix3f create_new_Rotation(float phi, float theta, float epsilon);
     Eigen::Vector3f ikGetPosition(int id, float length);
     void fix_rotate();
