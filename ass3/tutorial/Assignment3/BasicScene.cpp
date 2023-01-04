@@ -143,7 +143,8 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     // mesh[0]->data.push_back({V,F,V,E});
     int num_collapsed;
 
-    root->RotateByDegree(90,Eigen::Vector3f(-1,0,0));
+    //root->RotateByDegree(90,Eigen::Vector3f(-1,0,0));
+    cyls[0]->RotateInSystem(camera->GetRotation().transpose(),-M_PI/2,Axis::X);
     // Function to reset original mesh and data structures
     V = mesh[0]->data[0].vertices;
     F = mesh[0]->data[0].faces;
@@ -338,7 +339,6 @@ void BasicScene::IKCoordinateDecent(){
 }
 
 void BasicScene::fix_rotate(){
-    Eigen::Vector3f Z(0, 0, 1);
     int currLink = firstLinkIndex;
     while (currLink != -1) {
         Eigen::Matrix3f R =cyls[currLink]->GetRotation();
@@ -507,9 +507,7 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
             case GLFW_KEY_UP:
 
                 if(pickedModel) {
-                    Eigen::Vector3f acEuler = cyls[pickedIndex]->GetRotation().eulerAngles(2,0,2);
-                    Eigen::Matrix3f Rnew = create_new_Rotation(acEuler.data()[0],acEuler.data()[1]+(-1*angle),acEuler.data()[2]);
-                    pickedModel->Rotate( cyls[pickedIndex]->GetRotation().transpose() * Rnew);
+                    pickedModel->Rotate(  pickedModel->GetRotation().transpose() * create_new_Rotation_q(pickedModel,3, angle) );
                 } else{
 
                     root->RotateInSystem(system, angle, Axis::X);
@@ -517,29 +515,23 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
                 break;
             case GLFW_KEY_DOWN:
                 if (pickedModel) {
-                    Eigen::Vector3f acEuler = cyls[pickedIndex]->GetRotation().eulerAngles(2,0,2);
-                    Eigen::Matrix3f Rnew = create_new_Rotation(acEuler.data()[0],acEuler.data()[1]+angle,acEuler.data()[2]);
-                    pickedModel->Rotate(  cyls[pickedIndex]->GetRotation().transpose() * Rnew );
+                    pickedModel->Rotate(  pickedModel->GetRotation().transpose() * create_new_Rotation_q(pickedModel,3, -angle) );
+
                 } else{
-                    root->RotateInSystem(system, angle, Axis::X);
+                    root->RotateInSystem(system, -angle, Axis::X);
                 }
                 break;
             case GLFW_KEY_LEFT:
                 if (pickedModel) {
-                    //cyls[pickedIndex]->RotateInSystem(system,angle,Axis::Z);
-                    Eigen::Vector3f acEuler = cyls[pickedIndex]->GetRotation().eulerAngles(2,0,2);
-                    Eigen::Matrix3f Rnew = create_new_Rotation(acEuler.data()[0] + angle,acEuler.data()[1],acEuler.data()[2]+angle);
-                    pickedModel->Rotate(    cyls[pickedIndex]->GetRotation().transpose()* Rnew);
+                    pickedModel->Rotate(  pickedModel->GetRotation().transpose() * create_new_Rotation_q(pickedModel,2, +angle) );
+
                 } else{
                     root->RotateInSystem(system, angle, Axis::Y);
                 }
                 break;
             case GLFW_KEY_RIGHT:
                 if (pickedModel) {
-                    cyls[pickedIndex]->RotateInSystem(system,-angle,Axis::Z);
-                    Eigen::Vector3f acEuler = cyls[pickedIndex]->GetRotation().eulerAngles(2,0,2);
-                    Eigen::Matrix3f Rnew = create_new_Rotation(acEuler.data()[0]-angle,acEuler.data()[1]-angle,acEuler.data()[2]-angle);
-                    pickedModel->Rotate(   cyls[pickedIndex]->GetRotation().transpose() * Rnew);
+                    pickedModel->Rotate(  pickedModel->GetRotation().transpose() * create_new_Rotation_q(pickedModel,2, -angle) );
                 } else{
                     root->RotateInSystem(system, -angle, Axis::Y);
                 }
@@ -622,6 +614,25 @@ void BasicScene::print_positions() {
         counter++;
     }
 }
+Eigen::Quaternionf BasicScene::create_new_Rotation_q(std::shared_ptr<Model> scene, int xyz, float add_angle) {
+    Eigen::Matrix3f rot_from_euler_t;
+    Eigen::Vector3f euler_t = scene->GetRotation().eulerAngles(2, 1, 0);
+    Eigen::AngleAxis<float>::Scalar z = euler_t(0);
+    Eigen::AngleAxis<float>::Scalar y = euler_t(1);
+    Eigen::AngleAxis<float>::Scalar x = euler_t(2);
+    if (xyz == 1){
+        z = z + add_angle;
+    } else if (xyz == 2){
+        y = y + add_angle;
+    } else{
+        x = x + add_angle;
+    }
+    Eigen::AngleAxisf Y(z, Eigen::Vector3f::UnitZ());
+    Eigen::AngleAxisf P((y), Eigen::Vector3f::UnitY());
+    Eigen::AngleAxisf R(x, Eigen::Vector3f::UnitX());
+    return Eigen::Quaternionf(Y*P*R);
+}
+
 
 Eigen::Matrix3f BasicScene::create_new_Rotation(float phi, float theta, float psi){
     Eigen::Matrix3f A,B,C,D;

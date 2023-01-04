@@ -50,4 +50,6 @@ private:
     void print_positions();
 
     void print_rotation();
+
+    Eigen::Quaternionf create_new_Rotation_q(std::shared_ptr<cg3d::Model> scene,int xyz, float add_angle);
 };
