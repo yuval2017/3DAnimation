@@ -75,18 +75,16 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     children = *new std::vector<int>(1);
     //set parents and children vectors to number of cylinders.
 
-    num_of_cyls = 3;
-    lastLinkIndex = 2;
+    num_of_cyls = 7;
+    lastLinkIndex = num_of_cyls - 1;
     firstLinkIndex = 0 ;
-    int num = lastLinkIndex+1 ;
-    parents.resize(num);
-    children.resize(num);
+    parents.resize(num_of_cyls);
+    children.resize(num_of_cyls);
     cyls.push_back( Model::Create("cyl",cylMesh, material));
     cyls[0]->Scale(scaleFactor,Axis::Z);
     cyls[0]->SetCenter(Eigen::Vector3f(0,0,-0.8f*scaleFactor));
     root->AddChild(cyls[0]);
-   
-    for(int i = 1;i < 3; i++)
+    for(int i = 1;i < num_of_cyls; i++)
     { 
         cyls.push_back( Model::Create("cyl", cylMesh, material));
         cyls[i]->Scale(scaleFactor,Axis::Z);
@@ -101,7 +99,7 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
 
     }
     //cyls[0]->Rotate(3.141592654/2, Axis::Z);
-    for (int i =0 ; i < num; i++ ){
+    for (int i =0 ; i < num_of_cyls; i++ ){
         //set parent/children values in vectors
         if (i == 0)
             parents[i] = -1;
@@ -134,6 +132,7 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     // points = Eigen::MatrixXd::Ones(1,3);
     // edges = Eigen::MatrixXd::Ones(1,3);
     // colors = Eigen::MatrixXd::Ones(1,3);
+
     
     // cyl->AddOverlay({points,edges,colors},true);
     cube->mode =1;
@@ -143,7 +142,8 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     // mesh[0]->data.push_back({V,F,V,E});
     int num_collapsed;
 
-  // Function to reset original mesh and data structures
+    root->RotateByDegree(90,Eigen::Vector3f(-1,0,0));
+    // Function to reset original mesh and data structures
     V = mesh[0]->data[0].vertices;
     F = mesh[0]->data[0].faces;
    // igl::read_triangle_mesh("data/cube.off",V,F);
