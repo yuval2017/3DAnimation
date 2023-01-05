@@ -41,7 +41,7 @@ private:
     std::vector<int> parents ;
     std::vector<int> children;
     bool decent = true;
-    float angle= 0.1f;
+    float angle= 0.3f;
     Eigen::Matrix3f create_new_Rotation(float phi, float theta, float epsilon);
     Eigen::Vector3f ikGetPosition(int id, float length);
     void fix_rotate();
@@ -51,5 +51,5 @@ private:
 
     void print_rotation();
 
-    Eigen::Quaternionf create_new_Rotation_q(std::shared_ptr<cg3d::Model> scene,int xyz, float add_angle);
+    Eigen::Matrix3f create_new_Rotation_q(std::shared_ptr<cg3d::Model> scene,int xyz, float add_angle);
 };
