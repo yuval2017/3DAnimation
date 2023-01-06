@@ -18,7 +18,7 @@ public:
      Eigen::Vector3f GetSpherePos();
      void Draw_changes() override;
      void IKCoordinateDecent();
-     void ikSolverHelper(int id, const Eigen::Vector3f& t);
+     void ikRotateHelper(int id, const Eigen::Vector3f& t);
 private:
     std::shared_ptr<Movable> root;
     std::shared_ptr<cg3d::Model> sphere1 ,cube;
@@ -45,10 +45,11 @@ private:
     bool addCyl = false;
     float scaleFactor = 1;
 
-    Eigen::Matrix3f create_new_Rotation(float phi, float theta, float epsilon);
     Eigen::Vector3f ikGetPosition(int id, float length);
-    void fix_rotate();
     void IKFabric();
+    void reset();
+    Eigen::Matrix3f get_euler_rotate_matrix(std::shared_ptr<cg3d::Model> scene,float phi, float theta, float psi);
+
 
 
     void print_positions();

@@ -51,7 +51,7 @@ void Renderer::RenderViewportAtPos(int x, int y, Visitor* visitor)
 void Renderer::RenderAllViewports()
 {
     defaultVisitor.Init();
-    viewports[0]->scene->animate = true;
+
 
 
 
