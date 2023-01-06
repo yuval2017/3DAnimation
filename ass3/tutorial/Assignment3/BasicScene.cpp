@@ -35,7 +35,7 @@ using namespace cg3d;
 void BasicScene::Init(float fov, int width, int height, float near, float far)
 {
     camera = Camera::Create( "camera", fov, float(width) / height, near, far);
-    
+
     AddChild(root = Movable::Create("root")); // a common (invisible) parent object for all the shapes
     auto daylight{std::make_shared<Material>("daylight", "shaders/cubemapShader")}; 
     daylight->AddTexture(0, "textures/cubemaps/Daylight Box_", 3);
@@ -51,12 +51,14 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
 //    SetNamedObject(cube, Model::Create, Mesh::Cube(), material, shared_from_this());
     material->AddTexture(0, "textures/box0.bmp", 2);
     auto sphereMesh{IglLoader::MeshFromFiles("sphere_igl", "data/sphere.obj")};
-    auto cylMesh{IglLoader::MeshFromFiles("cyl_igl","data/zcylinder.obj")};
+    auto cylMesh {IglLoader::MeshFromFiles("cyl_igl","data/zcylinder.obj")};
     auto cubeMesh{IglLoader::MeshFromFiles("cube_igl","data/cube_old.obj")};
     sphere1 = Model::Create( "sphere",sphereMesh, material);    
     cube = Model::Create( "cube", cubeMesh, material);
     decent = true;
+    float scaleFactor = 1;
     angle = 0.1f;
+
     //Axis
     Eigen::MatrixXd vertices(6,3);
     vertices << -1,0,0,1,0,0,0,-1,0,0,1,0,0,0,-1,0,0,1;
@@ -64,13 +66,18 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     faces << 0,1,2,3,4,5;
     Eigen::MatrixXd vertexNormals = Eigen::MatrixXd::Ones(6,3);
     Eigen::MatrixXd textureCoords = Eigen::MatrixXd::Ones(6,2);
-    std::shared_ptr<Mesh> coordsys = std::make_shared<Mesh>("coordsys",vertices,faces,vertexNormals,textureCoords);
+    auto coordsys = std::make_shared<Mesh>("coordsys",vertices,faces,vertexNormals,textureCoords);
     axis.push_back(Model::Create("axis",coordsys,material1));
     axis[0]->mode = 1;   
     axis[0]->Scale(4,Axis::XYZ);
+    auto system = camera->GetRotation().transpose();
+    //root->RotateInSystem(system, M_PI/2, Axis::Y);
     // axis[0]->lineWidth = 5;
     root->AddChild(axis[0]);
-    float scaleFactor = 1;
+
+
+
+
     parents = *new std::vector<int>(1);
     children = *new std::vector<int>(1);
     //set parents and children vectors to number of cylinders.
@@ -83,6 +90,7 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     cyls[0]->Scale(scaleFactor,Axis::Z);
     cyls[0]->SetCenter(Eigen::Vector3f(0,0,-0.8f*scaleFactor));
     root->AddChild(cyls[0]);
+
     for(int i = 1;i < num_of_cyls; i++)
     { 
         cyls.push_back( Model::Create("cyl", cylMesh, material));
@@ -111,6 +119,8 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
         else
             children[i] = -1;
     }
+
+
     cyls[0]->Translate({0,0, 0.8f*scaleFactor});
     root->RotateByDegree(90,Eigen::Vector3f(-1,0,0));
 
@@ -162,7 +172,7 @@ void BasicScene::IKFabric(){
     {
         if (animate&&shouldAnimateFabrik) {
             std::cout<< "in Fabrik \n" << std::endl;
-            std::vector<Eigen::Vector3f> p; //joint positions
+            std::vector<Eigen::Vector3f> p;
             p.resize(num_of_cyls + 1 );
             Eigen::Vector3f target = sphere1->GetAggregatedTransform().col(3).head(3);
             Eigen::Vector3f p1 = ikGetPosition(firstLinkIndex, -link_len/2);
@@ -277,8 +287,6 @@ void BasicScene::ikSolverHelper(int id, const Eigen::Vector3f& t){
     Eigen::Vector3f normal = re.normalized().cross(rd.normalized());
     float dot = rd.normalized().dot(re.normalized());//get dot
 
-    //Eigen::Quaternion q = Eigen::Quaternionf::FromTwoVectors(re,rd);
-    //q = q.slerp(0.9f, Eigen::Quaternionf::Identity());
     if (dot > 1)
         dot = 1;
     if (dot < -1)
@@ -286,7 +294,12 @@ void BasicScene::ikSolverHelper(int id, const Eigen::Vector3f& t){
     float angle = (float)acos(dot)/100 ;
     Eigen::Vector3f rotationVec = (cyls[id]->GetAggregatedTransform()).block<3, 3>(0, 0).inverse() * normal;
     int parent = parents[id];
+    Eigen::Matrix3f rot = (Eigen::AngleAxisf(angle,rotationVec.normalized())).toRotationMatrix();
+    Eigen::Vector3d oi = rot.cast<double>().eulerAngles(2,0,2);
 
+    cyls[id]->Rotate(oi[0],Axis::Z);
+    cyls[id]->Rotate(oi[1], Axis::X);
+    cyls[id]->Rotate(oi[2],Axis::Z);
     cyls[id]->Rotate(angle, rotationVec);
 }
 
@@ -307,11 +320,9 @@ void BasicScene::IKCoordinateDecent(){
             Eigen::Vector3f rd = target_des - r;
             Eigen::Vector3f re = e - r;
 
-            //Eigen::Quaternion q = Eigen::Quaternionf::FromTwoVectors(re,rd);
-            //q = q.slerp(0.9f, Eigen::Quaternionf::Identity());
-
 
             Eigen::Vector3f normal = re.normalized().cross(rd.normalized());//returns the plane normal
+
             double distance = (target_des - e).norm();
             if (distance < 0.05) {
                 std::cout << "distance: " << distance << std::endl;
@@ -327,26 +338,18 @@ void BasicScene::IKCoordinateDecent(){
                 dot = -1;
             double angle = acosf(dot) / 100;
 
-            Eigen::Vector3f rotationVec = cyls[currLink]->GetAggregatedTransform().block<3, 3>(0, 0).inverse() * normal;
+            Eigen::Vector3f rotationVec = (cyls[currLink]->GetAggregatedTransform().block<3, 3>(0, 0).inverse()) * normal;
             int parent = parents[currLink];
 
 
+            Eigen::Matrix3f rot = (Eigen::AngleAxisf(angle,rotationVec.normalized())).toRotationMatrix();
+            Eigen::Vector3d oi = rot.cast<double>().eulerAngles(2,0,2);
 
-//            Eigen::Matrix3f rot_from_euler_t;
-//            Eigen::Matrix3f Ri = root->GetRotation().inverse()*cyls[currLink]->GetRotation();
-//            Eigen::Vector3f euler_t = Ri.eulerAngles(2, 1, 0);
-//            Eigen::AngleAxis<float>::Scalar z = euler_t(0);
-//            Eigen::AngleAxis<float>::Scalar y = euler_t(1);
-//            Eigen::AngleAxis<float>::Scalar x = euler_t(2);
-//
-//            Eigen::AngleAxisf Y(z+ angle, Eigen::Vector3f::UnitZ());
-//            Eigen::AngleAxisf P((y + angle), Eigen::Vector3f::UnitY());
-//            Eigen::AngleAxisf R(x + angle, Eigen::Vector3f::UnitX());
-//            Eigen::Matrix3f R_new = Eigen::Quaternionf(Y*P*R).toRotationMatrix();
-//            Eigen::Matrix3f ans = Ri.transpose()*R_new;
-
-            cyls[currLink]->Rotate(angle,rotationVec);
+            cyls[currLink]->Rotate(oi[0],Axis::Z);
+            cyls[currLink]->Rotate(oi[1], Axis::X);
+            cyls[currLink]->Rotate(oi[2],Axis::Z);
             currLink = parents[currLink];
+
         }
         animate = false;
     }
@@ -356,9 +359,11 @@ void BasicScene::fix_rotate(){
     int currLink = firstLinkIndex;
     while (currLink != -1) {
         Eigen::Matrix3f R =cyls[currLink]->GetRotation();
-        Eigen::Vector3f ea = R.eulerAngles(2, 0, 2);//get the rotation angles
+        Eigen::Vector3f ea = R.eulerAngles(2, 1, 0);//get the rotation angles
         float angleZ = ea[2];
-       cyls[currLink]->Rotate( -angleZ,Axis::Z);
+        float angleY = ea[1];
+        float angleX = ea[0];
+        cyls[currLink]->Rotate( -angleZ,Axis::Z);
         currLink = children[currLink];
         if (currLink != -1) {
             auto system = camera->GetRotation().transpose();
@@ -384,6 +389,9 @@ void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, con
     program.SetUniform4f("light_position", 0.0, 15.0f, 0.0, 1.0f);
 //    cyl->Rotate(0.001f, Axis::Y);
     cube->Rotate(0.1f, Axis::XYZ);
+
+
+
 
 
 }
@@ -521,7 +529,7 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
             case GLFW_KEY_UP:
 
                 if(pickedModel) {
-                    pickedModel->Rotate(  create_new_Rotation_q(pickedModel,1, angle) );
+                    pickedModel->Rotate(  create_new_Rotation_q(pickedModel,2, angle) );
                 } else{
 
                     root->RotateInSystem(system, angle, Axis::X);
@@ -529,7 +537,7 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
                 break;
             case GLFW_KEY_DOWN:
                 if (pickedModel) {
-                    pickedModel->Rotate(  create_new_Rotation_q(pickedModel,1, -angle) );
+                    pickedModel->Rotate(  create_new_Rotation_q(pickedModel,2, -angle) );
 
                 } else{
                     root->RotateInSystem(system, -angle, Axis::X);
@@ -551,7 +559,6 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
                 }
                 break;
             case GLFW_KEY_T:
-                camera->TranslateInSystem(system, {0, 0.1f, 0});
                 print_positions();
                 break;
                 //TODO p
@@ -574,6 +581,9 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
                 break;
             case GLFW_KEY_F:
                 camera->TranslateInSystem(system, {0, 0, -0.1f});
+                break;
+            case GLFW_KEY_M:
+                addCyl = true;
                 break;
             case GLFW_KEY_1:
                 if( pickedIndex > 0)
@@ -633,20 +643,20 @@ Eigen::Matrix3f BasicScene::create_new_Rotation_q(std::shared_ptr<Model> scene, 
     Eigen::Matrix3f rot_from_euler_t;
     Eigen::Matrix3f Ri = root->GetRotation().inverse()*scene->GetRotation();
     Eigen::Vector3f euler_t = Ri.eulerAngles(2, 0, 2);
-    Eigen::AngleAxis<float>::Scalar z = euler_t(0);
-    Eigen::AngleAxis<float>::Scalar y = euler_t(1);
-    Eigen::AngleAxis<float>::Scalar x = euler_t(2);
+    Eigen::AngleAxis<float>::Scalar z1 = euler_t(0);
+    Eigen::AngleAxis<float>::Scalar x = euler_t(1);
+    Eigen::AngleAxis<float>::Scalar z2 = euler_t(2);
     if (xyz == 1){
-        z = z + add_angle;
+        z1 = z1 + add_angle;
     } else if (xyz == 2){
-        y = y + add_angle;
-    } else{
         x = x + add_angle;
+    } else{
+        z2 = z2 + add_angle;
     }
-    Eigen::AngleAxisf Y(z, Eigen::Vector3f::UnitZ());
-    Eigen::AngleAxisf P(y, Eigen::Vector3f::UnitY());
-    Eigen::AngleAxisf R(x, Eigen::Vector3f::UnitX());
-    Eigen::Matrix3f R_new = Eigen::Quaternionf(R*P*Y).toRotationMatrix();
+    Eigen::AngleAxisf Y(z1, Eigen::Vector3f::UnitZ());
+    Eigen::AngleAxisf P(x, Eigen::Vector3f::UnitX());
+    Eigen::AngleAxisf R(z2, Eigen::Vector3f::UnitZ());
+    Eigen::Matrix3f R_new = Eigen::Quaternionf(Y*P*R).toRotationMatrix();
     return Ri.transpose()*R_new;
 }
 

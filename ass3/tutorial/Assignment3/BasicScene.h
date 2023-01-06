@@ -4,7 +4,7 @@
 
 #include <memory>
 #include <utility>
-
+using namespace cg3d;
 class BasicScene : public cg3d::Scene
 {
 public:
@@ -18,7 +18,6 @@ public:
      Eigen::Vector3f GetSpherePos();
      void Draw_changes() override;
      void IKCoordinateDecent();
-
      void ikSolverHelper(int id, const Eigen::Vector3f& t);
 private:
     std::shared_ptr<Movable> root;
@@ -30,6 +29,7 @@ private:
     Eigen::VectorXi EMAP;
     Eigen::MatrixXi F,E,EF,EI;
     Eigen::VectorXi EQ;
+
   // If an edge were collapsed, we'd collapse it to these points:
     Eigen::MatrixXd V, C, N, T, points,edges,colors;
     float link_len;
@@ -41,11 +41,15 @@ private:
     std::vector<int> parents ;
     std::vector<int> children;
     bool decent = true;
-    float angle= 0.3f;
+    float angle= 0.05f;
+    bool addCyl = false;
+    float scaleFactor = 1;
+
     Eigen::Matrix3f create_new_Rotation(float phi, float theta, float epsilon);
     Eigen::Vector3f ikGetPosition(int id, float length);
     void fix_rotate();
     void IKFabric();
+
 
     void print_positions();
 
