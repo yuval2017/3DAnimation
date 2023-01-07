@@ -802,9 +802,7 @@ void BasicScene::reset() {
             children[i] = -1;
     }
     cyls[firstLinkIndex]->Translate({0,0, 0.8f*scaleFactor});
-
     link_len = cyls[firstLinkIndex]->GetMeshList()[0]->data[cyls[firstLinkIndex]->meshIndex].vertices.colwise().maxCoeff()[2]*2;
-
     root->Translate(Eigen::Vector3f(0,0,0));
 }
 
