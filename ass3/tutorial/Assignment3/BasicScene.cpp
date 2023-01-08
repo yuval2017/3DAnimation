@@ -49,7 +49,7 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     shouldAnimateCCD = false;
     decent = true;
     float scaleFactor = 1;
-    angle = 0.1f;
+    angle = 0.3f;
     num_of_cyls = 3;
     lastLinkIndex = num_of_cyls -1;
     firstLinkIndex = 0 ;
@@ -455,8 +455,11 @@ void BasicScene::CursorPosCallback(Viewport* viewport, int x, int y, bool draggi
                 }
                 if (found){
                     float z_angle = -float(xAtPress - x) / angleCoeff;
-                    float x_angle = float(yAtPress - y) / angleCoeff;
-                    pickedModel->Rotate(get_euler_rotate_matrix(pickedModel,z_angle,x_angle,0.0f));
+                    float y_angle = float(yAtPress - y) / angleCoeff;
+
+                    pickedModel->Rotate(create_new_Rotation_q(pickedModel,1,z_angle));
+                    pickedModel->Rotate(create_new_Rotation_q(pickedModel,2,y_angle));
+
                 } else{
                     pickedModel->RotateInSystem(system * pickedModel->GetRotation(), -float(xAtPress - x) / angleCoeff, Axis::Y);
                     pickedModel->RotateInSystem(system * pickedModel->GetRotation(), -float(yAtPress - y) / angleCoeff, Axis::X);
@@ -548,7 +551,7 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
                 break;
             case GLFW_KEY_LEFT:
                 if (pickedModel) {
-                    pickedModel->Rotate(   create_new_Rotation_q(pickedModel,1, +angle) );
+                    pickedModel->Rotate(   create_new_Rotation_q(pickedModel,1, -angle) );
 
                 } else{
                     root->RotateInSystem(system, angle, Axis::Y);
@@ -556,7 +559,7 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
                 break;
             case GLFW_KEY_RIGHT:
                 if (pickedModel) {
-                    pickedModel->Rotate(  create_new_Rotation_q(pickedModel,1, -angle) );
+                    pickedModel->Rotate(  create_new_Rotation_q(pickedModel,1, angle) );
                 } else{
                     root->RotateInSystem(system, -angle, Axis::Y);
                 }
@@ -732,7 +735,7 @@ void BasicScene::reset() {
     shouldAnimateFabrik= false;
     shouldAnimateCCD = false;
     decent = true;
-    angle = 0.1f;
+    angle = 0.3f;
     parents.clear();
     children.clear();
     root->RemoveChild(cyls[firstLinkIndex]);
