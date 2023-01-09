@@ -264,3 +264,86 @@ Parsed CXX implicit link information from above output:
   implicit fwks: [/Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk/System/Library/Frameworks]
 
 
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD succeeded with the following output:
+Change Dir: /Users/bardamri/3DAnimation/ass3/build/CMakeFiles/CMakeScratch/TryCompile-rsO9zq
+
+Run Build Command(s):/usr/bin/make -f Makefile cmTC_b263f/fast && /Library/Developer/CommandLineTools/usr/bin/make  -f CMakeFiles/cmTC_b263f.dir/build.make CMakeFiles/cmTC_b263f.dir/build
+Building C object CMakeFiles/cmTC_b263f.dir/src.c.o
+/Library/Developer/CommandLineTools/usr/bin/cc -DCMAKE_HAVE_LIBC_PTHREAD  -fPIC  -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk -MD -MT CMakeFiles/cmTC_b263f.dir/src.c.o -MF CMakeFiles/cmTC_b263f.dir/src.c.o.d -o CMakeFiles/cmTC_b263f.dir/src.c.o -c /Users/bardamri/3DAnimation/ass3/build/CMakeFiles/CMakeScratch/TryCompile-rsO9zq/src.c
+Linking C executable cmTC_b263f
+/Applications/CMake.app/Contents/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b263f.dir/link.txt --verbose=1
+/Library/Developer/CommandLineTools/usr/bin/cc  -fPIC  -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_b263f.dir/src.c.o -o cmTC_b263f 
+
+
+Source file was:
+#include <pthread.h>
+
+static void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_cancel(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+
+Performing C++ SOURCE FILE Test COMPILER_HAS_HIDDEN_VISIBILITY succeeded with the following output:
+Change Dir: /Users/bardamri/3DAnimation/ass3/build/CMakeFiles/CMakeScratch/TryCompile-NuBbH7
+
+Run Build Command(s):/usr/bin/make -f Makefile cmTC_050d8/fast && /Library/Developer/CommandLineTools/usr/bin/make  -f CMakeFiles/cmTC_050d8.dir/build.make CMakeFiles/cmTC_050d8.dir/build
+Building CXX object CMakeFiles/cmTC_050d8.dir/src.cxx.o
+/Library/Developer/CommandLineTools/usr/bin/c++ -DCOMPILER_HAS_HIDDEN_VISIBILITY  -fPIC  -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk   -fvisibility=hidden -MD -MT CMakeFiles/cmTC_050d8.dir/src.cxx.o -MF CMakeFiles/cmTC_050d8.dir/src.cxx.o.d -o CMakeFiles/cmTC_050d8.dir/src.cxx.o -c /Users/bardamri/3DAnimation/ass3/build/CMakeFiles/CMakeScratch/TryCompile-NuBbH7/src.cxx
+Linking CXX executable cmTC_050d8
+/Applications/CMake.app/Contents/bin/cmake -E cmake_link_script CMakeFiles/cmTC_050d8.dir/link.txt --verbose=1
+/Library/Developer/CommandLineTools/usr/bin/c++  -fPIC  -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_050d8.dir/src.cxx.o -o cmTC_050d8 
+
+
+Source file was:
+int main() { return 0; }
+
+Performing C++ SOURCE FILE Test COMPILER_HAS_HIDDEN_INLINE_VISIBILITY succeeded with the following output:
+Change Dir: /Users/bardamri/3DAnimation/ass3/build/CMakeFiles/CMakeScratch/TryCompile-9FZUq8
+
+Run Build Command(s):/usr/bin/make -f Makefile cmTC_96249/fast && /Library/Developer/CommandLineTools/usr/bin/make  -f CMakeFiles/cmTC_96249.dir/build.make CMakeFiles/cmTC_96249.dir/build
+Building CXX object CMakeFiles/cmTC_96249.dir/src.cxx.o
+/Library/Developer/CommandLineTools/usr/bin/c++ -DCOMPILER_HAS_HIDDEN_INLINE_VISIBILITY  -fPIC  -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk   -fvisibility-inlines-hidden -MD -MT CMakeFiles/cmTC_96249.dir/src.cxx.o -MF CMakeFiles/cmTC_96249.dir/src.cxx.o.d -o CMakeFiles/cmTC_96249.dir/src.cxx.o -c /Users/bardamri/3DAnimation/ass3/build/CMakeFiles/CMakeScratch/TryCompile-9FZUq8/src.cxx
+Linking CXX executable cmTC_96249
+/Applications/CMake.app/Contents/bin/cmake -E cmake_link_script CMakeFiles/cmTC_96249.dir/link.txt --verbose=1
+/Library/Developer/CommandLineTools/usr/bin/c++  -fPIC  -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_96249.dir/src.cxx.o -o cmTC_96249 
+
+
+Source file was:
+int main() { return 0; }
+
+Performing C++ SOURCE FILE Test COMPILER_HAS_DEPRECATED_ATTR succeeded with the following output:
+Change Dir: /Users/bardamri/3DAnimation/ass3/build/CMakeFiles/CMakeScratch/TryCompile-KeYTwK
+
+Run Build Command(s):/usr/bin/make -f Makefile cmTC_6fdf8/fast && /Library/Developer/CommandLineTools/usr/bin/make  -f CMakeFiles/cmTC_6fdf8.dir/build.make CMakeFiles/cmTC_6fdf8.dir/build
+Building CXX object CMakeFiles/cmTC_6fdf8.dir/src.cxx.o
+/Library/Developer/CommandLineTools/usr/bin/c++ -DCOMPILER_HAS_DEPRECATED_ATTR  -fPIC  -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk -MD -MT CMakeFiles/cmTC_6fdf8.dir/src.cxx.o -MF CMakeFiles/cmTC_6fdf8.dir/src.cxx.o.d -o CMakeFiles/cmTC_6fdf8.dir/src.cxx.o -c /Users/bardamri/3DAnimation/ass3/build/CMakeFiles/CMakeScratch/TryCompile-KeYTwK/src.cxx
+/Users/bardamri/3DAnimation/ass3/build/CMakeFiles/CMakeScratch/TryCompile-KeYTwK/src.cxx:2:25: warning: 'somefunc' is deprecated [-Wdeprecated-declarations]
+    int main() { return somefunc();}
+                        ^
+/Users/bardamri/3DAnimation/ass3/build/CMakeFiles/CMakeScratch/TryCompile-KeYTwK/src.cxx:1:16: note: 'somefunc' has been explicitly marked deprecated here
+__attribute__((__deprecated__)) int somefunc() { return 0; }
+               ^
+1 warning generated.
+Linking CXX executable cmTC_6fdf8
+/Applications/CMake.app/Contents/bin/cmake -E cmake_link_script CMakeFiles/cmTC_6fdf8.dir/link.txt --verbose=1
+/Library/Developer/CommandLineTools/usr/bin/c++  -fPIC  -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.1.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/cmTC_6fdf8.dir/src.cxx.o -o cmTC_6fdf8 
+
+
+Source file was:
+__attribute__((__deprecated__)) int somefunc() { return 0; }
+    int main() { return somefunc();}
+

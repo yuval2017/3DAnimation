@@ -15,13 +15,13 @@
 ########################
 
 //Value Computed by CMake
-Assignment3_BINARY_DIR:STATIC=/Users/bardamri/3DAnimation/ass3/cmake-build-debug/tutorial/Assignment3
+Assignment3_BINARY_DIR:STATIC=/Users/bardamri/3DAnimation/ass3/cmake-build-debug/tutorial/Final
 
 //Value Computed by CMake
 Assignment3_IS_TOP_LEVEL:STATIC=OFF
 
 //Value Computed by CMake
-Assignment3_SOURCE_DIR:STATIC=/Users/bardamri/3DAnimation/ass3/tutorial/Assignment3
+Assignment3_SOURCE_DIR:STATIC=/Users/bardamri/3DAnimation/ass3/tutorial/Final
 
 //Build shared libraries
 BUILD_SHARED_LIBS:BOOL=OFF
