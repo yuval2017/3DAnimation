@@ -29,7 +29,9 @@ private:
     inline void SetActive(bool _isActive = true) { animate = _isActive; }
     void LoadObjectFromFileDialog();
     void SetCamera(int index);
+    bool show;
     static std::shared_ptr<CamModel> CreateCameraWithModel(int width, int height, float fov, float near, float far, const std::shared_ptr<cg3d::Material>& material);
     static void DumpMeshData(const Eigen::IOFormat& simple, const cg3d::MeshData& data) ;
+    int score ;
 };
 

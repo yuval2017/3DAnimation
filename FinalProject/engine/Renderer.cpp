@@ -3,7 +3,7 @@
 #include "DrawVisitor.h"
 #include "Scene.h"
 #include "GLFW/glfw3.h"
-#include "../tutorial/Assignment3/BasicScene.h"
+#include "../tutorial/Final/BasicScene.h"
 
 namespace cg3d
 {

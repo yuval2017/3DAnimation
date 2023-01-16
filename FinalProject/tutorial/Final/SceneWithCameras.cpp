@@ -8,7 +8,6 @@
 #include "CamModel.h"
 #include "Visitor.h"
 #include "Utility.h"
-
 #include "imgui.h"
 #include "file_dialog_open.h"
 #include "GLFW/glfw3.h"
@@ -24,8 +23,10 @@ void SceneWithCameras::BuildImGui()
     ImGui::Begin("Menu", pOpen, flags);
     ImGui::SetWindowPos(ImVec2(0, 0), ImGuiCond_Always);
     ImGui::SetWindowSize(ImVec2(0, 0), ImGuiCond_Always);
-    if (ImGui::Button("Load object"))
-        LoadObjectFromFileDialog();
+    if (ImGui::Button("Load object")) {
+        show = true;
+    }
+
 
     ImGui::Text("Camera: ");
     for (int i = 0; i < camList.size(); i++) {
@@ -89,9 +90,25 @@ void SceneWithCameras::BuildImGui()
                           << std::endl << "Scaling:" << std::endl << Movable::GetScaling(transform).matrix().format(format) << std::endl;
             }
         }
-    }
+    }ImGui::End();
 
-    ImGui::End();
+    if (show) {
+        //LoadObjectFromFileDialog();
+        ImGui::SetNextWindowSize(ImVec2(500, 500));
+        if(ImGui::Begin("start menu"))
+        {
+            ImGui::Text("Click to start the game");
+            ImGui::Text(  std::to_string(score).c_str());
+            if (ImGui::Button("start")){
+                this->show = false;
+            }
+            if (ImGui::Button("refresh")){
+
+                score+=10;
+            }
+
+        }ImGui::End();
+    }
 }
 
 void SceneWithCameras::DumpMeshData(const Eigen::IOFormat& simple, const MeshData& data)
@@ -118,6 +135,8 @@ void SceneWithCameras::SetCamera(int index)
 
 void SceneWithCameras::Init(float fov, int width, int height, float near, float far)
 {
+    show =false;
+    score = 0 ;
     // create the basic elements of the scene
     AddChild(root = Movable::Create("root")); // a common (invisible) parent object for all the shapes
     auto program = std::make_shared<Program>("shaders/basicShader"); // TODO: TAL: replace with hard-coded basic program

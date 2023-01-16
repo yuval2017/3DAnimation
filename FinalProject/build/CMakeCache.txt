@@ -14,15 +14,6 @@
 # EXTERNAL cache entries
 ########################
 
-//Value Computed by CMake
-Assignment3_BINARY_DIR:STATIC=/Users/bardamri/3DAnimation/FinalProject/build/tutorial/Final
-
-//Value Computed by CMake
-Assignment3_IS_TOP_LEVEL:STATIC=OFF
-
-//Value Computed by CMake
-Assignment3_SOURCE_DIR:STATIC=/Users/bardamri/3DAnimation/ass3/tutorial/Final
-
 //Build shared libraries
 BUILD_SHARED_LIBS:BOOL=OFF
 
@@ -294,7 +285,7 @@ Demo_BINARY_DIR:STATIC=/Users/bardamri/3DAnimation/FinalProject/build/tutorial/D
 Demo_IS_TOP_LEVEL:STATIC=OFF
 
 //Value Computed by CMake
-Demo_SOURCE_DIR:STATIC=/Users/bardamri/3DAnimation/ass3/tutorial/Demo
+Demo_SOURCE_DIR:STATIC=/Users/bardamri/3DAnimation/FinalProject/tutorial/Demo
 
 //Value Computed by CMake
 EngineRework_BINARY_DIR:STATIC=/Users/bardamri/3DAnimation/FinalProject/build
@@ -303,7 +294,7 @@ EngineRework_BINARY_DIR:STATIC=/Users/bardamri/3DAnimation/FinalProject/build
 EngineRework_IS_TOP_LEVEL:STATIC=ON
 
 //Value Computed by CMake
-EngineRework_SOURCE_DIR:STATIC=/Users/bardamri/3DAnimation/ass3
+EngineRework_SOURCE_DIR:STATIC=/Users/bardamri/3DAnimation/FinalProject
 
 //Value Computed by CMake
 Example1_BINARY_DIR:STATIC=/Users/bardamri/3DAnimation/FinalProject/build/tutorial/Example1
@@ -312,7 +303,16 @@ Example1_BINARY_DIR:STATIC=/Users/bardamri/3DAnimation/FinalProject/build/tutori
 Example1_IS_TOP_LEVEL:STATIC=OFF
 
 //Value Computed by CMake
-Example1_SOURCE_DIR:STATIC=/Users/bardamri/3DAnimation/ass3/tutorial/Example1
+Example1_SOURCE_DIR:STATIC=/Users/bardamri/3DAnimation/FinalProject/tutorial/Example1
+
+//Value Computed by CMake
+Final_BINARY_DIR:STATIC=/Users/bardamri/3DAnimation/FinalProject/build/tutorial/Final
+
+//Value Computed by CMake
+Final_IS_TOP_LEVEL:STATIC=OFF
+
+//Value Computed by CMake
+Final_SOURCE_DIR:STATIC=/Users/bardamri/3DAnimation/FinalProject/tutorial/Final
 
 //Value Computed by CMake
 GLFW_BINARY_DIR:STATIC=/Users/bardamri/3DAnimation/FinalProject/build/tutorial/glfw
@@ -333,7 +333,7 @@ GLFW_INSTALL:BOOL=OFF
 GLFW_IS_TOP_LEVEL:STATIC=OFF
 
 //Value Computed by CMake
-GLFW_SOURCE_DIR:STATIC=/Users/bardamri/3DAnimation/ass3/external/glfw
+GLFW_SOURCE_DIR:STATIC=/Users/bardamri/3DAnimation/FinalProject/external/glfw
 
 //Use OSMesa for offscreen context creation
 GLFW_USE_OSMESA:BOOL=OFF
@@ -438,7 +438,7 @@ engine_IS_TOP_LEVEL:STATIC=OFF
 engine_LIB_DEPENDS:STATIC=general;igl;general;igl_opengl;general;igl_opengl_glfw;general;igl_opengl_glfw_imgui;
 
 //Value Computed by CMake
-engine_SOURCE_DIR:STATIC=/Users/bardamri/3DAnimation/ass3/tutorial
+engine_SOURCE_DIR:STATIC=/Users/bardamri/3DAnimation/FinalProject/tutorial
 
 //Value Computed by CMake
 glad_BINARY_DIR:STATIC=/Users/bardamri/3DAnimation/FinalProject/build/tutorial/glad
@@ -447,7 +447,7 @@ glad_BINARY_DIR:STATIC=/Users/bardamri/3DAnimation/FinalProject/build/tutorial/g
 glad_IS_TOP_LEVEL:STATIC=OFF
 
 //Value Computed by CMake
-glad_SOURCE_DIR:STATIC=/Users/bardamri/3DAnimation/ass3/external/glad
+glad_SOURCE_DIR:STATIC=/Users/bardamri/3DAnimation/FinalProject/external/glad
 
 //Dependencies for the target
 igl_opengl_LIB_DEPENDS:STATIC=general;igl;general;OpenGL::GL;general;glad;
@@ -468,7 +468,7 @@ igl_stb_image_BINARY_DIR:STATIC=/Users/bardamri/3DAnimation/FinalProject/build/t
 igl_stb_image_IS_TOP_LEVEL:STATIC=OFF
 
 //Value Computed by CMake
-igl_stb_image_SOURCE_DIR:STATIC=/Users/bardamri/3DAnimation/ass3/external/stb
+igl_stb_image_SOURCE_DIR:STATIC=/Users/bardamri/3DAnimation/FinalProject/external/stb
 
 //Dependencies for the target
 imgui_LIB_DEPENDS:STATIC=general;glad;general;glfw;
@@ -483,7 +483,7 @@ libigl_tutorials_BINARY_DIR:STATIC=/Users/bardamri/3DAnimation/FinalProject/buil
 libigl_tutorials_IS_TOP_LEVEL:STATIC=OFF
 
 //Value Computed by CMake
-libigl_tutorials_SOURCE_DIR:STATIC=/Users/bardamri/3DAnimation/ass3/tutorial
+libigl_tutorials_SOURCE_DIR:STATIC=/Users/bardamri/3DAnimation/FinalProject/tutorial
 
 
 ########################
@@ -568,7 +568,7 @@ CMAKE_GENERATOR_TOOLSET:INTERNAL=
 CMAKE_HAVE_LIBC_PTHREAD:INTERNAL=1
 //Source directory with the top level CMakeLists.txt file for this
 // project
-CMAKE_HOME_DIRECTORY:INTERNAL=/Users/bardamri/3DAnimation/ass3
+CMAKE_HOME_DIRECTORY:INTERNAL=/Users/bardamri/3DAnimation/FinalProject
 //ADVANCED property for variable: CMAKE_INSTALL_BINDIR
 CMAKE_INSTALL_BINDIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_INSTALL_DATADIR
