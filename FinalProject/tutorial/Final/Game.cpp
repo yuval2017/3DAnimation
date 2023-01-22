@@ -8,10 +8,14 @@
 #include "ObjectManager.h"
 #include "backgroundHandler.h"
 #include "SoundManager.h"
+#include "Game.h"
 
 
-Game::Game(igl::opengl::glfw::imgui::ImGuiMenu* menu, SoundManager* soundManager) :level(0),score(0.0),maxScore(100.0), health(100.0), maxHealth(100.0),tick(0),
-meshIdCollision(-1), shouldMoveSanke(false), total_money(0),curr_level_money(0),maxLevel(5),speed(0.04){
+Game::Game(std::string name, Display *display, igl::opengl::glfw::imgui::ImGuiMenu *menu,
+           SoundManager *soundManager) : BasicScene(name, display), level(0), score(0.0), maxScore(100.0),
+                                         health(100.0), maxHealth(100.0), tick(0), meshIdCollision(-1),
+                                         shouldMoveSanke(false), total_money(0), curr_level_money(0), maxLevel(5),
+                                         speed(0.04) {
 	 snake         = new Snake             (this, 16);
 	 this->soundManager = soundManager;
 	 gameMenu      = new GameMenu(this,menu);
@@ -20,7 +24,7 @@ meshIdCollision(-1), shouldMoveSanke(false), total_money(0),curr_level_money(0),
 
 	 gameState     = GameState::MENU; 
 	 direction     = Eigen::Vector3d(0, 0, 0.04);
-	 MyTranslate(Eigen::Vector3d(0, 0, -10), true);
+	 Translate(Eigen::Vector3d(0, 0, -10), true);
 	 initGame();
 
 }
@@ -119,8 +123,9 @@ void Game::initMenu(){
 void Game::gameLoop() {
 	tick++;
 	objectManager->updateObjects();
-	if (shouldMoveSanke) 
-		snake->skinnig(direction);
+	if (shouldMoveSanke) {
+        snake->skinnig(direction);
+    }
 	
 	int size = data_list.size();
 	for (int i = 0; i < 16; i++) {
@@ -192,7 +197,7 @@ void Game::increaseProgress() {
 		if(level==maxLevel)
 			gameState = GameState::WIN;
 		else
-		gameState = GameState::NEXTLEVEL;
+		gameState = GameState::Nextlevel;
 	}
 }
 void Game::increaseHealth()

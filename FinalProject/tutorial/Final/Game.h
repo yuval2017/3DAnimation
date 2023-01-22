@@ -11,10 +11,11 @@
 class GameMenu;
 class ObjectManager;
 class SoundManager;
-enum class GameState { PLAY, PAUSED, MENU,LOST,NEXTLEVEL,STORE,WIN };
+enum class GameState { PLAY, PAUSED, MENU,LOST,Nextlevel,STORE,WIN };
 class Game : public BasicScene {
 public:
-	Game(igl::opengl::glfw::imgui::ImGuiMenu* menu, SoundManager* soundManager);
+	Game(std::string name, Display *display, igl::opengl::glfw::imgui::ImGuiMenu *menu,
+         SoundManager *soundManager);
 	~Game();
 	void initMenu();
 	void initGame();
@@ -54,7 +55,9 @@ private:
 	ObjectManager* objectManager;
 	GameState gameState;
 	GameMenu* gameMenu;
+    Snake* snake;
 	backgroundHandler* back;
+    Eigen::Vector3d direction;
 	int level;
 	float score;
 	int total_money;
