@@ -4,6 +4,8 @@
 
 #include <memory>
 #include <utility>
+#include <AABB.h>
+
 using namespace cg3d;
 class BasicScene : public cg3d::Scene
 {
@@ -44,17 +46,15 @@ private:
     float angle= 0.05f;
     bool addCyl = false;
     float scaleFactor = 1;
-
     Eigen::Vector3f ikGetPosition(int id, float length);
+    Eigen::Matrix3f get_euler_rotate_matrix(std::shared_ptr<cg3d::Model> scene,float phi, float theta, float psi);
+    std::vector< igl::AABB<Eigen::MatrixXd, 3>> trees;
+    std::vector< igl::AABB<Eigen::MatrixXd, 3>> subTrees;
+    Eigen::Matrix3f create_new_Rotation_q(std::shared_ptr<cg3d::Model> scene,int xyz, float add_angle);
+
+    void initTree(int i);
+    void print_positions();
+    void print_rotation();
     void IKFabric();
     void reset();
-    Eigen::Matrix3f get_euler_rotate_matrix(std::shared_ptr<cg3d::Model> scene,float phi, float theta, float psi);
-
-
-
-    void print_positions();
-
-    void print_rotation();
-
-    Eigen::Matrix3f create_new_Rotation_q(std::shared_ptr<cg3d::Model> scene,int xyz, float add_angle);
 };

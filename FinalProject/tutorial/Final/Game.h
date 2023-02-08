@@ -3,6 +3,7 @@
 #include "igl/opengl/ViewerData.h"
 #include "igl/opengl/ViewerCore.h"
 #include <time.h>
+#include <AABB.h>
 #include "snake.h"
 #include "backgroundHandler.h"
 #include "ImGuiMenu.h"
@@ -58,6 +59,7 @@ private:
     Snake* snake;
 	backgroundHandler* back;
     Eigen::Vector3d direction;
+
 	int level;
 	float score;
 	int total_money;
