@@ -31,5 +31,17 @@ private:
     void SetCamera(int index);
     static std::shared_ptr<CamModel> CreateCameraWithModel(int width, int height, float fov, float near, float far, const std::shared_ptr<cg3d::Material>& material);
     static void DumpMeshData(const Eigen::IOFormat& simple, const cg3d::MeshData& data) ;
+    void startGameMenu(std::vector<igl::opengl::ViewerCore> &core);
+    void startGameMenuWin(std::vector<igl::opengl::ViewerCore> &core);
+    void startGameMenuNextLevel(std::vector<igl::opengl::ViewerCore> &core);
+    void startGameStore(std::vector<igl::opengl::ViewerCore> &core);
+    void startGameMenuLose(std::vector<igl::opengl::ViewerCore>& core);
+    void startGameMenuPlay(std::vector<igl::opengl::ViewerCore>& core);
+    void startGameMenuPaused(std::vector<igl::opengl::ViewerCore>& core);
+    bool ImGuiSetCond_FirstUseEver;
+    char *msg;
+    char *name;
+    int name_len;
+
 };
 
