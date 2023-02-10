@@ -94,5 +94,13 @@ void Model::SetMeshList(std::vector<std::shared_ptr<Mesh>> _meshList)
     for (auto& mesh: meshList)
         viewerDataListPerMesh.emplace_back(CreateViewerData(mesh));
 }
+//may do it in the game initiate
+igl::AABB<Eigen::MatrixXd, 3> *Model::GetTree(){
+    if(!is_tree_inited){
+        treeA1.init(GetMeshList()[0]->data[0].vertices,GetMeshList()[0]->data[0].faces);
+        is_tree_inited = true;
+    }
+    return &treeA1;
+}
 
 } // namespace cg3d

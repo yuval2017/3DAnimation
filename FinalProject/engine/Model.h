@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <igl/AABB.h>
 #include "Mesh.h"
 #include "Material.h"
 #include "Movable.h"
@@ -24,11 +25,18 @@ protected:
     Model(Model&&) = default; // important: doesn't add itself to the parent's children (object isn't constructed yet)
     Model& operator=(const Model& other) = default;
 
+    //add to eigen
+    igl::AABB<Eigen::MatrixXd, 3> treeA1;
+    bool is_tree_inited = false;
+
 public:
     template<typename... Args>
     static std::shared_ptr<Model> Create(Args&&... args) {
         return std::shared_ptr<Model>{new Model{std::forward<Args>(args)...}}; // NOLINT(modernize-make-shared)
     }
+    //add to eigen
+    igl::AABB<Eigen::MatrixXd, 3> *GetTree();
+
 
     ~Model() override = default;
 
@@ -59,6 +67,8 @@ private:
     Eigen::RowVector4f ambient = Eigen::RowVector4f(1.0, 1.0, 1.0, 1.0);
     Eigen::RowVector4f diffuse = Eigen::RowVector4f(1.0, 1.0, 1.0, 1.0);
     Eigen::RowVector4f specular = Eigen::RowVector4f(1.0, 1.0, 1.0, 1.0);
+
+
 };
 
 } // namespace cg3d

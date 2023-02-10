@@ -38,6 +38,11 @@ public:
     virtual void Update(const Program& program, const Eigen::Matrix4f& proj, const Eigen::Matrix4f& view, const Eigen::Matrix4f& model);
 
     std::shared_ptr<Model> pickedModel;
+    //added for engine
+    std::shared_ptr<Model> snake;
+    std::vector<std::shared_ptr<Model>> game_models;
+
+
     std::shared_ptr<Camera> camera;
     virtual void Draw_changes();
     virtual void MouseCallback(Viewport* viewport, int x, int y, int button, int action, int mods, int buttonState[]);

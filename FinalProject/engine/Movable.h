@@ -26,6 +26,9 @@ private:
     Eigen::Matrix4f aggregatedTransform{Eigen::Matrix4f::Identity()}; // aggregation of all transformations starting from top level
 
 public:
+    //add to eigen
+    float scale_factor = 1.0f;
+
     std::string name;
 
     template<typename... Args>

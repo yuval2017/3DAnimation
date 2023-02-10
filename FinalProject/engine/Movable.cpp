@@ -199,6 +199,7 @@ void Movable::Scale(const Eigen::Vector3f& scaleVec)
 
 void Movable::Scale(float factor)
 {
+    scale_factor = factor;
     Scale(factor, Axis::XYZ);
 }
 

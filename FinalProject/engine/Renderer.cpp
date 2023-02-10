@@ -3,7 +3,7 @@
 #include "DrawVisitor.h"
 #include "Scene.h"
 #include "GLFW/glfw3.h"
-#include "../tutorial/Final/BasicScene.h"
+#include "../tutorial/Example1/BasicScene.h"
 
 namespace cg3d
 {
@@ -29,15 +29,13 @@ void Renderer::RenderViewport(Viewport* viewport, Visitor* visitor)
 {
     if (!visitor)
         visitor = &defaultVisitor;
-
     viewport->Bind();
     visitor->Run(viewport->scene.get(), viewport->camera.get());
+    meshCollisionVisitor.Run(viewport->scene.get(), viewport->camera.get());
 }
 
 void Renderer::Draw() {
-
     RenderAllViewports();
-    viewports[0]->scene->Draw_changes();
 }
 
 void Renderer::RenderViewportAtPos(int x, int y, Visitor* visitor)
@@ -51,10 +49,7 @@ void Renderer::RenderViewportAtPos(int x, int y, Visitor* visitor)
 void Renderer::RenderAllViewports()
 {
     defaultVisitor.Init();
-
-
-
-
+    meshCollisionVisitor.Init();
     for (auto& viewport: viewports)
         RenderViewport(viewport.get());
 }
