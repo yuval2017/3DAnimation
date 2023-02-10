@@ -40,11 +40,13 @@ void Snake::MoveLeft(){
 }
 void Snake::MoveRight(){
     bones[0]->Rotate(-0.1f, cg3d::Movable::Axis::Y);
-    bones[1]->Rotate(+0.1f, cg3d::Movable::Axis::Y);
+    bones[1]->Rotate(0.1f, cg3d::Movable::Axis::Y);
 }
 void Snake::MoveUp(){
-
+    bones[0]->Rotate(0.1f, cg3d::Movable::Axis::X);
+    bones[1]->Rotate(-0.1f, cg3d::Movable::Axis::X);
 }
 void Snake::MoveDone(){
-
+    bones[0]->Rotate(-0.1f, cg3d::Movable::Axis::X);
+    bones[1]->Rotate(0.1f, cg3d::Movable::Axis::X);
 }

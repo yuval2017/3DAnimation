@@ -9,31 +9,24 @@
 #include "Scene.h"
 using namespace std;
 void cg3d::MeshCollisionVisitor::Run(cg3d::Scene *scene, cg3d::Camera *camera) {
-    Visitor::Run(scene, camera);
     basicScene = (BasicScene *)scene;
+    Visitor::Run(basicScene, camera);
+
 }
 
 
-void cg3d::MeshCollisionVisitor::Visit(Scene *scene){
-    BasicScene *_scene = (BasicScene *)scene;
-    if (false){
-        auto snake = _scene->snake->GetSnakeBones()[0];
-        for(std::shared_ptr<Model> model: _scene->game_models){
-            igl::AABB<Eigen::MatrixXd, 3>* treeA = (snake)->GetTree();
-
-            igl::AABB<Eigen::MatrixXd, 3>* treeB = model->GetTree();
-
-            if(isMeshCollision(snake,model,((snake)->GetTree()),model->GetTree())){
-                scene->animate = false;
-                std::cout<< "collision with " <<model->name<< " \n"<< std::endl;
-
-            }
+void cg3d::MeshCollisionVisitor::Visit(Model *model) {
+    if (model->name != std::string("bone 0")) {
+        std::shared_ptr <Model> snake = basicScene->snake->GetSnakeBones()[0];
+        if (isMeshCollision(snake, model, ((snake)->GetTree()), model->GetTree())) {
+            //basicScene->animate = false;
+            std::cout << "collision with " << model->name << " \n" << std::endl;
         }
     }
-
 }
 
-bool cg3d::MeshCollisionVisitor::isMeshCollision(std::shared_ptr<cg3d::Model> mesh1, std::shared_ptr<cg3d::Model> mesh2, igl::AABB<Eigen::MatrixXd, 3>* treeA, igl::AABB<Eigen::MatrixXd, 3>* treeB){
+
+bool cg3d::MeshCollisionVisitor::isMeshCollision(std::shared_ptr<cg3d::Model> mesh1, Model* mesh2, igl::AABB<Eigen::MatrixXd, 3>* treeA, igl::AABB<Eigen::MatrixXd, 3>* treeB){
     //base cases
 
     if (treeA == nullptr || treeB == nullptr){
@@ -67,7 +60,7 @@ bool cg3d::MeshCollisionVisitor::isMeshCollision(std::shared_ptr<cg3d::Model> me
            isMeshCollision(mesh1, mesh2, treeA->m_right, treeB->m_left) |
            isMeshCollision(mesh1, mesh2, treeA->m_right, treeB->m_right);
 }
-bool cg3d::MeshCollisionVisitor::isBoxesIntersect(Eigen::AlignedBox<double, 3>& boxA, Eigen::AlignedBox<double, 3>& boxB, const std::shared_ptr<cg3d::Model>& mesh1,const std::shared_ptr<cg3d::Model> &mesh2){
+bool cg3d::MeshCollisionVisitor::isBoxesIntersect(Eigen::AlignedBox<double, 3>& boxA, Eigen::AlignedBox<double, 3>& boxB, const std::shared_ptr<cg3d::Model>& mesh1,Model* mesh2){
     // matrix A
     Eigen::Matrix3d A = mesh1->GetRotation().cast<double>();
     Eigen::Vector3d A0 = A.col(0);

@@ -20,6 +20,7 @@ public:
     Snake *snake;
     //added for engine
     std::vector<std::shared_ptr<cg3d::Model>> game_models;
+    bool done_inite = false;
 private:
     std::shared_ptr<Movable> root;
     std::shared_ptr<cg3d::Model> sphere1, sphere2, sphere3 ,cube;

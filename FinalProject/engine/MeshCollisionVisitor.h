@@ -19,12 +19,14 @@ class MeshCollisionVisitor :public Visitor
 public:
             void Run(Scene *scene, Camera *camera)
             override;
-            void Visit(Scene *scene)
+//            void Visit(Scene *scene)
+//            override;
+            void Visit(Model *model)
             override;
 
 protected:
-    bool isMeshCollision (std::shared_ptr<cg3d::Model> mesh1, std::shared_ptr<cg3d::Model> mesh2,igl::AABB<Eigen::MatrixXd, 3>* treeA, igl::AABB<Eigen::MatrixXd, 3>* treeB);
-    bool isBoxesIntersect(Eigen::AlignedBox<double, 3>& boxA, Eigen::AlignedBox<double, 3>& boxB, const std::shared_ptr<cg3d::Model>& mesh1, const std::shared_ptr<cg3d::Model> &mesh2);
+    bool isMeshCollision (std::shared_ptr<cg3d::Model> mesh1, Model* mesh2,igl::AABB<Eigen::MatrixXd, 3>* treeA, igl::AABB<Eigen::MatrixXd, 3>* treeB);
+    bool isBoxesIntersect(Eigen::AlignedBox<double, 3>& boxA, Eigen::AlignedBox<double, 3>& boxB, const std::shared_ptr<cg3d::Model>& mesh1, Model* mesh2);
     BasicScene *basicScene;
     };
 }

@@ -14,6 +14,7 @@ using namespace cg3d;
 
 void BasicScene::Init(float fov, int width, int height, float near, float far)
 {
+    done_inite = false;
     camera = Camera::Create( "camera", fov, float(width) / height, near, far);
 
     AddChild(root = Movable::Create("root")); // a common (invisible) parent object for all the shapes
@@ -87,6 +88,7 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     autoCube->showWireframe = true;
 
     sphere2->Translate({6,0,0});
+    sphere1->Translate({4,0,0});
     autoCube->Translate({-6,0,0});
     sphere3->Translate({-4,0,0});
 
@@ -245,7 +247,7 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
                     pickedIndex--;
                 break;
             case GLFW_KEY_2:
-
+                done_inite = true;
                 break;
             case GLFW_KEY_3:
 
