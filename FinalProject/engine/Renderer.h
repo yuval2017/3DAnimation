@@ -4,6 +4,7 @@
 #include "Viewport.h"
 #include "DrawVisitor.h"
 #include "MeshCollisionVisitor.h"
+#include "AnimationVisitor.h"
 #include "GLFW/glfw3.h"
 
 
@@ -34,10 +35,13 @@ public:
     [[nodiscard]] inline int GetWindowHeight() const { return windowHeight; };
 
 private:
-    Viewport* FindViewportAtPos(int x, int y);
 
-    DrawVisitor defaultVisitor;
+
     MeshCollisionVisitor meshCollisionVisitor;
+    AnimationVisitor animationVisitor;
+
+    Viewport* FindViewportAtPos(int x, int y);
+    DrawVisitor defaultVisitor;
     std::vector<std::shared_ptr<Viewport>> viewports;
     Viewport* viewportAtMousePress = nullptr;
     Viewport* viewportAtKeyPress = nullptr;

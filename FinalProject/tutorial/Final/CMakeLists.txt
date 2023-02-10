@@ -1,4 +1,4 @@
-get_filename_component(PROJECT_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+get_filename_component(PROJECT_NAME ../Example1 NAME)
 
 message(STATUS "Creating target: ${PROJECT_NAME}")
 

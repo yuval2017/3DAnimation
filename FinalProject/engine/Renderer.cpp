@@ -32,6 +32,8 @@ void Renderer::RenderViewport(Viewport* viewport, Visitor* visitor)
     viewport->Bind();
     visitor->Run(viewport->scene.get(), viewport->camera.get());
     meshCollisionVisitor.Run(viewport->scene.get(), viewport->camera.get());
+    animationVisitor.Run(viewport->scene.get(), viewport->camera.get());
+
 }
 
 void Renderer::Draw() {
@@ -50,6 +52,7 @@ void Renderer::RenderAllViewports()
 {
     defaultVisitor.Init();
     meshCollisionVisitor.Init();
+    animationVisitor.Init();
     for (auto& viewport: viewports)
         RenderViewport(viewport.get());
 }

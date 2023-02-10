@@ -38,9 +38,7 @@ public:
     virtual void Update(const Program& program, const Eigen::Matrix4f& proj, const Eigen::Matrix4f& view, const Eigen::Matrix4f& model);
 
     std::shared_ptr<Model> pickedModel;
-    //added for engine
-    std::shared_ptr<Model> snake;
-    std::vector<std::shared_ptr<Model>> game_models;
+
 
 
     std::shared_ptr<Camera> camera;
@@ -52,7 +50,7 @@ public:
     virtual void CharCallback(Viewport* viewport, int x, int y, unsigned int codepoint);
     virtual void ViewportSizeCallback(Viewport* viewport);
     virtual void AddViewportCallback(Viewport* viewport) {};
-    bool animate = false;
+    bool animate = true;
 
 protected:
     Renderer* renderer; // required for picking

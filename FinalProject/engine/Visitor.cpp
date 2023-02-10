@@ -1,7 +1,6 @@
 #include "Visitor.h"
 #include "Scene.h"
 
-
 namespace cg3d
 {
 
@@ -10,7 +9,6 @@ void Visitor::Run(Scene* scene, Camera* camera)
     proj = camera->GetViewProjection();
     view = camera->GetAggregatedTransform().inverse();
     norm = scene->GetAggregatedTransform();
-    this->scene = scene;
     scene->Accept(this);
 }
 

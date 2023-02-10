@@ -2,7 +2,6 @@
 #include <Eigen/src/Core/Matrix.h>
 
 #include <memory>
-#include <per_face_normals.h>
 
 #include "GLFW/glfw3.h"
 #include "Mesh.h"
@@ -10,10 +9,6 @@
 #include "Renderer.h"
 #include "IglMeshLoader.h"
 
-#include "igl/edge_flaps.h"
-
-
-// #include "AutoMorphingModel.h"
 
 using namespace cg3d;
 
@@ -40,10 +35,14 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
 
     material->AddTexture(0, "textures/box0.bmp", 2);
     auto sphereMesh{IglLoader::MeshFromFiles("sphere_igl", "data/sphere.obj")};
-    auto cylMesh{IglLoader::MeshFromFiles("cyl_igl","data/xcylinder.obj")};
+    auto sphereMesh2{IglLoader::MeshFromFiles("sphere_igl", "data/sphere.obj")};
+    auto sphereMesh3{IglLoader::MeshFromFiles("sphere_igl", "data/sphere.obj")};
+
+    auto cylMesh{IglLoader::MeshFromFiles("cyl_igl","data/zcylinder.obj")};
     auto cubeMesh{IglLoader::MeshFromFiles("cube_igl","data/cube_old.obj")};
 
     cube = Model::Create( "cube", cubeMesh, material);
+
 
     //Axis
     Eigen::MatrixXd vertices(6,3);
@@ -56,40 +55,69 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     axis.push_back(Model::Create("axis",coordsys,material1));
     axis[0]->mode = 1;
     axis[0]->Scale(4,Axis::XYZ);
-    // axis[0]->lineWidth = 5;
+
     root->AddChild(axis[0]);
     float scaleFactor = 1;
-    cyls.push_back( Model::Create("cyl",cylMesh, material));
-    cyls[0]->Scale(scaleFactor,Axis::X);
-    cyls[0]->SetCenter(Eigen::Vector3f(-0.8f*scaleFactor,0,0));
+    cyls.push_back( Model::Create("bone 0",cylMesh, material));
+    cyls[0]->Scale(scaleFactor,Axis::Z);
+    cyls[0]->SetCenter(Eigen::Vector3f(0,0,-0.8f*scaleFactor));
     root->AddChild(cyls[0]);
 
     for(int i = 1;i < 3; i++)
     {
-        cyls.push_back( Model::Create("cyl", cylMesh, material));
-        cyls[i]->Scale(scaleFactor,Axis::X);
-        cyls[i]->Translate(1.6f*scaleFactor,Axis::X);
-        cyls[i]->SetCenter(Eigen::Vector3f(-0.8f*scaleFactor,0,0));
+        cyls.push_back( Model::Create("bone " + std::to_string(i), cylMesh, material));
+        cyls[i]->Scale(scaleFactor,Axis::Z);
+        cyls[i]->Translate(1.6f*scaleFactor,Axis::Z);
+        cyls[i]->SetCenter(Eigen::Vector3f(0,0,-0.8f*scaleFactor));
         cyls[i-1]->AddChild(cyls[i]);
     }
-    cyls[0]->Translate({0.8f*scaleFactor,0,0});
-
+    cyls[0]->Translate({0,0,0.8f*scaleFactor});
+    cyls[0]->AddChild(camera);
+    snake = new Snake(material,root,camera);
     auto morphFunc = [](Model* model, cg3d::Visitor* visitor) {
         return model->meshIndex;//(model->GetMeshList())[0]->data.size()-1;
     };
-    autoCube = AutoMorphingModel::Create(*cube, morphFunc);
-    autoCube->Translate({-6,0,0});
 
-    sphere1 = Model::Create( "sphere",sphereMesh, material);
+
+
+    autoCube = AutoMorphingModel::Create(*cube, morphFunc);
+
+
+
+    sphere1 = Model::Create( "sphere1",sphereMesh, material);
+    sphere2 = Model::Create( "sphere2",sphereMesh2, material);
+    sphere3 = Model::Create( "sphere3",sphereMesh3, material);
+
+
+
+
+
+
+
+    root->AddChild(sphere1);
+    root->AddChild(sphere2);
+    root->AddChild(sphere3);
+//    root->AddChild(cyl);
+    root->AddChild(autoCube);
+
     sphere1->showWireframe = true;
+    sphere2->showWireframe = true;
+    sphere3->showWireframe = true;
+
+
+
     //autoCube->Scale(1.5f);
 //    sphere1->Translate({-2,0,0});
 
     autoCube->showWireframe = true;
+
+    sphere2->Translate({6,0,0});
+    autoCube->Translate({-6,0,0});
+    sphere3->Translate({-4,0,0});
+
     camera->Translate(22, Axis::Z);
-    root->AddChild(sphere1);
-//    root->AddChild(cyl);
-    root->AddChild(autoCube);
+    camera->Translate(10, Axis::Y);
+    camera->RotateByDegree(-10.f,Axis::X);
     // points = Eigen::MatrixXd::Ones(1,3);
     // edges = Eigen::MatrixXd::Ones(1,3);
     // colors = Eigen::MatrixXd::Ones(1,3);
@@ -98,25 +126,11 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     cube->mode =1;
     auto mesh = cube->GetMeshList();
 
-    //autoCube->AddOverlay(points,edges,colors);
-    // mesh[0]->data.push_back({V,F,V,E});
-    int num_collapsed;
 
-    // Function to reset original mesh and data structures
-    V = mesh[0]->data[0].vertices;
-    F = mesh[0]->data[0].faces;
-    // igl::read_triangle_mesh("data/cube.off",V,F);
-    igl::edge_flaps(F,E,EMAP,EF,EI);
-    std::cout<< "vertices: \n" << V <<std::endl;
-    std::cout<< "faces: \n" << F <<std::endl;
-
-    std::cout<< "edges: \n" << E.transpose() <<std::endl;
-    std::cout<< "edges to faces: \n" << EF.transpose() <<std::endl;
-    std::cout<< "faces to edges: \n "<< EMAP.transpose()<<std::endl;
-    std::cout<< "edges indices: \n" << EI.transpose() <<std::endl;
     game_models.resize(0);
-    game_models.push_back(cube);
-    snake = sphere1;
+    game_models.push_back(sphere2);
+    game_models.push_back(sphere3);
+
 
 }
 
@@ -226,10 +240,14 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
                 cyls[pickedIndex]->RotateInSystem(system, -0.1f, Axis::X);
                 break;
             case GLFW_KEY_LEFT:
-                sphere1->Translate(-0.1f, Axis::X);
+                cyls[0]->Rotate(0.1f, Axis::Y);
+                cyls[1]->Rotate(-0.1f, Axis::Y);
+
                 break;
             case GLFW_KEY_RIGHT:
-                cyls[pickedIndex]->RotateInSystem(system, -0.1f, Axis::Y);
+                cyls[0]->Rotate(-0.1f, Axis::Y);
+                cyls[1]->Rotate(0.1f, Axis::Y);
+
                 break;
             case GLFW_KEY_W:
                 camera->TranslateInSystem(system, {0, 0.1f, 0});

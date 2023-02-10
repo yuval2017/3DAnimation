@@ -2,7 +2,7 @@
 #include "MeshCollisionVisitor.h"
 #include "Visitor.h"
 #include "Camera.h"
-
+#include "../tutorial/Final/BasicScene.h"
 #include <utility>
 #include <memory>
 #include "iostream"
@@ -15,18 +15,22 @@ void cg3d::MeshCollisionVisitor::Run(cg3d::Scene *scene, cg3d::Camera *camera) {
 
 
 void cg3d::MeshCollisionVisitor::Visit(Scene *scene){
+    BasicScene *_scene = (BasicScene *)scene;
+    if (false){
+        auto snake = _scene->snake->GetSnakeBones()[0];
+        for(std::shared_ptr<Model> model: _scene->game_models){
+            igl::AABB<Eigen::MatrixXd, 3>* treeA = (snake)->GetTree();
 
-    for(std::shared_ptr<Model> model: scene->game_models){
-        igl::AABB<Eigen::MatrixXd, 3>* treeA = (scene->snake)->GetTree();
+            igl::AABB<Eigen::MatrixXd, 3>* treeB = model->GetTree();
 
-        igl::AABB<Eigen::MatrixXd, 3>* treeB = model->GetTree();
+            if(isMeshCollision(snake,model,((snake)->GetTree()),model->GetTree())){
+                scene->animate = false;
+                std::cout<< "collision with " <<model->name<< " \n"<< std::endl;
 
-        if(isMeshCollision(scene->snake,model,((scene->snake)->GetTree()),model->GetTree())){
-            scene->animate = false;
-            std::cout<< "collision!!!" << " \n"<< std::endl;
-
+            }
         }
     }
+
 }
 
 bool cg3d::MeshCollisionVisitor::isMeshCollision(std::shared_ptr<cg3d::Model> mesh1, std::shared_ptr<cg3d::Model> mesh2, igl::AABB<Eigen::MatrixXd, 3>* treeA, igl::AABB<Eigen::MatrixXd, 3>* treeB){

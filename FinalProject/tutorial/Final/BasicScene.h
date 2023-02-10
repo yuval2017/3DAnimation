@@ -1,6 +1,7 @@
 #pragma once
 #include "AutoMorphingModel.h"
 #include "Scene.h"
+#include "Snake.h"
 
 #include <memory>
 #include <utility>
@@ -16,9 +17,12 @@ public:
     void CursorPosCallback(cg3d::Viewport* viewport, int x, int y, bool dragging, int* buttonState)  override;
     void KeyCallback(cg3d::Viewport* viewport, int x, int y, int key, int scancode, int action, int mods) override;
     Eigen::Vector3f GetSpherePos();
+    Snake *snake;
+    //added for engine
+    std::vector<std::shared_ptr<cg3d::Model>> game_models;
 private:
     std::shared_ptr<Movable> root;
-    std::shared_ptr<cg3d::Model> sphere1 ,cube;
+    std::shared_ptr<cg3d::Model> sphere1, sphere2, sphere3 ,cube;
     std::shared_ptr<cg3d::AutoMorphingModel> autoCube;
     std::vector<std::shared_ptr<cg3d::Model>> cyls, axis;
     int pickedIndex = 0;
