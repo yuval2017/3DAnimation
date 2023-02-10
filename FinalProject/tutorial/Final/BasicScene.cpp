@@ -1,32 +1,17 @@
 #include "BasicScene.h"
 #include <Eigen/src/Core/Matrix.h>
-#include <edges.h>
+
 #include <memory>
 #include <per_face_normals.h>
-#include <read_triangle_mesh.h>
-#include <utility>
-#include <vector>
+
 #include "GLFW/glfw3.h"
 #include "Mesh.h"
 #include "PickVisitor.h"
 #include "Renderer.h"
-#include "ObjLoader.h"
 #include "IglMeshLoader.h"
 
-#include "igl/per_vertex_normals.h"
-#include "igl/per_face_normals.h"
-#include "igl/unproject_onto_mesh.h"
 #include "igl/edge_flaps.h"
-#include "igl/loop.h"
-#include "igl/upsample.h"
-#include "igl/AABB.h"
-#include "igl/parallel_for.h"
-#include "igl/shortest_edge_and_midpoint.h"
-#include "igl/circulation.h"
-#include "igl/edge_midpoints.h"
-#include "igl/collapse_edge.h"
-#include "igl/edge_collapse_is_valid.h"
-#include "igl/write_triangle_mesh.h"
+
 
 // #include "AutoMorphingModel.h"
 

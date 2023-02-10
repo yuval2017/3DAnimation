@@ -1,5 +1,4 @@
 #include "IglMeshLoader.h"
-//#include <per_vertex_normals.h>
 #include <barycentric_coordinates.h>
 #include <vector>
 

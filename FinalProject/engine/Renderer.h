@@ -3,7 +3,7 @@
 #include <vector>
 #include "Viewport.h"
 #include "DrawVisitor.h"
-#include "../tutorial/Final/MeshCollisionVisitor.h"
+#include "MeshCollisionVisitor.h"
 #include "GLFW/glfw3.h"
 
 
