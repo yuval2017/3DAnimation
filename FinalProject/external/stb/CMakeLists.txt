@@ -8,7 +8,7 @@ else()
 	message(WARNING "CMake version is < 3.3, visibility properties for static libraries will be ignored.")
 endif()
 
-add_library(${PROJECT_NAME} igl_stb_image.cpp stb_image.h stb_image_write.h)
+add_library(${PROJECT_NAME} igl_stb_image.cpp stb_image.h stb_image_write.h ../../tutorial/Final/Data.cpp ../../tutorial/Final/Data.h)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Generate position independent code

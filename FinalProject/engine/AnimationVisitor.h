@@ -2,11 +2,8 @@
 // Created by Ofir Gilad on 06/02/2023.
 //
 
-#ifndef ENGINEFORANIMATIONCOURSE_FINALPROJECT_ANIMATIONVISITOR_H
-#define ENGINEFORANIMATIONCOURSE_FINALPROJECT_ANIMATIONVISITOR_H
-
-#endif //ENGINEFORANIMATIONCOURSE_FINALPROJECT_ANIMATIONVISITOR_H
-
+#pragma once
+#include "../tutorial/Final/BasicScene.h"
 #include "Visitor.h"
 #include "Model.h"
 #include <vector>
@@ -22,7 +19,7 @@ namespace cg3d
 
     private:
         std::vector<Model*> models;
-        Scene* scene;
+        BasicScene* basicScene;
         Eigen::Quaternionf quaternion;
         int bone_index = 0;
         int number_of_bones = 2; // without the first bone

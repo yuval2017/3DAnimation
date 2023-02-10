@@ -1,15 +1,16 @@
 //
 // Created by יובל היטר on 16/01/2023.
 //
+#pragma once
 #include "Visitor.h"
 #include <vector>
 #include <AABB.h>
 #include "igl/read_triangle_mesh.cpp"
 #include "igl/edge_flaps.h"
 #include "igl/per_vertex_normals.h"
+#include "../tutorial/Final/BasicScene.h"
 
-#ifndef ENGINEREWORK_MESHCOLLISIONVISITOR_H
-#define ENGINEREWORK_MESHCOLLISIONVISITOR_H
+
 namespace cg3d
 {
 
@@ -24,8 +25,7 @@ public:
 protected:
     bool isMeshCollision (std::shared_ptr<cg3d::Model> mesh1, std::shared_ptr<cg3d::Model> mesh2,igl::AABB<Eigen::MatrixXd, 3>* treeA, igl::AABB<Eigen::MatrixXd, 3>* treeB);
     bool isBoxesIntersect(Eigen::AlignedBox<double, 3>& boxA, Eigen::AlignedBox<double, 3>& boxB, const std::shared_ptr<cg3d::Model>& mesh1, const std::shared_ptr<cg3d::Model> &mesh2);
+    BasicScene *basicScene;
     };
 }
 
-
-#endif //ENGINEREWORK_MESHCOLLISIONVISITOR_H

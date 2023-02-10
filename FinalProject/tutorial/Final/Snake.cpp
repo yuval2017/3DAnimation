@@ -6,9 +6,10 @@
 #include "Movable.h"
 #include "IglMeshLoader.h"
 
-
-Snake::Snake(std::shared_ptr<cg3d::Material> material, std::shared_ptr<cg3d::Movable> root,auto _camera){
-    this->camera = _camera;
+Snake::Snake(){
+    std::cout<< "Snake :) " << " \n"<< std::endl;
+}
+Snake::Snake(const std::shared_ptr<cg3d::Material>& material, const std::shared_ptr<cg3d::Movable>& root, std::shared_ptr<cg3d::Camera> _camera){
     auto cylMesh{cg3d::IglLoader::MeshFromFiles("cyl_igl","data/zcylinder.obj")};
     bones.push_back(cg3d::Model::Create("bone 0",cylMesh, material));
     bones[0]->Scale(scaleFactor,cg3d::Movable::Axis::Z);
@@ -24,7 +25,8 @@ Snake::Snake(std::shared_ptr<cg3d::Material> material, std::shared_ptr<cg3d::Mov
         bones[i-1]->AddChild(bones[i]);
     }
     bones[0]->Translate({0,0,0.8f*scaleFactor});
-    bones[0]->AddChild(_camera);
+    camera = _camera;
+    bones[0]->AddChild(camera);
 }
 std::vector<std::shared_ptr<cg3d::Model>> Snake::GetSnakeBones(){
     return bones;

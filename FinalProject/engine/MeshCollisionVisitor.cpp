@@ -2,7 +2,6 @@
 #include "MeshCollisionVisitor.h"
 #include "Visitor.h"
 #include "Camera.h"
-#include "../tutorial/Final/BasicScene.h"
 #include <utility>
 #include <memory>
 #include "iostream"
@@ -11,6 +10,7 @@
 using namespace std;
 void cg3d::MeshCollisionVisitor::Run(cg3d::Scene *scene, cg3d::Camera *camera) {
     Visitor::Run(scene, camera);
+    basicScene = (BasicScene *)scene;
 }
 
 

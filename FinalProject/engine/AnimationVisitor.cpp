@@ -12,8 +12,8 @@ namespace cg3d
 {
     void AnimationVisitor::Run(Scene* _scene, Camera* camera)
     {
-        scene =  _scene;
-        Visitor::Run(scene, camera);
+        basicScene =  (BasicScene *)_scene;
+        Visitor::Run(basicScene, camera);
     }
 
     void AnimationVisitor::Visit(Model* model)
@@ -23,7 +23,7 @@ namespace cg3d
         Eigen::Vector3f vector1 = Eigen::Vector3f(1, 0, 0);
         Eigen::Vector3f vector2;
 
-        if (scene->animate)
+        if (basicScene->animate)
         {
             if (model->name.find("bone") != std::string::npos)
             {

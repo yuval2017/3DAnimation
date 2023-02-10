@@ -44,35 +44,10 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     cube = Model::Create( "cube", cubeMesh, material);
 
 
-    //Axis
-    Eigen::MatrixXd vertices(6,3);
-    vertices << -1,0,0,1,0,0,0,-1,0,0,1,0,0,0,-1,0,0,1;
-    Eigen::MatrixXi faces(3,2);
-    faces << 0,1,2,3,4,5;
-    Eigen::MatrixXd vertexNormals = Eigen::MatrixXd::Ones(6,3);
-    Eigen::MatrixXd textureCoords = Eigen::MatrixXd::Ones(6,2);
-    std::shared_ptr<Mesh> coordsys = std::make_shared<Mesh>("coordsys",vertices,faces,vertexNormals,textureCoords);
-    axis.push_back(Model::Create("axis",coordsys,material1));
-    axis[0]->mode = 1;
-    axis[0]->Scale(4,Axis::XYZ);
-
-    root->AddChild(axis[0]);
     float scaleFactor = 1;
-    cyls.push_back( Model::Create("bone 0",cylMesh, material));
-    cyls[0]->Scale(scaleFactor,Axis::Z);
-    cyls[0]->SetCenter(Eigen::Vector3f(0,0,-0.8f*scaleFactor));
-    root->AddChild(cyls[0]);
 
-    for(int i = 1;i < 3; i++)
-    {
-        cyls.push_back( Model::Create("bone " + std::to_string(i), cylMesh, material));
-        cyls[i]->Scale(scaleFactor,Axis::Z);
-        cyls[i]->Translate(1.6f*scaleFactor,Axis::Z);
-        cyls[i]->SetCenter(Eigen::Vector3f(0,0,-0.8f*scaleFactor));
-        cyls[i-1]->AddChild(cyls[i]);
-    }
-    cyls[0]->Translate({0,0,0.8f*scaleFactor});
-    cyls[0]->AddChild(camera);
+
+
     snake = new Snake(material,root,camera);
     auto morphFunc = [](Model* model, cg3d::Visitor* visitor) {
         return model->meshIndex;//(model->GetMeshList())[0]->data.size()-1;
@@ -234,19 +209,17 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
                 glfwSetWindowShouldClose(window, GLFW_TRUE);
                 break;
             case GLFW_KEY_UP:
-                cyls[pickedIndex]->RotateInSystem(system, 0.1f, Axis::X);
+                snake->MoveUp();
                 break;
             case GLFW_KEY_DOWN:
-                cyls[pickedIndex]->RotateInSystem(system, -0.1f, Axis::X);
+                snake->MoveDone();
                 break;
             case GLFW_KEY_LEFT:
-                cyls[0]->Rotate(0.1f, Axis::Y);
-                cyls[1]->Rotate(-0.1f, Axis::Y);
+                snake->MoveLeft();
 
                 break;
             case GLFW_KEY_RIGHT:
-                cyls[0]->Rotate(-0.1f, Axis::Y);
-                cyls[1]->Rotate(0.1f, Axis::Y);
+                snake->MoveRight();
 
                 break;
             case GLFW_KEY_W:
@@ -272,26 +245,13 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
                     pickedIndex--;
                 break;
             case GLFW_KEY_2:
-                if(pickedIndex < cyls.size()-1)
-                    pickedIndex++;
+
                 break;
             case GLFW_KEY_3:
-                if( tipIndex >= 0)
-                {
-                    if(tipIndex == cyls.size())
-                        tipIndex--;
-                    sphere1->Translate(GetSpherePos());
-                    tipIndex--;
-                }
+
                 break;
             case GLFW_KEY_4:
-                if(tipIndex < cyls.size())
-                {
-                    if(tipIndex < 0)
-                        tipIndex++;
-                    sphere1->Translate(GetSpherePos());
-                    tipIndex++;
-                }
+
                 break;
         }
     }
@@ -301,6 +261,5 @@ Eigen::Vector3f BasicScene::GetSpherePos()
 {
     Eigen::Vector3f l = Eigen::Vector3f(1.6f,0,0);
     Eigen::Vector3f res;
-    res = cyls[tipIndex]->GetRotation()*l;
     return res;
 }

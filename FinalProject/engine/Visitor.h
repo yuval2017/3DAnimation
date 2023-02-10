@@ -2,7 +2,6 @@
 
 #include "Eigen/Core"
 
-
 namespace cg3d
 {
 

@@ -2,10 +2,10 @@
 // Created by יובל היטר on 10/02/2023.
 //
 
-#ifndef ENGINEREWORK_SNAKE_H
-#define ENGINEREWORK_SNAKE_H
+#pragma once
 #include "iostream"
 #include "Model.h"
+#include "Camera.h"
 using namespace cg3d;
 class Snake {
 private:
@@ -15,7 +15,8 @@ private:
     float scaleFactor = 1.0f;
 
 public:
-    Snake(std::shared_ptr<cg3d::Material> material, std::shared_ptr<cg3d::Movable> root, auto _camera);
+    Snake();
+    Snake(const std::shared_ptr<cg3d::Material>& material, const std::shared_ptr<cg3d::Movable>& root, std::shared_ptr<cg3d::Camera> _camera);
     std::vector<std::shared_ptr<cg3d::Model>> GetSnakeBones();
     void SetSpeed(float new_speed);
     float GetSpeed(){return speed;};
@@ -26,4 +27,3 @@ public:
 };
 
 
-#endif //ENGINEREWORK_SNAKE_H
