@@ -18,6 +18,7 @@ namespace cg3d
         void Visit(Model* model) override;
 
     private:
+        void MoveAccordingToBezierCurve(Model *model);
         std::vector<Model*> models;
         BasicScene* basicScene;
         Eigen::Quaternionf quaternion;

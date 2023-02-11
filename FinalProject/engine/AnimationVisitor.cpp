@@ -18,6 +18,7 @@ namespace cg3d
 
     void AnimationVisitor::Visit(Model* model)
     {
+        //basicScene->snake->skinning(Eigen::Vector3d(1, 0, 0));
         Eigen::Matrix3f system = model->GetRotation().transpose();
 
         Eigen::Vector3f vector1 = Eigen::Vector3f(1, 0, 0);
@@ -59,5 +60,9 @@ namespace cg3d
                 }
             }
         }
+    }
+
+    void AnimationVisitor::MoveAccordingToBezierCurve(Model *model) {
+
     }
 }

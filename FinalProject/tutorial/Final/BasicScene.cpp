@@ -39,17 +39,18 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     auto sphereMesh2{IglLoader::MeshFromFiles("sphere_igl", "data/sphere.obj")};
     auto sphereMesh3{IglLoader::MeshFromFiles("sphere_igl", "data/sphere.obj")};
 
-    auto cylMesh{IglLoader::MeshFromFiles("cyl_igl","data/zcylinder.obj")};
+
     auto cubeMesh{IglLoader::MeshFromFiles("cube_igl","data/cube_old.obj")};
 
     cube = Model::Create( "cube", cubeMesh, material);
 
 
-    float scaleFactor = 1;
 
 
 
     snake = new Snake(material,root,camera);
+
+
     auto morphFunc = [](Model* model, cg3d::Visitor* visitor) {
         return model->meshIndex;//(model->GetMeshList())[0]->data.size()-1;
     };

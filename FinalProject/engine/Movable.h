@@ -95,6 +95,8 @@ public:
     std::weak_ptr<Movable> scene;
 
     void Rotate(const Eigen::Quaternionf &rot);
+
+    void SetTranslation(Eigen::Vector3d position, int id);
 };
 
 } // namespace cg3d
