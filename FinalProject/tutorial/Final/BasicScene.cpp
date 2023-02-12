@@ -14,101 +14,9 @@ using namespace cg3d;
 
 void BasicScene::Init(float fov, int width, int height, float near, float far)
 {
-    done_inite = false;
+    //init game objects
     camera = Camera::Create( "camera", fov, float(width) / height, near, far);
-
-    AddChild(root = Movable::Create("root")); // a common (invisible) parent object for all the shapes
-    auto daylight{std::make_shared<Material>("daylight", "shaders/cubemapShader")};
-    daylight->AddTexture(0, "textures/cubemaps/Daylight Box_", 3);
-    auto background{Model::Create("background", Mesh::Cube(), daylight)};
-    AddChild(background);
-    background->Scale(120, Axis::XYZ);
-    background->SetPickable(false);
-    background->SetStatic();
-
-
-    auto program = std::make_shared<Program>("shaders/phongShader");
-    auto program1 = std::make_shared<Program>("shaders/pickingShader");
-
-    auto material{ std::make_shared<Material>("material", program)}; // empty material
-    auto material1{ std::make_shared<Material>("material", program1)}; // empty material
-//    SetNamedObject(cube, Model::Create, Mesh::Cube(), material, shared_from_this());
-
-    material->AddTexture(0, "textures/box0.bmp", 2);
-    auto sphereMesh{IglLoader::MeshFromFiles("sphere_igl", "data/sphere.obj")};
-    auto sphereMesh2{IglLoader::MeshFromFiles("sphere_igl", "data/sphere.obj")};
-    auto sphereMesh3{IglLoader::MeshFromFiles("sphere_igl", "data/sphere.obj")};
-
-
-    auto cubeMesh{IglLoader::MeshFromFiles("cube_igl","data/cube_old.obj")};
-
-    cube = Model::Create( "cube", cubeMesh, material);
-
-
-
-
-
-    snake = new Snake(material,root,camera);
-
-
-    auto morphFunc = [](Model* model, cg3d::Visitor* visitor) {
-        return model->meshIndex;//(model->GetMeshList())[0]->data.size()-1;
-    };
-
-
-
-    autoCube = AutoMorphingModel::Create(*cube, morphFunc);
-
-
-
-    sphere1 = Model::Create( "sphere1",sphereMesh, material);
-    sphere2 = Model::Create( "sphere2",sphereMesh2, material);
-    sphere3 = Model::Create( "sphere3",sphereMesh3, material);
-
-
-
-
-
-
-
-    root->AddChild(sphere1);
-    root->AddChild(sphere2);
-    root->AddChild(sphere3);
-//    root->AddChild(cyl);
-    root->AddChild(autoCube);
-
-    sphere1->showWireframe = true;
-    sphere2->showWireframe = true;
-    sphere3->showWireframe = true;
-
-
-
-    //autoCube->Scale(1.5f);
-//    sphere1->Translate({-2,0,0});
-
-    autoCube->showWireframe = true;
-
-    sphere2->Translate({6,0,0});
-    sphere1->Translate({4,0,0});
-    autoCube->Translate({-6,0,0});
-    sphere3->Translate({-4,0,0});
-
-    camera->Translate(22, Axis::Z);
-    camera->Translate(10, Axis::Y);
-    camera->RotateByDegree(-10.f,Axis::X);
-    // points = Eigen::MatrixXd::Ones(1,3);
-    // edges = Eigen::MatrixXd::Ones(1,3);
-    // colors = Eigen::MatrixXd::Ones(1,3);
-
-    // cyl->AddOverlay({points,edges,colors},true);
-    cube->mode =1;
-    auto mesh = cube->GetMeshList();
-
-
-    game_models.resize(0);
-    game_models.push_back(sphere2);
-    game_models.push_back(sphere3);
-
+    init_objects();
 
 }
 
@@ -120,8 +28,6 @@ void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, con
     program.SetUniform4f("Kdi", 0.5f, 0.5f, 0.0f, 1.0f);
     program.SetUniform1f("specular_exponent", 5.0f);
     program.SetUniform4f("light_position", 0.0, 15.0f, 0.0, 1.0f);
-//    cyl->Rotate(0.001f, Axis::Y);
-    cube->Rotate(0.1f, Axis::XYZ);
 }
 
 void BasicScene::MouseCallback(Viewport* viewport, int x, int y, int button, int action, int mods, int buttonState[])
@@ -265,4 +171,23 @@ Eigen::Vector3f BasicScene::GetSpherePos()
     Eigen::Vector3f l = Eigen::Vector3f(1.6f,0,0);
     Eigen::Vector3f res;
     return res;
+}
+
+void BasicScene::init_objects() {
+    AddChild(root = Movable::Create("root")); // a common (invisible) parent object for all the shapes
+    auto daylight{std::make_shared<Material>("daylight", "shaders/cubemapShader")};
+    daylight->AddTexture(0, "textures/cubemaps/Daylight Box_", 3);
+    auto background{Model::Create("background", Mesh::Cube(), daylight)};
+    AddChild(background);
+    background->Scale(120, Axis::XYZ);
+    background->SetPickable(false);
+    background->SetStatic();
+    auto program = std::make_shared<Program>("shaders/phongShader");
+    auto program1 = std::make_shared<Program>("shaders/pickingShader");
+    material =  std::make_shared<Material>("material", program); // empty material
+    material->AddTexture(0, "textures/box0.bmp", 2);
+    snake = new Snake(material,root,camera);
+    camera->Translate(22,Movable::Axis::Z);
+    camera->Translate(10, Movable::Axis::Y);
+    camera->RotateByDegree(-10.f,Movable::Axis::X);
 }

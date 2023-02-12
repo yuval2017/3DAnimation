@@ -16,14 +16,18 @@ public:
     void ScrollCallback(cg3d::Viewport* viewport, int x, int y, int xoffset, int yoffset, bool dragging, int buttonState[]) override;
     void CursorPosCallback(cg3d::Viewport* viewport, int x, int y, bool dragging, int* buttonState)  override;
     void KeyCallback(cg3d::Viewport* viewport, int x, int y, int key, int scancode, int action, int mods) override;
+    std::shared_ptr<Movable> GetRoot(){return root;};
     Eigen::Vector3f GetSpherePos();
     Snake *snake;
     //added for engine
     std::vector<std::shared_ptr<cg3d::Model>> game_models;
+
     bool done_inite = false;
 private:
     std::shared_ptr<Movable> root;
-    std::shared_ptr<cg3d::Model> sphere1, sphere2, sphere3 ,cube;
+    std::shared_ptr<Material> material;
+    std::shared_ptr<Program> program;
+    std::shared_ptr<cg3d::Model> sphere1, sphere2, sphere3;
     std::shared_ptr<cg3d::AutoMorphingModel> autoCube;
     std::vector<std::shared_ptr<cg3d::Model>> cyls, axis;
     int pickedIndex = 0;
@@ -33,4 +37,5 @@ private:
     Eigen::VectorXi EQ;
     // If an edge were collapsed, we'd collapse it to these points:
     Eigen::MatrixXd V, C, N, T, points,edges,colors;
+    void init_objects();
 };

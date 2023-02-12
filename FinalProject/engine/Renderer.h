@@ -5,6 +5,7 @@
 #include "DrawVisitor.h"
 #include "MeshCollisionVisitor.h"
 #include "AnimationVisitor.h"
+#include "ObjectsAnimationVisitor.h"
 #include "GLFW/glfw3.h"
 
 
@@ -39,6 +40,7 @@ private:
 
     MeshCollisionVisitor meshCollisionVisitor;
     AnimationVisitor animationVisitor;
+    ObjectsAnimationVisitor objectsAnimationVisitor;
 
     Viewport* FindViewportAtPos(int x, int y);
     DrawVisitor defaultVisitor;

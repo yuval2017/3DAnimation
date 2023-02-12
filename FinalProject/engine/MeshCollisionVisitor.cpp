@@ -16,13 +16,19 @@ void cg3d::MeshCollisionVisitor::Run(cg3d::Scene *scene, cg3d::Camera *camera) {
 
 
 void cg3d::MeshCollisionVisitor::Visit(Model *model) {
-    if (false && model->name != std::string("bone 0")) {
+    if (false&&model->showWireframe && model->name != std::string("bone 0") && model->name != std::string("snake")) {
+        //cg3d::Visitor::Visit(model);
+
         std::shared_ptr<Model> snake = basicScene->snake->GetSnakeBones()[0];
         if (isMeshCollision(snake, model, ((snake)->GetTree()), model->GetTree())) {
-            basicScene->animate = false;
+            //to make sure it was deleted
+            model->showWireframe = false;
             std::cout << "collision with " << model->name << " \n" << std::endl;
+            basicScene->GetRoot()->RemoveChild(model->shared_from_this());
         }
     }
+    //for childs
+
 }
 
 

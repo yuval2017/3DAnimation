@@ -32,6 +32,7 @@ void Renderer::RenderViewport(Viewport* viewport, Visitor* visitor)
     visitor->Run(viewport->scene.get(), viewport->camera.get());
     meshCollisionVisitor.Run(viewport->scene.get(), viewport->camera.get());
     animationVisitor.Run(viewport->scene.get(), viewport->camera.get());
+    objectsAnimationVisitor.Run(viewport->scene.get(), viewport->camera.get());
 
 }
 
@@ -52,6 +53,7 @@ void Renderer::RenderAllViewports()
     defaultVisitor.Init();
     meshCollisionVisitor.Init();
     animationVisitor.Init();
+    objectsAnimationVisitor.Init();
     for (auto& viewport: viewports)
         RenderViewport(viewport.get());
 }
