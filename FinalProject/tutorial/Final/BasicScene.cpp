@@ -2,12 +2,13 @@
 #include <Eigen/src/Core/Matrix.h>
 
 #include <memory>
-
+#include "SceneWithImGui.h"
 #include "GLFW/glfw3.h"
 #include "Mesh.h"
 #include "PickVisitor.h"
 #include "Renderer.h"
 #include "IglMeshLoader.h"
+#include "imgui.h"
 
 
 using namespace cg3d;
@@ -19,7 +20,16 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     init_objects();
 
 }
+BasicScene::BasicScene(std::string name, Display* display) : SceneWithImGui(std::move(name), display)
+{
+    ImGui::GetIO().IniFilename = nullptr;
+    ImGui::StyleColorsDark();
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.FrameRounding = 5.0f;
+}
+void BasicScene::BuildImGui(){
 
+}
 void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, const Eigen::Matrix4f& view, const Eigen::Matrix4f& model)
 {
     Scene::Update(program, proj, view, model);
