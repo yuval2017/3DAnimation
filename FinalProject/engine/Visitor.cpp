@@ -15,7 +15,9 @@ void Visitor::Run(Scene* scene, Camera* camera)
 void Visitor::Visit(Movable* movable)
 {
     for (const auto& child: movable->children)
-        child->Accept(this);
+        if(child != nullptr){
+            child->Accept(this);
+        }
 }
 
 void Visitor::Visit(Scene* scene)

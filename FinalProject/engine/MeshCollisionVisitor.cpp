@@ -11,14 +11,12 @@ using namespace std;
 void cg3d::MeshCollisionVisitor::Run(cg3d::Scene *scene, cg3d::Camera *camera) {
     basicScene = (BasicScene *)scene;
     Visitor::Run(basicScene, camera);
-
 }
 
 
 void cg3d::MeshCollisionVisitor::Visit(Model *model) {
-    if (false&&model->showWireframe && model->name != std::string("bone 0") && model->name != std::string("snake")) {
-        //cg3d::Visitor::Visit(model);
-
+    if (basicScene->animate && model != nullptr && model->showWireframe && model->name != std::string("bone 0") && model->name != std::string("snake")) {
+        Visitor::Visit(model);
         std::shared_ptr<Model> snake = basicScene->snake->GetSnakeBones()[0];
         if (isMeshCollision(snake, model, ((snake)->GetTree()), model->GetTree())) {
             //to make sure it was deleted
@@ -28,7 +26,6 @@ void cg3d::MeshCollisionVisitor::Visit(Model *model) {
         }
     }
     //for childs
-
 }
 
 
