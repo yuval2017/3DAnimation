@@ -8,7 +8,7 @@
 Data::Data() {
     msg = "";
     level = 1;
-    menu_flags;
+    menu_flags[0] = true;
     speed =1;
     score = 0;
     life = 0 ;

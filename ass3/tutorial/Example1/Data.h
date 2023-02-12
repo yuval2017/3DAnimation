@@ -3,14 +3,14 @@
 //
 #pragma once
 #include <iostream>
-#define MainMenu_OP                 0
-#define StoreMenu_OP                1
-#define PauseMenu_OP                2
-#define SettingsMenu_OP             3
-#define LeadersMenu_OP              4
-#define LevelMenu_OP                5
-#define GameOverMenu_OP             6
-#define WinMenu_OP                  7
+#define MainMenu                    0
+#define StoreMenu                   1
+#define PauseMenu                   2
+#define SettingsMenu                3
+#define LeadersMenu                 4
+#define LevelMenu                   5
+#define LooseMenu                   6
+#define GameOverMenu                7
 #define SPEED_COST                  50
 #define LIFE_COST                   30
 
@@ -34,7 +34,7 @@ public:
     const char * msg_c_str();
     int get_level();
     char characterName[256] = "";
-    bool menu_flags[10] = {false, false,false, false,false, false,false, false,false, false};
+    bool menu_flags[10] = {false};
     int get_life();
     void set_life(int l);
     float get_progress();

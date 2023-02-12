@@ -3,7 +3,8 @@
 #include "SceneWithImGui.h"
 #include "Snake.h"
 #include "CamModel.h"
-
+#include "Data.h"
+#include "HighScores.h"
 #include <memory>
 #include <utility>
 
@@ -24,9 +25,11 @@ public:
     Snake *snake;
     //added for engine
     std::vector<std::shared_ptr<cg3d::Model>> game_models;
-
+    void create_menu();
     bool done_inite = false;
 private:
+    Data* data;
+    HighScores* highScores;
     std::shared_ptr<Movable> root;
     std::shared_ptr<Material> material;
     std::shared_ptr<Program> program;
@@ -41,4 +44,11 @@ private:
     // If an edge were collapsed, we'd collapse it to these points:
     Eigen::MatrixXd V, C, N, T, points,edges,colors;
     void init_objects();
+    void startMenu();
+    void PausedMenu();
+    void NextLevelMenu();
+    void WinMenu();
+    void LoseMenu();
+    void StoreMenu();
+
 };
