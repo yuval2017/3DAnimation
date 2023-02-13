@@ -21,7 +21,7 @@ class Data {
 public:
 
 
-    Data();
+
     void inc_Level();
     void dec_Level();
     int get_score();
@@ -35,6 +35,7 @@ public:
     int get_level();
     char characterName[256] = "";
     bool menu_flags[10] = {false, false,false, false,false, false,false, false,false, false};
+    bool back_to_main=false;
     int get_life();
     void set_life(int l);
     float get_progress();
@@ -42,16 +43,24 @@ public:
     int get_Num_Of_Levels();
     std::string inc_speed();
     std::string add_life();
+    int get_back_to();
+    void set_back(int val);
     void restart_game();
-
-
+    static Data* getInstance();
 private :
+
+    static Data* instance;
+    Data();
     std::string msg;
     int level;
     const int num_of_levels =3;
     int score ;
     int life ;
     int speed;
+
+    Data(Data const&);              // Don't Implement.
+    void operator=(Data const&); // Don't implement
 };
+
 
 

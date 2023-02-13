@@ -5,15 +5,31 @@
 #include "Data.h"
 #include "iostream"
 
+
+Data* Data::instance = 0;
+
+Data* Data::getInstance()
+{
+    if (instance == 0)
+    {
+        instance = new Data();
+    }
+
+    return instance;
+}
+
+
+
 Data::Data() {
     msg = "";
     level = 1;
-    menu_flags;
     speed =1;
     score = 0;
     life = 0 ;
 
 }
+
+
 
 void Data::dec_Level() {
 
@@ -95,7 +111,12 @@ void Data::reset_Speed() {
 
     this->speed=1;
 }
-
+int Data::get_back_to(){
+    return this->back_to_main;
+}
+void Data::set_back(int val){
+    this->back_to_main= val;
+}
 void Data::restart_game() {
 
     this->score=0;

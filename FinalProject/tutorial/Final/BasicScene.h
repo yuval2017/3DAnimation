@@ -50,5 +50,6 @@ private:
     void WinMenu();
     void LoseMenu();
     void StoreMenu();
+    void LeadersMenu();
 
 };
