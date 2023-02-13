@@ -15,14 +15,18 @@ void cg3d::MeshCollisionVisitor::Run(cg3d::Scene *scene, cg3d::Camera *camera) {
 
 
 void cg3d::MeshCollisionVisitor::Visit(Model *model) {
-    if (basicScene->animate && model != nullptr && model->showWireframe && model->name != std::string("bone 0") && model->name != std::string("snake")) {
-        Visitor::Visit(model);
+    Visitor::Visit(model);
+    if (false && model != nullptr  && model->name != std::string("bone 0") && model->name != std::string("snake")) {
         std::shared_ptr<Model> snake = basicScene->snake->GetSnakeBones()[0];
-        if (isMeshCollision(snake, model, ((snake)->GetTree()), model->GetTree())) {
-            //to make sure it was deleted
-            model->showWireframe = false;
-            std::cout << "collision with " << model->name << " \n" << std::endl;
-            basicScene->GetRoot()->RemoveChild(model->shared_from_this());
+        if (model->name != std::string("bone 1") && isMeshCollision(snake, model, ((snake)->GetTree()), model->GetTree())) {
+            if(model->name.substr(0,4) == std::string("bone")){
+                std::cout << "collision with " << model->name << " \n" << std::endl;
+                basicScene->animate = false;
+            }else {
+                //to make sure it was deleted
+                std::cout << "collision with " << model->name << " \n" << std::endl;
+                basicScene->GetRoot()->RemoveChild(model->shared_from_this());
+            }
         }
     }
     //for childs
@@ -90,7 +94,7 @@ bool cg3d::MeshCollisionVisitor::isBoxesIntersect(Eigen::AlignedBox<double, 3>& 
     //create matrix D
     Eigen::Vector4d CA = Eigen::Vector4d(boxA.center()[0], boxA.center()[1], boxA.center()[2], 1);
     Eigen::Vector4d CB = Eigen::Vector4d(boxB.center()[0], boxB.center()[1], boxB.center()[2], 1);
-    Eigen::Vector4d DOfVector4d = mesh2->GetTransform().cast<double>() * CB - mesh1->GetTransform().cast<double>() * CA;
+    Eigen::Vector4d DOfVector4d = mesh2->GetAggregatedTransform().cast<double>() * CB - mesh1->GetAggregatedTransform().cast<double>() * CA;
     Eigen::Vector3d D = DOfVector4d.head(3);
 //    Eigen::Vector3d CA = Eigen::Vector3d(boxA.center()[0], boxA.center()[1], boxA.center()[2]);
 //    Eigen::Vector3d CB = Eigen::Vector3d(boxB.center()[0], boxB.center()[1], boxB.center()[2]);

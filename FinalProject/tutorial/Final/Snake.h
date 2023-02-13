@@ -15,7 +15,6 @@ using namespace cg3d;
 class Snake {
 private:
 
-    std::vector<std::shared_ptr<cg3d::Model>> bones;
     std::shared_ptr<cg3d::Camera> camera;
     std::shared_ptr<cg3d::Model> snake;
     float speed = 1.0f;
@@ -46,15 +45,15 @@ private:
     double anim_t_dir;
     int number_of_joints;
     float joint_length;
-    igl::opengl::glfw::Viewer *viewer;
     void load_snake(std::string& path);
 
 
 
 public:
+    std::vector<std::shared_ptr<cg3d::Model>> bones;
     std::vector<Eigen::AlignedBox <double, 3>> snakeJointBoxes;
     Snake();
-    Snake(const std::shared_ptr<cg3d::Material>& material, const std::shared_ptr<cg3d::Movable>& root, std::shared_ptr<cg3d::Camera> _camera, igl::opengl::glfw::Viewer *viewer);
+    Snake(const std::shared_ptr<cg3d::Material>& material, const std::shared_ptr<cg3d::Movable>& root, std::shared_ptr<cg3d::Camera> _camera);
     std::vector<std::shared_ptr<cg3d::Model>> GetSnakeBones();
     void SetSpeed(float new_speed);
     float GetSpeed(){return speed;};
@@ -65,7 +64,7 @@ public:
     void initJoints();
     void restartSnake();
     void calcWeight(Eigen::MatrixXd& V, double min_z);
-
+    igl::opengl::glfw::Viewer viewer;
     void skinning(Eigen::Vector3d t);
 
     Eigen::Matrix4d getHeadMakeTransd();

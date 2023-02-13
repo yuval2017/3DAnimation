@@ -51,6 +51,19 @@ public:
     int meshIndex = 0;
     int mode = 0;
 
+
+    Eigen::Matrix4f               M;
+    Eigen::Matrix <float, 4, 3 > MG_Result;
+    Eigen::Matrix <float, 4, 3 > curvePoints;
+    bool moveBackwards = false;
+    float t = 0;
+    Eigen::RowVector4f            T;
+    Eigen::Vector3f               currentPosition;
+    float xCoordinate;
+    float yCoordinate;
+    float zCoordinate;
+
+
     inline std::shared_ptr<Mesh> GetMesh(int index = 0) const { return meshList[index]; }
     inline std::vector<std::shared_ptr<Mesh>> GetMeshList() const { return meshList; }
     void SetMeshList(std::vector<std::shared_ptr<Mesh>> _meshList);

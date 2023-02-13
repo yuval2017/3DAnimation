@@ -32,13 +32,13 @@ BasicScene::BasicScene(std::string name, Display* display) : SceneWithImGui(std:
     style.FrameRounding = 5.0f;
 }
 void BasicScene::BuildImGui(){
-    startMenu();
-    PausedMenu();
-    NextLevelMenu();
-    WinMenu();
-    LoseMenu();
-    StoreMenu();
-    LeadersMenu();
+//    startMenu();
+//    PausedMenu();
+//    NextLevelMenu();
+//    WinMenu();
+//    LoseMenu();
+//    StoreMenu();
+//    LeadersMenu();
 }
 void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, const Eigen::Matrix4f& view, const Eigen::Matrix4f& model)
 {
@@ -180,7 +180,7 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
                 done_inite = true;
                 break;
             case GLFW_KEY_3:
-
+                animate = true;
                 break;
             case GLFW_KEY_4:
 

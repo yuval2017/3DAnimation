@@ -19,11 +19,11 @@ namespace cg3d
 
     private:
         void MoveAccordingToBezierCurve(Model *model);
+        Eigen::Quaternionf quaternionx, quaterniony;
         std::vector<Model*> models;
         BasicScene* basicScene;
         Eigen::Quaternionf quaternion;
         int bone_index = 0;
-        int number_of_bones = 2; // without the first bone
-        bool bones_found_flag = false;
+        int number_of_bones = 0; // without the first bone
     };
 }

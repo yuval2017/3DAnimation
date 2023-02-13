@@ -16,7 +16,12 @@ namespace cg3d {
         void Visit(Model *model) override;
         void GenerateCubeObject(const std::shared_ptr<Material>& _material);
         void GenerateSphereObject(const std::shared_ptr<Material>& _material);
-
+        void moveAccordingToBeizerCurve(Model *model);
+        void setModelBezier(Eigen::Vector3f vectors, Model *model);
+        void generateBeizerCurve(Model *model);
+        void drawTheBeizerCurve(Model *model);
+        Eigen::Vector3f calcForDraw(float ti, Model *model);
+        std::vector<double> linspace(float start_in, float end_in, int num_in);
     private:
         std::shared_ptr<Material> material;
         std::shared_ptr<Program> program;
@@ -25,6 +30,7 @@ namespace cg3d {
         int minx = -6;
         int maxx = 6;
         int generate_random_number(int min, int max);
+
 
     };
 }
