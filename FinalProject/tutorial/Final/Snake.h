@@ -46,14 +46,15 @@ private:
     double anim_t_dir;
     int number_of_joints;
     float joint_length;
-    igl::opengl::glfw::Viewer viewer;
+    igl::opengl::glfw::Viewer *viewer;
+    void load_snake(std::string& path);
 
 
 
 public:
     std::vector<Eigen::AlignedBox <double, 3>> snakeJointBoxes;
     Snake();
-    Snake(const std::shared_ptr<cg3d::Material>& material, const std::shared_ptr<cg3d::Movable>& root, std::shared_ptr<cg3d::Camera> _camera);
+    Snake(const std::shared_ptr<cg3d::Material>& material, const std::shared_ptr<cg3d::Movable>& root, std::shared_ptr<cg3d::Camera> _camera, igl::opengl::glfw::Viewer *viewer);
     std::vector<std::shared_ptr<cg3d::Model>> GetSnakeBones();
     void SetSpeed(float new_speed);
     float GetSpeed(){return speed;};

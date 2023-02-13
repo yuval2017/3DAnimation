@@ -31,7 +31,9 @@
 Snake::Snake(){
     std::cout<< "Snake :) " << " \n"<< std::endl;
 }
-Snake::Snake(const std::shared_ptr<cg3d::Material>& material, const std::shared_ptr<cg3d::Movable>& root, std::shared_ptr<cg3d::Camera> _camera){
+Snake::Snake(const std::shared_ptr<cg3d::Material>& material, const std::shared_ptr<cg3d::Movable>& root, std::shared_ptr<cg3d::Camera> _camera,igl::opengl::glfw::Viewer *viewer){
+
+
     auto cylMesh{cg3d::IglLoader::MeshFromFiles("cyl_igl","data/zcylinder.obj")};
     bones.push_back(cg3d::Model::Create("bone 0",cylMesh, material));
     bones[0]->Scale(scaleFactor,cg3d::Movable::Axis::Z);
@@ -61,7 +63,7 @@ Snake::Snake(const std::shared_ptr<cg3d::Material>& material, const std::shared_
     std::cout<< joint_length << std::endl;
     snake->Scale((number_of_joints),cg3d::Movable::Axis::Z);
     snake->Translate(0,cg3d::Movable::Axis::XYZ);
-    viewer.data().set_mesh(snake->GetMeshList()[0]->data[0].vertices, snake->GetMeshList()[0]->data[0].faces);
+    viewer->data().set_mesh(snake->GetMeshList()[0]->data[0].vertices, snake->GetMeshList()[0]->data[0].faces);
     //initJoints();
 
 }
@@ -188,15 +190,15 @@ void Snake::skinning(Eigen::Vector3d t) {
     igl::dqs(snake->GetMeshList()[0]->data[0].vertices, W, vQ, vT, U);
     //move joints according to T, returns new position in CT and BET
     igl::deform_skeleton(Cp.cast<double>(), BE, T, CT, BET);
-    viewer.data(0).set_vertices(U);
-    viewer.data(0).set_edges(CT.cast<double>(), BET,Eigen::RowVector3d(70. / 255., 252. / 255., 167. / 255.));
+    viewer->data(0).set_vertices(U);
+    viewer->data(0).set_edges(CT.cast<double>(), BET,Eigen::RowVector3d(70. / 255., 252. / 255., 167. / 255.));
 
-    igl::per_vertex_normals(U,viewer.data().F,viewer.data().V);
+    igl::per_vertex_normals(U,viewer->data().F,viewer->data().V);
 
 
     T = Eigen::MatrixXd::Zero(U.rows(),2);
     snake->GetMeshList()[0]->data.pop_back();
-    snake->GetMeshList()[0]->data.push_back({U,viewer.data().F,viewer.data().V,T});
+    snake->GetMeshList()[0]->data.push_back({U,viewer->data().F,viewer->data().V,T});
     snake->SetMeshList(snake->GetMeshList());
 
 
