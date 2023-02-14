@@ -27,7 +27,7 @@ private:
 
 public:
     //add to eigen
-    float scale_factor = 1.0f;
+    Eigen::Vector3f scale_factor = {1.0,1.0,1.0};
 
     std::string name;
 

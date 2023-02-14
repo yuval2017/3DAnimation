@@ -18,12 +18,7 @@
 
 #include <iostream>
 #include <vector>
-#include <stb_image.h>
-#include <triangle/triangulate.h>
-#include <iostream>
-#include <vector>
-#include <tuple>
-#include <map>
+#include "Calculates.h"
 
 Snake::Snake(){
     std::cout<< "Snake :) " << " \n"<< std::endl;
@@ -43,6 +38,7 @@ Snake::Snake(const std::shared_ptr<cg3d::Material>& material, const std::shared_
         bones[i]->Scale(scaleFactor,cg3d::Movable::Axis::Z);
         bones[i]->Translate(1.6f*scaleFactor,cg3d::Movable::Axis::Z);
         bones[i]->SetCenter(Eigen::Vector3f(0,0,-0.8f*scaleFactor));
+        bones[i]->GetTreeWithOutCube();
         bones[i-1]->AddChild(bones[i]);
     }
     bones[0]->Translate({0,0,0.8f*scaleFactor});
@@ -62,7 +58,8 @@ Snake::Snake(const std::shared_ptr<cg3d::Material>& material, const std::shared_
     snake->Translate(0,cg3d::Movable::Axis::XYZ);
     viewer.data().set_mesh(snake->GetMeshList()[0]->data[0].vertices, snake->GetMeshList()[0]->data[0].faces);
     //initJoints();
-    //getTextureCoords("../tutorial/textures/snake.png",snake->GetMeshList()[0]->data[0].vertices,snake->GetMeshList()[0]->data[0].faces);
+    Calculates calculate = Calculates();
+    std::vector<TexCoord> Vts = calculate.calculateTextureCoordinates(snake->GetMeshList()[0]->data[0].vertices,snake->GetMeshList()[0]->data[0].faces);
 }
 
 std::vector<std::shared_ptr<cg3d::Model>> Snake::GetSnakeBones(){

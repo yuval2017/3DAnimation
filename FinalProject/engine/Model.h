@@ -37,7 +37,8 @@ public:
         return std::shared_ptr<Model>{new Model{std::forward<Args>(args)...}}; // NOLINT(modernize-make-shared)
     }
     //add to eigen
-    igl::AABB<Eigen::MatrixXd, 3> *GetTree();
+    igl::AABB<Eigen::MatrixXd, 3> *GetTreeWithCube();
+    igl::AABB<Eigen::MatrixXd, 3> *GetTreeWithOutCube();
 
 
     ~Model() override = default;

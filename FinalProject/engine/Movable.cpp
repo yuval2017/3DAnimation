@@ -192,6 +192,11 @@ void Movable::Scale(float factor, Axis axis)
 
 void Movable::Scale(const Eigen::Vector3f& scaleVec)
 {
+    Eigen::Vector3f new_fact = {scaleVec[0]*scale_factor[0],scaleVec[1]*scale_factor[1],scaleVec[2]*scale_factor[2]};
+
+    scale_factor = new_fact;
+
+
     if (isStatic) return;
     Tin.scale(scaleVec);
     PropagateTransform();
@@ -199,7 +204,6 @@ void Movable::Scale(const Eigen::Vector3f& scaleVec)
 
 void Movable::Scale(float factor)
 {
-    scale_factor = factor;
     Scale(factor, Axis::XYZ);
 }
 

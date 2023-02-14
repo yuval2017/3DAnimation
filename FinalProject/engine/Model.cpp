@@ -3,6 +3,7 @@
 #include "ViewerData.h"
 #include "Movable.h"
 #include "ObjLoader.h"
+#include "../tutorial/Final/IglMeshLoader.h"
 #include <filesystem>
 #include <utility>
 
@@ -95,13 +96,26 @@ void Model::SetMeshList(std::vector<std::shared_ptr<Mesh>> _meshList)
         viewerDataListPerMesh.emplace_back(CreateViewerData(mesh));
 }
 //may do it in the game initiate
-igl::AABB<Eigen::MatrixXd, 3> *Model::GetTree(){
+igl::AABB<Eigen::MatrixXd, 3> *Model::GetTreeWithCube(){
+
     if(!is_tree_inited){
-        treeA1.init(GetMeshList()[0]->data[0].vertices,GetMeshList()[0]->data[0].faces);
+        auto cubeMesh{IglLoader::MeshFromFiles("cube_igl","../tutorial/data/cube_old.obj")};
+        auto cube = Model::Create( "helpcube", cubeMesh, material);
+        AddChild(cube);
+        cube->isHidden = true;
+        treeA1.init(cube->GetMeshList()[0]->data[0].vertices,cube->GetMeshList()[0]->data[0].faces);
         is_tree_inited = true;
     }
     return &treeA1;
 }
+igl::AABB<Eigen::MatrixXd, 3> *Model::GetTreeWithOutCube(){
+
+        if(!is_tree_inited){
+            treeA1.init(GetMeshList()[0]->data[0].vertices,GetMeshList()[0]->data[0].faces);
+            is_tree_inited = true;
+        }
+        return &treeA1;
+    }
 
     Eigen::Vector3f Model::GetPosition() {
         return (Tout * Tin).matrix().block(0, 3, 3, 1);

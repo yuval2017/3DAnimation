@@ -19,7 +19,7 @@ void cg3d::MeshCollisionVisitor::Visit(Model *model) {
 
     if (model != nullptr && model->name != std::string("bone 1") && (model->name != std::string("bone 0")) && (model->name.substr(0,15) == std::string("CollisionObject") || model->name.substr(0,4) == std::string("bone"))) {
         std::shared_ptr<Model> snake = basicScene->snake->GetSnakeBones()[0];
-        if (isMeshCollision(snake, model, ((snake)->GetTree()), model->GetTree())) {
+        if (isMeshCollision(snake, model, ((snake)->GetTreeWithOutCube()), model->GetTreeWithOutCube())) {
             if(model->name.substr(0,4) == std::string("bone")){
                 std::cout << "collision with " << model->name << " \n" << std::endl;
                 basicScene->animate = false;
@@ -94,8 +94,8 @@ bool cg3d::MeshCollisionVisitor::isBoxesIntersect(Eigen::AlignedBox<double, 3>& 
     Eigen::Matrix3d C = A.transpose() * B;
 
     //length sides of bounding box
-    Eigen::Vector3d a = boxA.sizes() * mesh1->scale_factor;
-    Eigen::Vector3d b = boxB.sizes() * mesh2->scale_factor;
+    Eigen::Vector3d a =  {boxA.sizes()[0]*mesh1->scale_factor[0],boxA.sizes()[1]*mesh1->scale_factor[1],boxA.sizes()[2]*mesh1->scale_factor[2]};
+    Eigen::Vector3d b = {boxB.sizes()[0]*mesh2->scale_factor[0],boxB.sizes()[1]*mesh2->scale_factor[1],boxB.sizes()[2]*mesh2->scale_factor[2]};
 
     a = a / 2;
     b = b / 2;

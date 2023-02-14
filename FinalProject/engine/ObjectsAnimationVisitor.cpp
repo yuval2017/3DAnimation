@@ -49,6 +49,7 @@ void ObjectsAnimationVisitor::GenerateCubeObject(const std::shared_ptr<Material>
     cube->showWireframe = true;
     Eigen::Vector3f location = Eigen::Vector3f (generate_random_number(minx,maxx),generate_random_number(miny,maxy),generate_random_number(minz,maxz));
     cube->Translate(location);
+    cube->Scale(3.0f,Movable::Axis::XYZ);
     setModelBezier(location,cube.get());
 }
 
@@ -59,6 +60,9 @@ void ObjectsAnimationVisitor::GenerateSphereObject(const std::shared_ptr<Materia
     sphere1->showWireframe = true;
     Eigen::Vector3f location = Eigen::Vector3f (generate_random_number(minx,maxx),generate_random_number(miny,maxy),generate_random_number(minz,maxz));
     sphere1->Translate(location);
+    sphere1->Scale(3.0f,Movable::Axis::XYZ);
+    //call this for complicate meshes
+    sphere1->GetTreeWithCube();
     setModelBezier(location,sphere1.get());
 }
 void ObjectsAnimationVisitor::setModelBezier(Eigen::Vector3f vectors, Model *model){
