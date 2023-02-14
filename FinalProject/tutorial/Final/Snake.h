@@ -45,6 +45,7 @@ private:
     double anim_t_dir;
     int number_of_joints;
     float joint_length;
+    Eigen::MatrixXd V_new;
     void load_snake(std::string& path);
 
 
@@ -66,7 +67,8 @@ public:
     void calcWeight(Eigen::MatrixXd& V, double min_z);
     igl::opengl::glfw::Viewer viewer;
     void skinning(Eigen::Vector3d t);
-
+    void initSnake();
+    Eigen::Vector3f ikGetPosition(int id, float length);
     Eigen::Matrix4d getHeadMakeTransd();
 
     void moveSnake(Eigen::Vector3d t);

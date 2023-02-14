@@ -54,12 +54,11 @@ Snake::Snake(const std::shared_ptr<cg3d::Material>& material, const std::shared_
     std::cout<< lengthOfSnake << std::endl;
     joint_length = lengthOfSnake / number_of_joints;
     std::cout<< joint_length << std::endl;
-    snake->Scale((number_of_joints),cg3d::Movable::Axis::Z);
-    snake->Translate(0,cg3d::Movable::Axis::XYZ);
     viewer.data().set_mesh(snake->GetMeshList()[0]->data[0].vertices, snake->GetMeshList()[0]->data[0].faces);
     //initJoints();
-    Calculates calculate = Calculates();
-    std::vector<TexCoord> Vts = calculate.calculateTextureCoordinates(snake->GetMeshList()[0]->data[0].vertices,snake->GetMeshList()[0]->data[0].faces);
+    //Calculates calculate = Calculates();
+    //std::vector<TexCoord> Vts = calculate.calculateTextureCoordinates(snake->GetMeshList()[0]->data[0].vertices,snake->GetMeshList()[0]->data[0].faces,"../tutorial/Final/snaketry.obj");
+    initSnake();
 }
 
 std::vector<std::shared_ptr<cg3d::Model>> Snake::GetSnakeBones(){
@@ -152,22 +151,37 @@ void Snake::restartSnake(){
     }
 }
 void Snake::calcWeight(Eigen::MatrixXd& V, double min_z){
-    int bones_size = number_of_joints;
-    int n = snake->GetMeshList()[0]->data[0].vertices.rows();
-    W=Eigen::MatrixXd::Zero( n,bones_size+1);
+//    int bones_size = number_of_joints;
+//    int n = snake->GetMeshList()[0]->data[0].vertices.rows();
+//    W=Eigen::MatrixXd::Zero( n,bones_size+1);
+//    for (int i = 0; i < n; i++) {
+//        double curr_z = V.row(i)[2];
+//        for (int j = 0; j < bones_size + 1; j++) {
+//            if (curr_z >= min_z + joint_length * float(j) && curr_z <= min_z + joint_length * float(j + 1)) {
+//                //double res = abs(curr_z - (min_z + joint_length * float(j + 1))/16) * 10;
+//                double res = abs(curr_z - (min_z*joint_length*(i+1)));
+//                W.row(i)[j] = res;
+//                W.row(i)[j + 1] = 1-res ;
+//                break;
+//            }
+//        }
+//    }
+    int n = V.rows();
+    W = Eigen::MatrixXd::Zero(n, number_of_joints + 1);
     for (int i = 0; i < n; i++) {
         double curr_z = V.row(i)[2];
-        for (int j = 0; j < bones_size + 1; j++) {
-            if (curr_z >= min_z + joint_length * float(j) && curr_z <= min_z + joint_length * float(j + 1)) {
-                double res = abs(curr_z - (min_z + joint_length * float(j + 1))/16) * 10;
-                W.row(i)[j] = res;
-                W.row(i)[j + 1] = 1-res ;
+        for (int j = 0; j < number_of_joints + 1; j++) {
+            if (curr_z >= min_z + joint_length * j && curr_z <= min_z + joint_length * (j + 1)) {
+                // my way
+                double dist = abs(curr_z - (min_z + joint_length * j));
+                W.row(i)[j] = (joint_length - dist) / joint_length;
+                W.row(i)[j + 1] = 1 - W.row(i)[j];
+//                std::cout << "curr_z: " << curr_z << " i: " << i << " jointLength: " << jointLength << " j: " << j << " dist: " << dist << " W.row(i)[j]: " << W.row(i)[j] << " W.row(i)[j + 1]: " << W.row(i)[j + 1] << std::endl;
                 break;
             }
         }
-
     }
-
+    std::cout<< W <<std::endl;
 }
 
 void Snake::skinning(Eigen::Vector3d t) {
@@ -246,4 +260,51 @@ void Snake::moveSnake(Eigen::Vector3d t){
 
         bones[i]->Tout.rotate(((q * quat.conjugate()) * q.conjugate()).cast<float>());
     }
+}
+void Snake::initSnake(){
+    Eigen::MatrixXd vertices = snake->GetMeshList()[0]->data[0].vertices;
+    joint_length = bones[0]->GetMeshList()[0]->data[0].vertices.colwise().maxCoeff()[2] - bones[0]->GetMeshList()[0]->data[0].vertices.colwise().minCoeff()[2];
+    Eigen::Vector3d translate = Eigen::Vector3d(0.0f,0.0f,number_of_joints*(joint_length/2));
+    Eigen::Vector3d scale = Eigen::Vector3d(1.0f,1.0f,number_of_joints);
+    Eigen::Affine3d Tout{Eigen::Affine3d::Identity()}, Tin{Eigen::Affine3d::Identity()};
+    Tout.pretranslate(translate);
+    Tin.scale(scale);
+    Eigen::MatrixX4d transform = Tout.matrix()*Tin.matrix();
+
+    // Init new V
+    V_new = Eigen::MatrixXd::Zero(vertices.rows(), vertices.cols());
+    for (int i = 0; i < vertices.rows(); i++) {
+        Eigen::Vector4d Vi = Eigen::Vector4d(vertices.row(i).x(), vertices.row(i).y(), vertices.row(i).z(), 1);
+        Eigen::Vector4d V_new_i = transform * Vi;
+        V_new.row(i) = Eigen::Vector3d(V_new_i[0], V_new_i[1], V_new_i[2]);
+    }
+    U = V_new;
+
+    Eigen::Vector3d min = snake->GetMeshList()[0]->data[0].vertices.colwise().minCoeff();
+    float min_z = min[2];
+    Eigen::Vector3d pos(0, 0, min_z);
+    // Init C
+    Cp.resize(17, 3);
+    for (int i = 0; i < number_of_joints+1; i++)
+    {
+        Cp.row(i) = pos;
+        pos = pos + Eigen::Vector3d(0, 0, joint_length);
+    }
+
+
+    std::shared_ptr<cg3d::Mesh> new_mesh = std::make_shared<cg3d::Mesh>(snake->name,
+                                                                        V_new,
+                                                                        snake->GetMeshList()[0]->data[0].faces,
+                                                                        snake->GetMeshList()[0]->data[0].vertexNormals,
+                                                                        snake->GetMeshList()[0]->data[0].textureCoords);
+    snake->SetMeshList({new_mesh});
+    Eigen::Vector3d min_vec = V_new.colwise().minCoeff();
+    double minz = min_vec[2];
+    calcWeight(V_new,minz);
+
+}
+Eigen::Vector3f Snake::ikGetPosition(int id, float length){
+    Eigen::Vector3f cen = bones[id]->GetAggregatedTransform().col(3).head(3);
+    Eigen::Vector3f mov = Eigen::Vector3f(0,0,length);
+    return (cen+(bones[id]->GetRotation()*mov));
 }

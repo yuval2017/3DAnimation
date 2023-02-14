@@ -5,7 +5,7 @@
 #include "Calculates.h"
 #include <cmath>
 using namespace std;
-vector<TexCoord> Calculates::calculateTextureCoordinates(vector<Vertex> vertices, vector<Face> faces) {
+vector<TexCoord> Calculates::calculateTextureCoordinates(vector<Vertex> vertices, vector<Face> faces, const std::string& filename ) {
     vector<TexCoord> texCoords;
 
     // Iterate over each face
@@ -53,11 +53,25 @@ vector<TexCoord> Calculates::calculateTextureCoordinates(vector<Vertex> vertices
             texCoords.push_back(texCoord);
         }
     }
-
+    write_obj_file(vertices,faces,texCoords,filename);
     return texCoords;
 }
+void Calculates::write_obj_file(const std::vector<Vertex>& vertices,std::vector<Face> faces,std::vector<TexCoord> VT, const std::string& filename){
+    std::ofstream out(filename);
+    for (const auto& v : vertices) {
+        out << "v " << v.x << " " << v.y << " " << v.z << "\n";
+    }
+    for (const auto& vt : VT) {
+        out << "vt " << vt.u << " " << vt.v << "\n";
+    }
+    for (const auto& f : faces) {
+        out << "f " << f.v1 << " " << f.v2 << " " << f.v3 << "\n";
+    }
+    out.close();
+}
 
-std::vector<TexCoord> Calculates::calculateTextureCoordinates(Eigen::MatrixXd vertices, Eigen::MatrixXi faces) {
+
+std::vector<TexCoord> Calculates::calculateTextureCoordinates(Eigen::MatrixXd vertices, Eigen::MatrixXi faces, const std::string& filename) {
     vector<Vertex> _vertices;
     for (int i = 0; i < vertices.rows(); i++) {
         float v1 = vertices.row(i)[0];
@@ -72,5 +86,5 @@ std::vector<TexCoord> Calculates::calculateTextureCoordinates(Eigen::MatrixXd ve
         int fv3 = faces.row(i)[2];
         _faces.push_back({fv1,fv2,fv3});
     }
-    return calculateTextureCoordinates(_vertices,_faces);
+    return calculateTextureCoordinates(_vertices,_faces,filename);
 }
