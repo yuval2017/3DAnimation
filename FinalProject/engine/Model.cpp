@@ -103,4 +103,8 @@ igl::AABB<Eigen::MatrixXd, 3> *Model::GetTree(){
     return &treeA1;
 }
 
+    Eigen::Vector3f Model::GetPosition() {
+        return (Tout * Tin).matrix().block(0, 3, 3, 1);
+    }
+
 } // namespace cg3d

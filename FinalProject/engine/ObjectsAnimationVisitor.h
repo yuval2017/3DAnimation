@@ -18,7 +18,7 @@ namespace cg3d {
         void GenerateSphereObject(const std::shared_ptr<Material>& _material);
         void moveAccordingToBeizerCurve(Model *model);
         void setModelBezier(Eigen::Vector3f vectors, Model *model);
-        void generateBeizerCurve(Model *model);
+        void generateBeizerCurve(Model *model, Eigen::Vector3f vector);
         void drawTheBeizerCurve(Model *model);
         Eigen::Vector3f calcForDraw(float ti, Model *model);
         std::vector<double> linspace(float start_in, float end_in, int num_in);
@@ -27,9 +27,13 @@ namespace cg3d {
         std::shared_ptr<Program> program;
         BasicScene *basicScene;
         bool is_visitor_inited = false;
-        int minx = -6;
-        int maxx = 6;
-        int generate_random_number(int min, int max);
+        float minx = -10.0f;
+        float maxx = 10.0f;
+        float miny = -5.0f;
+        float maxy = 5.0f;
+        float minz = -5.0f;
+        float maxz = 5.0f;
+        float generate_random_number(float min, float max);
 
 
     };

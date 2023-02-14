@@ -81,6 +81,7 @@ namespace cg3d
         }
     }
 }
-    void AnimationVisitor::MoveAccordingToBezierCurve(Model *model) {
 
-    }
+void AnimationVisitor::MoveAccordingToBezierCurve(Model *model) {
+
+}

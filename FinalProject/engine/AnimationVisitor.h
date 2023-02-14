@@ -6,6 +6,7 @@
 #include "../tutorial/Final/BasicScene.h"
 #include "Visitor.h"
 #include "Model.h"
+
 #include <vector>
 
 
@@ -16,6 +17,7 @@ namespace cg3d
     public:
         void Run(Scene* scene, Camera* camera) override;
         void Visit(Model* model) override;
+
 
     private:
         void MoveAccordingToBezierCurve(Model *model);

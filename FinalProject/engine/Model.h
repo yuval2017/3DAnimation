@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <utility>
 #include <igl/AABB.h>
 #include "Mesh.h"
 #include "Material.h"
@@ -30,6 +31,7 @@ protected:
     bool is_tree_inited = false;
 
 public:
+    void setMaterial(std::shared_ptr<Material> _material){material = std::move(_material);};
     template<typename... Args>
     static std::shared_ptr<Model> Create(Args&&... args) {
         return std::shared_ptr<Model>{new Model{std::forward<Args>(args)...}}; // NOLINT(modernize-make-shared)
@@ -52,16 +54,14 @@ public:
     int mode = 0;
 
 
-    Eigen::Matrix4f               M;
+
+    //add to engine for gameplay
     Eigen::Matrix <float, 4, 3 > MG_Result;
-    Eigen::Matrix <float, 4, 3 > curvePoints;
     bool moveBackwards = false;
     float t = 0;
-    Eigen::RowVector4f            T;
-    Eigen::Vector3f               currentPosition;
-    float xCoordinate;
-    float yCoordinate;
-    float zCoordinate;
+    Eigen::Vector3f GetPosition();
+    std::shared_ptr <Model> bezier;
+
 
 
     inline std::shared_ptr<Mesh> GetMesh(int index = 0) const { return meshList[index]; }

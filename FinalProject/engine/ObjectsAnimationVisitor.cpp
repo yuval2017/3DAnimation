@@ -7,6 +7,7 @@
 #include <igl/per_vertex_normals.h>
 #include <iostream>
 #include <random>
+#include <utility>
 void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
     basicScene = (BasicScene *)scene;
     if(!is_visitor_inited){
@@ -20,12 +21,11 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
         GenerateSphereObject(material);
         GenerateCubeObject(material);
     }
-
     Visitor::Run(scene, camera);
 }
 
 void ObjectsAnimationVisitor::Visit(Model *model) {
-    if(model->name.substr(0,4) != std::string("bone")&&model->name != std::string("snake")) {
+    if(basicScene->animate && model->name.substr(0,15) == std::string("CollisionObject")) {
         if (model->t <= 1 && !model->moveBackwards) {
             model->t += 0.004;
             moveAccordingToBeizerCurve(model);
@@ -44,46 +44,44 @@ void ObjectsAnimationVisitor::Visit(Model *model) {
 
 void ObjectsAnimationVisitor::GenerateCubeObject(const std::shared_ptr<Material>& _material) {
     auto cubeMesh{IglLoader::MeshFromFiles("cube_igl","../tutorial/data/cube_old.obj")};
-    auto cube = Model::Create( "cube", cubeMesh, _material);
+    auto cube = Model::Create( "CollisionObject cube", cubeMesh, _material);
     basicScene->GetRoot()->AddChild(cube);
     cube->showWireframe = true;
-    Eigen::Vector3f location = Eigen::Vector3f (generate_random_number(minx,maxx),0,0);
+    Eigen::Vector3f location = Eigen::Vector3f (generate_random_number(minx,maxx),generate_random_number(miny,maxy),generate_random_number(minz,maxz));
     cube->Translate(location);
     setModelBezier(location,cube.get());
-
 }
 
 void ObjectsAnimationVisitor::GenerateSphereObject(const std::shared_ptr<Material>& _material) {
     auto sphereMesh{IglLoader::MeshFromFiles("sphere_igl", "../tutorial/data/sphere.obj")};
-    auto sphere1 = Model::Create( "sphere3",sphereMesh, _material);
+    shared_ptr<Model> sphere1 = Model::Create( "CollisionObject sphere",sphereMesh, _material);
     basicScene->GetRoot()->AddChild(sphere1);
     sphere1->showWireframe = true;
-    Eigen::Vector3f location = Eigen::Vector3f (generate_random_number(minx,maxx),0,0);
+    Eigen::Vector3f location = Eigen::Vector3f (generate_random_number(minx,maxx),generate_random_number(miny,maxy),generate_random_number(minz,maxz));
     sphere1->Translate(location);
     setModelBezier(location,sphere1.get());
 }
 void ObjectsAnimationVisitor::setModelBezier(Eigen::Vector3f vectors, Model *model){
-    model->xCoordinate = vectors[0];
-    model->yCoordinate = vectors[1];
-    model->zCoordinate = vectors[2];
-    generateBeizerCurve(model);
+    generateBeizerCurve(model,std::move(vectors));
     drawTheBeizerCurve(model);
 }
 
-int ObjectsAnimationVisitor::generate_random_number(int min, int max) {
-    return rand()%(max-min + 1) + min;;
+float ObjectsAnimationVisitor::generate_random_number(float min, float max) {
+    return min + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(max-min)));
 }
 void ObjectsAnimationVisitor::moveAccordingToBeizerCurve(Model *model) {
-    model->T[0] = powf(model->t, 3);
-    model->T[1] = powf(model->t, 2);
-    model->T[2] = model->t;
-    model->T[3] = 1;
+    Eigen::RowVector4f Ti;
+    Ti[0] = powf(model->t, 3);
+    Ti[1] = powf(model->t, 2);
+    Ti[2] = model->t;
+    Ti[3] = 1;
 
-    model->currentPosition = (model->T * model->MG_Result);
-    //model->Translate(model->currentPosition);
 
-    Eigen::Vector3f oldPositionOfObject = (model->Tout * model->Tin).matrix().block(0, 3, 3, 1);
-    model->Translate(model->currentPosition - oldPositionOfObject);
+    Eigen::Vector3f               currentPosition;
+    currentPosition = (Ti * model->MG_Result);
+
+    Eigen::Vector3f oldPositionOfObject = model->GetPosition();
+    model->Translate(currentPosition - oldPositionOfObject);
 
 }
 
@@ -113,11 +111,11 @@ void ObjectsAnimationVisitor::drawTheBeizerCurve(Model *model) {
     auto material1{ std::make_shared<Material>("material", program1)}; // empty material
 
     std::shared_ptr<Mesh> coordsys = std::make_shared<Mesh>("coordsys",vertices,faces,vertexNormals,textureCoords);
-    auto bezier = Model::Create("bez",coordsys,material1);
+    std::shared_ptr<Model> bezier = Model::Create("bez",coordsys,material1);
     bezier->mode = 1;
-    //bezier->Scale(4,Axis::XYZ);
-    // axis[0]->lineWidth = 5;
+    model->bezier = bezier;
     basicScene->GetRoot()->AddChild(bezier);
+
 
 }
 Eigen::Vector3f ObjectsAnimationVisitor::calcForDraw(float ti, Model *model){
@@ -129,38 +127,38 @@ Eigen::Vector3f ObjectsAnimationVisitor::calcForDraw(float ti, Model *model){
     return Eigen::Vector3f(Ti * model->MG_Result);
 }
 
-void ObjectsAnimationVisitor::generateBeizerCurve(Model *model) {
+void ObjectsAnimationVisitor::generateBeizerCurve(Model *model, Eigen::Vector3f vector) {
     //Slide 15 Beizer_Curves_And_surfaces.pdf
-
     Eigen::Vector3f pRow1;
     Eigen::Vector3f pRow2;
     Eigen::Vector3f pRow3;
     Eigen::Vector3f pRow4;
-
+    float xCoordinate = vector[0];
+    float yCoordinate = vector[1];
+    float zCoordinate = vector[2];
 
     std::random_device dev;
     std::mt19937       rng(dev());
-    std::uniform_int_distribution<int> distributeX(model->xCoordinate, model->xCoordinate + 4);
-    std::uniform_int_distribution<int> distributeY(model->yCoordinate - 1, model->yCoordinate + 5);
-    std::uniform_int_distribution<int> distributeZ(model->zCoordinate - 5, model->zCoordinate + 5);
+    std::uniform_int_distribution<int> distributeX(xCoordinate, xCoordinate + 4);
+    std::uniform_int_distribution<int> distributeY(yCoordinate - 1, yCoordinate + 5);
+    std::uniform_int_distribution<int> distributeZ(zCoordinate - 5, zCoordinate + 5);
 
     pRow1 = Eigen::Vector3f(distributeX(rng), distributeY(rng), distributeZ(rng));
     pRow2 = Eigen::Vector3f(distributeX(rng), distributeY(rng), distributeZ(rng));
     pRow3 = Eigen::Vector3f(distributeX(rng), distributeY(rng), distributeZ(rng));
     pRow4 = Eigen::Vector3f(distributeX(rng), distributeY(rng), distributeZ(rng));
-
-    model->curvePoints.row(0) = pRow1;
-    model->curvePoints.row(1) = pRow2;
-    model->curvePoints.row(2) = pRow3;
-    model->curvePoints.row(3) = pRow4;
-
-    model->M << -1, 3, -3, 1,
+    Eigen::Matrix <float, 4, 3 > curvePoints;
+    curvePoints.row(0) = pRow1;
+    curvePoints.row(1) = pRow2;
+    curvePoints.row(2) = pRow3;
+    curvePoints.row(3) = pRow4;
+    Eigen::Matrix4f               M;
+    M << -1, 3, -3, 1,
             3, -6, 3, 0,
             -3, 3, 0, 0,
             1, 0, 0, 0;
 
-    model->MG_Result =model->M * model->curvePoints;
-    //drawTheBeizerCurve();
+    model->MG_Result = M * curvePoints;
 }
 std::vector<double> ObjectsAnimationVisitor::linspace(float start_in, float end_in, int num_in)
 {
