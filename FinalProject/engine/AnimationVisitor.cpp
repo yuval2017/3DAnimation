@@ -19,6 +19,9 @@ namespace cg3d
 
     void AnimationVisitor::Visit(Model* model)
     {
+        if(model->name == std::string("snake")){
+            basicScene->snake->skinning(basicScene->snake->direction);
+        }
         Eigen::Matrix3f system = model->GetRotation().transpose();
 
         Eigen::Vector3f vector1x = Eigen::Vector3f(1, 0, 0);
@@ -27,8 +30,9 @@ namespace cg3d
         Eigen::Vector3f vector1y = Eigen::Vector3f(0, 1, 0);
         Eigen::Vector3f vector2y;
 
-        if (basicScene->animate)
+        if (!basicScene->snake->with_skinning && basicScene->animate)
         {
+
             if (model->name.find("bone") != std::string::npos)
             {
                 if (model->name == std::string("bone 0"))
@@ -85,3 +89,5 @@ namespace cg3d
 void AnimationVisitor::MoveAccordingToBezierCurve(Model *model) {
 
 }
+
+

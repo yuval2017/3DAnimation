@@ -70,7 +70,13 @@ public:
     void initSnake();
     Eigen::Vector3f ikGetPosition(int id, float length);
     Eigen::Matrix4d getHeadMakeTransd();
+    Eigen::Vector3d direction;
+    bool with_skinning = false;
 
+
+    void ikRotateHelper(int id, const Eigen::Vector3f& t);
+    void IKFabric();
+    std::shared_ptr<Model> sphere1;
     void moveSnake(Eigen::Vector3d t);
 
     void SetTranslation(const Eigen::Vector3d& position, int id);
