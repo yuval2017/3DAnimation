@@ -72,12 +72,19 @@ public:
     Eigen::Matrix4d getHeadMakeTransd();
     Eigen::Vector3d direction;
     bool with_skinning = false;
+    float move = 0.5f;
 
+    std::vector<Eigen::Vector3d> rotationPropogation;
+    std::vector<Eigen::Vector3d> translatePropogation;
 
     void ikRotateHelper(int id, const Eigen::Vector3f& t);
     void IKFabric();
     std::shared_ptr<Model> sphere1;
     void moveSnake(Eigen::Vector3d t);
+    void moveSnake2(Eigen::Vector3d t);
+    void propTranslate(Eigen::Vector3d t ,int id);
+
+
 
     void SetTranslation(const Eigen::Vector3d& position, int id);
 };

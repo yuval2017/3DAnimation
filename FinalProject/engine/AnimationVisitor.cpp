@@ -47,12 +47,12 @@ namespace cg3d
                         //Rotate Forward
                         vector2x = model->Tout.rotation() * vector1x;
                         quaternionx = Eigen::Quaternionf::FromTwoVectors(vector2x, vector1x);
-                        quaternionx = quaternionx.slerp(0.97, Eigen::Quaternionf::Identity());
+                        quaternionx = quaternionx.slerp(0.95, Eigen::Quaternionf::Identity());
                         model->Rotate(quaternionx);
 
                         vector2y = model->Tout.rotation() * vector1y;
                         quaterniony = Eigen::Quaternionf::FromTwoVectors(vector2y, vector1y);
-                        quaterniony = quaterniony.slerp(0.97, Eigen::Quaternionf::Identity());
+                        quaterniony = quaterniony.slerp(0.95, Eigen::Quaternionf::Identity());
                         model->Rotate(quaterniony);
 
                         bone_index = (bone_index + 1) % number_of_bones;
@@ -69,12 +69,12 @@ namespace cg3d
                         //Rotate Forward
                         vector2x = model->Tout.rotation() * vector1x;
                         quaternionx = Eigen::Quaternionf::FromTwoVectors(vector2x, vector1x);
-                        quaternionx = quaternionx.slerp(0.97, Eigen::Quaternionf::Identity());
+                        quaternionx = quaternionx.slerp(0.95, Eigen::Quaternionf::Identity());
                         model->Rotate(quaternionx);
 
                         vector2y = model->Tout.rotation() * vector1y;
                         quaterniony = Eigen::Quaternionf::FromTwoVectors(vector2y, vector1y);
-                        quaterniony = quaterniony.slerp(0.97, Eigen::Quaternionf::Identity());
+                        quaterniony = quaterniony.slerp(0.95, Eigen::Quaternionf::Identity());
                         model->Rotate(quaterniony);
 
                         bone_index = (bone_index + 1) % number_of_bones;

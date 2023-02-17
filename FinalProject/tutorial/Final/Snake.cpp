@@ -34,7 +34,7 @@ Snake::Snake(const std::shared_ptr<cg3d::Material>& material, const std::shared_
 
 
 
-    direction = {0, 0, 0.004};
+    direction = {0, 0, 1.0f};
     auto cylMesh{cg3d::IglLoader::MeshFromFiles("cyl_igl","data/zcylinder.obj")};
     bones.push_back(cg3d::Model::Create("bone 0",cylMesh, material));
     bones[0]->Scale(scaleFactor,cg3d::Movable::Axis::Z);
@@ -48,7 +48,7 @@ Snake::Snake(const std::shared_ptr<cg3d::Material>& material, const std::shared_
         bones[i]->Translate(1.6f*scaleFactor,cg3d::Movable::Axis::Z);
         bones[i]->SetCenter(Eigen::Vector3f(0,0,-0.8f*scaleFactor));
         bones[i]->GetTreeWithOutCube();
-
+        //root->AddChild(bones[i]);
         bones[i-1]->AddChild(bones[i]);
     }
     bones[0]->Translate({0,0,0.8f*scaleFactor});
@@ -67,7 +67,11 @@ Snake::Snake(const std::shared_ptr<cg3d::Material>& material, const std::shared_
     //initJoints();
     //Calculates calculate = Calculates();
     //std::vector<TexCoord> Vts = calculate.calculateTextureCoordinates(snake->GetMeshList()[0]->data[0].vertices,snake->GetMeshList()[0]->data[0].faces,"../tutorial/Final/snaketry.obj");
+//    bones[0]->Rotate(M_PI,Model::Axis::X);
+//    bones[0]->Translate({0,0,0.8f*scaleFactor*number_of_joints});
     initSnake();
+
+
 
 
 }
@@ -79,14 +83,14 @@ void Snake::SetSpeed(float new_speed){
     speed = new_speed;
 }
 void Snake::MoveLeft(){
-    direction = Eigen::Vector3d(-0.04, 0, 0);
+    direction = Eigen::Vector3d(-1.0, 0, 0);
     if(!with_skinning) {
         bones[0]->Rotate(0.1f, cg3d::Movable::Axis::Y);
         bones[1]->Rotate(-0.1f, cg3d::Movable::Axis::Y);
     }
 }
 void Snake::MoveRight(){
-    direction = Eigen::Vector3d(0.04, 0, 0);
+    direction = Eigen::Vector3d(1.0, 0, 0);
     if(!with_skinning) {
 
         bones[0]->Rotate(-0.1f, cg3d::Movable::Axis::Y);
@@ -94,14 +98,14 @@ void Snake::MoveRight(){
     }
 }
 void Snake::MoveUp(){
-    direction = Eigen::Vector3d(0, 0.04, 0);
+    direction = Eigen::Vector3d(0, 1.0, 0);
     if(!with_skinning) {
         bones[0]->Rotate(0.1f, cg3d::Movable::Axis::X);
         bones[1]->Rotate(-0.1f, cg3d::Movable::Axis::X);
     }
 }
 void Snake::MoveDone(){
-    direction = Eigen::Vector3d(0, -0.04, 0);
+    direction = Eigen::Vector3d(0, 1.0, 0);
     if(!with_skinning) {
         bones[0]->Rotate(-0.1f, cg3d::Movable::Axis::X);
         bones[1]->Rotate(0.1f, cg3d::Movable::Axis::X);
@@ -211,8 +215,13 @@ void Snake::calcWeight(Eigen::MatrixXd& V, double min_z){
 
 void Snake::skinning(Eigen::Vector3d t) {
     if (with_skinning) {
-        moveSnake(std::move(t));
+        moveSnake2(std::move(t));
+        //IKFabric();
     }
+    //moving the cyls here...
+
+
+
     for (int i = 0; i < number_of_joints; i++) {
         vT[i] = ikGetPosition(i, -joint_length / 2).cast<double>() - (Eigen::Vector3d) Cp.row(i);
     }
@@ -232,7 +241,7 @@ void Snake::skinning(Eigen::Vector3d t) {
     // the position minus the first position.
 
     igl::dqs(V_new, W, vQ, vT, U);
-    igl::deform_skeleton(Cp, BE, T, CT, BET);
+    //igl::deform_skeleton(Cp, BE, T, CT, BET);
 
 
     std::shared_ptr<cg3d::Mesh> new_mesh = std::make_shared<cg3d::Mesh>(snake->name,
@@ -245,12 +254,12 @@ void Snake::skinning(Eigen::Vector3d t) {
 
     for (int i = 0; i < number_of_joints + 1; i++)
         vC[i] = vT[i].cast<double>();
-    if (with_skinning) {
-        for (int i = 0; i < number_of_joints; i++) {
-            Eigen::Vector3d newPositionOfObject = CT.row(2 * (i + 1) - 1);
-            bones[i]->Translate(newPositionOfObject.cast<float>());
-        }
-    }
+//    if (with_skinning) {
+//        for (int i = 0; i < number_of_joints; i++) {
+//            Eigen::Vector3d newPositionOfObject = CT.row(2 * (i + 1) - 1);
+//            bones[i]->Translate(newPositionOfObject.cast<float>());
+//        }
+//    }
 }
 
 
@@ -270,9 +279,9 @@ Eigen::Matrix4d Snake::getHeadMakeTransd()
 
 
 void Snake::moveSnake(Eigen::Vector3d t){
-//    for (int i = number_of_joints + 1; i < 1; i++)
-//        vT[i] = vT[i] + (vT[i - 1] - vT[i]);
-//    vT[0] = vT[0] + t;
+//    for (int i = 0; i < number_of_joints; i++)
+//        vT[i] = vT[i] + (vT[i + 1] - vT[i]);
+//    vT[number_of_joint] = vT[number_of_joint] + t;
 //    //update the joints
 
 //    for (int i = 0; i < number_of_joints; i++) {
@@ -285,6 +294,13 @@ void Snake::initSnake(){
     BE.resize(number_of_joints, 2);
     Cp.resize(number_of_joints+1, 3);
     CT.resize(32, 3);
+
+    rotationPropogation.resize(number_of_joints);
+    translatePropogation.resize(number_of_joints);
+    for (int i = 0; i < number_of_joints; i++) {
+        rotationPropogation[i] = Eigen::Vector3d::Identity();
+        translatePropogation[i] = Eigen::Vector3d(0, 0, -0.1f);
+    }
     BE << 0, 1,
             1, 2,
             2, 3,
@@ -388,7 +404,8 @@ void Snake::IKFabric() {
             std::cout << "cannot reach" << std::endl;
             //shouldAnimateFabrik = false;
             return;
-        } else {
+        }
+    else  {
             //1.10
             //the target is reachable
             Eigen::Vector3f b = p[firstLinkIndex];
@@ -398,11 +415,11 @@ void Snake::IKFabric() {
             float tolerance = 0.05;
 
             float diffA = (endEffector - target).norm();
-//            if (diffA < tolerance) {
-//                std::cout << "distance : " << diffA << "\n" << std::endl;
-//                //shouldAnimateFabrik = false;
-//                return;
-//        }
+            if (diffA < tolerance) {
+                std::cout << "distance : " << diffA << "\n" << std::endl;
+                //shouldAnimateFabrik = false;
+                return;
+        }
                 while (diffA > tolerance) {
                     //	1.19 foward to reach
                     p[lastLinkIndex + 1] = target;
@@ -469,10 +486,8 @@ void Snake::IKFabric() {
 
 
 void Snake::ikRotateHelper(int id, const Eigen::Vector3f& t){
-        Eigen::Matrix3f system = bones[id]->GetRotation().transpose();
-        bones[id]->TranslateInSystem(system, Eigen::Vector3f(0, 0, -0.1f));
-
-
+   Eigen::Matrix3f system = bones[id]->GetRotation().transpose();
+   bones[0]->TranslateInSystem(system,Eigen::Vector3f(0, 0, +0.04f));
 
     Eigen::Vector3f r = ikGetPosition(id, -joint_length/2);
     Eigen::Vector3f e = ikGetPosition(id, joint_length/2);
@@ -495,4 +510,27 @@ void Snake::ikRotateHelper(int id, const Eigen::Vector3f& t){
     bones[id]->Rotate(oi[1], Movable::Axis::X);
     bones[id]->Rotate(oi[2],Movable::Axis::Z);
     bones[id]->Rotate(angle, rotationVec);
+}
+void Snake::moveSnake2(Eigen::Vector3d t){
+    //the rotation on the end -
+    //translatePropogation[0] = Eigen::Vector3d(0, 0, -0.1f);
+    //rotationPropogation[0] = direction;
+    for (int i = 0; i < number_of_joints; i++) {
+        Eigen::Matrix3f system = bones[i]->GetRotation().transpose();
+        bones[i]->TranslateInSystem(system, translatePropogation[i].cast<float>());
+        //bones[i]->Rotate(move,rotationPropogation[i].cast<float>());
+    }
+    IKFabric();
+
+    //
+    for (int i = 1; i < number_of_joints; i++) {
+        rotationPropogation[i] = rotationPropogation[i-1];
+        translatePropogation[i-1] = translatePropogation[i];
+    }
+
+}
+void Snake::propTranslate(Eigen::Vector3d t ,int id){
+    for (int i = id+1; i < number_of_joints; i++) {
+        bones[i]->Translate(ikGetPosition(i-1,number_of_joints/2)-ikGetPosition(i,number_of_joints/2));
+    }
 }

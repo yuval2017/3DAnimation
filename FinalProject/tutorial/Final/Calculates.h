@@ -27,13 +27,22 @@ struct TexCoord {
 };
 using namespace cg3d;
 class Calculates {
-
+private:
+    static Calculates* instancePtr;
+    Calculates(){}
 public:
+    Calculates(const Calculates& obj) = delete;
+    static Calculates *getInstance(){
+        if (instancePtr == NULL){
+            instancePtr = new Calculates();
+        }
+        return instancePtr;
+    }
+    bool isMeshCollision(std::shared_ptr<cg3d::Model> mesh1, Model* mesh2, igl::AABB<Eigen::MatrixXd, 3>* treeA, igl::AABB<Eigen::MatrixXd, 3>* treeB);
+    bool isBoxesIntersect(Eigen::AlignedBox<double, 3>& boxA, Eigen::AlignedBox<double, 3>& boxB, const std::shared_ptr<cg3d::Model>& mesh1,Model* mesh2);
     std::vector<TexCoord> calculateTextureCoordinates(std::vector<Vertex> vertices, std::vector<Face> faces, const std::string& filename);
     std::vector<TexCoord> calculateTextureCoordinates(Eigen::MatrixXd vertices, Eigen::MatrixXi faces, const std::string& filename);
     void write_obj_file(const std::vector<Vertex>& vertices,std::vector<Face> faces,std::vector<TexCoord> VT, const std::string& filename);
-
-
 };
 
 

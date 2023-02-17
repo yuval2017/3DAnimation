@@ -9,6 +9,7 @@
 #include "igl/edge_flaps.h"
 #include "igl/per_vertex_normals.h"
 #include "../tutorial/Final/BasicScene.h"
+#include "../tutorial/Final/Calculates.h"
 
 
 namespace cg3d
@@ -25,8 +26,6 @@ public:
             override;
 
 protected:
-    bool isMeshCollision (std::shared_ptr<cg3d::Model> mesh1, Model* mesh2,igl::AABB<Eigen::MatrixXd, 3>* treeA, igl::AABB<Eigen::MatrixXd, 3>* treeB);
-    bool isBoxesIntersect(Eigen::AlignedBox<double, 3>& boxA, Eigen::AlignedBox<double, 3>& boxB, const std::shared_ptr<cg3d::Model>& mesh1, Model* mesh2);
     BasicScene *basicScene;
     };
 }
