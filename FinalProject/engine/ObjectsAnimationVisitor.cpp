@@ -8,6 +8,8 @@
 #include <iostream>
 #include <random>
 #include <utility>
+#include "../tutorial/Final/Calculates.h"
+#include "../tutorial/Final//ObjectsNames.h"
 void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
     basicScene = (BasicScene *)scene;
     if(!is_visitor_inited){
@@ -17,15 +19,15 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
         //material1
         material =  std::make_shared<Material>("material", program); // empty material
         material->AddTexture(0, "textures/box0.bmp", 2);
-        GenerateSphereObject(material);
-        GenerateSphereObject(material);
-        GenerateCubeObject(material);
+        GenerateSphereObject(material,BEZIER_OBJECT_NAME);
+        GenerateSphereObject(material, BEZIER_OBJECT_NAME);
+        GenerateCubeObject(material, BEZIER_OBJECT_NAME);
     }
     Visitor::Run(scene, camera);
 }
 
 void ObjectsAnimationVisitor::Visit(Model *model) {
-    if(basicScene->animate && model->name.substr(0,15) == std::string("CollisionObject")) {
+    if(basicScene->animate && model->name.substr(0,strlen(BEZIER_OBJECT_NAME)) == std::string(BEZIER_OBJECT_NAME)) {
         if (model->t <= 1 && !model->moveBackwards) {
             model->t += 0.004;
             moveAccordingToBeizerCurve(model);
@@ -42,9 +44,9 @@ void ObjectsAnimationVisitor::Visit(Model *model) {
     }
 }
 
-void ObjectsAnimationVisitor::GenerateCubeObject(const std::shared_ptr<Material>& _material) {
+void ObjectsAnimationVisitor::GenerateCubeObject(const std::shared_ptr<Material>& _material, std::string prefix) {
     auto cubeMesh{IglLoader::MeshFromFiles("cube_igl","../tutorial/data/cube_old.obj")};
-    auto cube = Model::Create( "CollisionObject cube", cubeMesh, _material);
+    auto cube = Model::Create( prefix + " cube", cubeMesh, _material);
     basicScene->GetRoot()->AddChild(cube);
     cube->showWireframe = true;
     Eigen::Vector3f location = Eigen::Vector3f (generate_random_number(minx,maxx),generate_random_number(miny,maxy),generate_random_number(minz,maxz));
@@ -53,9 +55,9 @@ void ObjectsAnimationVisitor::GenerateCubeObject(const std::shared_ptr<Material>
     setModelBezier(location,cube.get());
 }
 
-void ObjectsAnimationVisitor::GenerateSphereObject(const std::shared_ptr<Material>& _material) {
+void ObjectsAnimationVisitor::GenerateSphereObject(const std::shared_ptr<Material>& _material, std::string prefix) {
     auto sphereMesh{IglLoader::MeshFromFiles("sphere_igl", "../tutorial/data/sphere.obj")};
-    shared_ptr<Model> sphere1 = Model::Create( "CollisionObject sphere",sphereMesh, _material);
+    shared_ptr<Model> sphere1 = Model::Create( prefix + " sphere",sphereMesh, _material);
     basicScene->GetRoot()->AddChild(sphere1);
     sphere1->showWireframe = true;
     Eigen::Vector3f location = Eigen::Vector3f (generate_random_number(minx,maxx),generate_random_number(miny,maxy),generate_random_number(minz,maxz));
@@ -66,7 +68,7 @@ void ObjectsAnimationVisitor::GenerateSphereObject(const std::shared_ptr<Materia
     setModelBezier(location,sphere1.get());
 }
 void ObjectsAnimationVisitor::setModelBezier(Eigen::Vector3f vectors, Model *model){
-    generateBeizerCurve(model,std::move(vectors));
+    Calculates::getInstance()->generateRandomBeizierCurve(std::move(vectors),model->MG_Result);
     drawTheBeizerCurve(model);
 }
 
@@ -80,21 +82,17 @@ void ObjectsAnimationVisitor::moveAccordingToBeizerCurve(Model *model) {
     Ti[2] = model->t;
     Ti[3] = 1;
 
-
-    Eigen::Vector3f               currentPosition;
+    Eigen::Vector3f currentPosition;
     currentPosition = (Ti * model->MG_Result);
 
     Eigen::Vector3f oldPositionOfObject = model->GetPosition();
     model->Translate(currentPosition - oldPositionOfObject);
-
 }
 
 void ObjectsAnimationVisitor::drawTheBeizerCurve(Model *model) {
     int number_of_points_in_bezier = 100;
-    std::vector<double> line_space = linspace(0,1,number_of_points_in_bezier);
+    std::vector<double> line_space = Calculates::getInstance()->linspace(0,1,number_of_points_in_bezier);
     Eigen::Vector3d drawingColor = Eigen::RowVector3d(0, 0, 2);
-
-
 
     Eigen::MatrixXd vertices(number_of_points_in_bezier,3);
     for (int i = 0; i < number_of_points_in_bezier; ++i) {
@@ -129,65 +127,6 @@ Eigen::Vector3f ObjectsAnimationVisitor::calcForDraw(float ti, Model *model){
     Ti[2] = ti;
     Ti[3] = 1;
     return Eigen::Vector3f(Ti * model->MG_Result);
-}
-
-void ObjectsAnimationVisitor::generateBeizerCurve(Model *model, Eigen::Vector3f vector) {
-    //Slide 15 Beizer_Curves_And_surfaces.pdf
-    Eigen::Vector3f pRow1;
-    Eigen::Vector3f pRow2;
-    Eigen::Vector3f pRow3;
-    Eigen::Vector3f pRow4;
-    float xCoordinate = vector[0];
-    float yCoordinate = vector[1];
-    float zCoordinate = vector[2];
-
-    std::random_device dev;
-    std::mt19937       rng(dev());
-    std::uniform_int_distribution<int> distributeX(xCoordinate, xCoordinate + 4);
-    std::uniform_int_distribution<int> distributeY(yCoordinate - 1, yCoordinate + 5);
-    std::uniform_int_distribution<int> distributeZ(zCoordinate - 5, zCoordinate + 5);
-
-    pRow1 = Eigen::Vector3f(distributeX(rng), distributeY(rng), distributeZ(rng));
-    pRow2 = Eigen::Vector3f(distributeX(rng), distributeY(rng), distributeZ(rng));
-    pRow3 = Eigen::Vector3f(distributeX(rng), distributeY(rng), distributeZ(rng));
-    pRow4 = Eigen::Vector3f(distributeX(rng), distributeY(rng), distributeZ(rng));
-    Eigen::Matrix <float, 4, 3 > curvePoints;
-    curvePoints.row(0) = pRow1;
-    curvePoints.row(1) = pRow2;
-    curvePoints.row(2) = pRow3;
-    curvePoints.row(3) = pRow4;
-    Eigen::Matrix4f               M;
-    M << -1, 3, -3, 1,
-            3, -6, 3, 0,
-            -3, 3, 0, 0,
-            1, 0, 0, 0;
-
-    model->MG_Result = M * curvePoints;
-}
-std::vector<double> ObjectsAnimationVisitor::linspace(float start_in, float end_in, int num_in)
-{
-
-    std::vector<double> linspaced;
-
-    double start = static_cast<double>(start_in);
-    double end = static_cast<double>(end_in);
-    double num = static_cast<double>(num_in);
-
-    if (num == 0) { return linspaced; }
-    if (num == 1)
-    {
-        linspaced.push_back(start);
-        return linspaced;
-    }
-
-    double delta = (end - start) / (num - 1);
-
-    for(int i=0; i < num-1; ++i)
-    {
-        linspaced.push_back(start + delta * i);
-    }
-    linspaced.push_back(end);
-    return linspaced;
 }
 
 

@@ -4,6 +4,7 @@
 
 #include "Calculates.h"
 #include <cmath>
+#include <random>
 using namespace std;
 Calculates *Calculates::instancePtr = NULL;
 vector<TexCoord> Calculates::calculateTextureCoordinates(vector<Vertex> vertices, vector<Face> faces, const std::string& filename ) {
@@ -70,6 +71,66 @@ void Calculates::write_obj_file(const std::vector<Vertex>& vertices,std::vector<
     }
     out.close();
 }
+void Calculates::generateRandomBeizierCurve(Eigen::Vector3f vector, Eigen::Matrix <float, 4, 3 > &MG_Result){
+    //Slide 15 Beizer_Curves_And_surfaces.pdf
+    Eigen::Vector3f pRow1;
+    Eigen::Vector3f pRow2;
+    Eigen::Vector3f pRow3;
+    Eigen::Vector3f pRow4;
+    float xCoordinate = vector[0];
+    float yCoordinate = vector[1];
+    float zCoordinate = vector[2];
+
+    std::random_device dev;
+    std::mt19937       rng(dev());
+    std::uniform_int_distribution<int> distributeX(xCoordinate, xCoordinate + 4);
+    std::uniform_int_distribution<int> distributeY(yCoordinate - 1, yCoordinate + 5);
+    std::uniform_int_distribution<int> distributeZ(zCoordinate - 5, zCoordinate + 5);
+
+    pRow1 = Eigen::Vector3f(distributeX(rng), distributeY(rng), distributeZ(rng));
+    pRow2 = Eigen::Vector3f(distributeX(rng), distributeY(rng), distributeZ(rng));
+    pRow3 = Eigen::Vector3f(distributeX(rng), distributeY(rng), distributeZ(rng));
+    pRow4 = Eigen::Vector3f(distributeX(rng), distributeY(rng), distributeZ(rng));
+    Eigen::Matrix <float, 4, 3 > curvePoints;
+    curvePoints.row(0) = pRow1;
+    curvePoints.row(1) = pRow2;
+    curvePoints.row(2) = pRow3;
+    curvePoints.row(3) = pRow4;
+    Eigen::Matrix4f M;
+    M << -1, 3, -3, 1,
+            3, -6, 3, 0,
+            -3, 3, 0, 0,
+            1, 0, 0, 0;
+
+    MG_Result = M * curvePoints;
+}
+
+
+std::vector<double> Calculates::linspace(float start_in, float end_in, int num_in){
+
+    std::vector<double> linspaced;
+
+    double start = static_cast<double>(start_in);
+    double end = static_cast<double>(end_in);
+    double num = static_cast<double>(num_in);
+
+    if (num == 0) { return linspaced; }
+    if (num == 1)
+    {
+        linspaced.push_back(start);
+        return linspaced;
+    }
+
+    double delta = (end - start) / (num - 1);
+
+    for(int i=0; i < num-1; ++i)
+    {
+        linspaced.push_back(start + delta * i);
+    }
+    linspaced.push_back(end);
+    return linspaced;
+}
+
 
 
 std::vector<TexCoord> Calculates::calculateTextureCoordinates(Eigen::MatrixXd vertices, Eigen::MatrixXi faces, const std::string& filename) {

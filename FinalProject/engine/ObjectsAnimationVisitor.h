@@ -14,8 +14,8 @@ namespace cg3d {
     public:
         void Run(Scene *scene, Camera *camera) override;
         void Visit(Model *model) override;
-        void GenerateCubeObject(const std::shared_ptr<Material>& _material);
-        void GenerateSphereObject(const std::shared_ptr<Material>& _material);
+        void GenerateCubeObject(const std::shared_ptr<Material>& _material, std::string prefix);
+        void GenerateSphereObject(const std::shared_ptr<Material>& _material, std::string prefix);
         void moveAccordingToBeizerCurve(Model *model);
         void setModelBezier(Eigen::Vector3f vectors, Model *model);
         void generateBeizerCurve(Model *model, Eigen::Vector3f vector);
