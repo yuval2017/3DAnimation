@@ -18,44 +18,40 @@
 
 #include <iostream>
 #include <vector>
+#include "ModelsFactory.h"
 #include "Calculates.h"
 
 Snake::Snake(){
     std::cout<< "Snake :) " << " \n"<< std::endl;
 }
 Snake::Snake(const std::shared_ptr<cg3d::Material>& material, const std::shared_ptr<cg3d::Movable>& root, std::shared_ptr<cg3d::Camera> _camera){
-
+    ModelsFactory *factory = ModelsFactory::getInstance();
 
     auto sphereMesh{IglLoader::MeshFromFiles("sphere_igl", "data/sphere.obj")};
     sphere1 = Model::Create( "sphere",sphereMesh, material);
     sphere1->showWireframe = true;
-    sphere1->Translate({3,1,0});
-    root->AddChild(sphere1);
-
 
 
     direction = {0, 0, 1.0f};
-    auto cylMesh{cg3d::IglLoader::MeshFromFiles("cyl_igl","data/zcylinder.obj")};
-    bones.push_back(cg3d::Model::Create("bone 0",cylMesh, material));
+    bones.push_back(factory->CreateModel(BRICKS_MATERIAL, CYL, "bone 0"));
     bones[0]->Scale(scaleFactor,cg3d::Movable::Axis::Z);
     bones[0]->SetCenter(Eigen::Vector3f(0,0,-0.8f*scaleFactor));
     root->AddChild(bones[0]);
     number_of_joints = 16;
     for(int i = 1;i < number_of_joints; i++)
     {
-        bones.push_back(cg3d::Model::Create("bone " + std::to_string(i), cylMesh, material));
+        bones.push_back(factory->CreateModel(PHONG_MATERIAL, CYL, "bone " + std::to_string(i)));
         bones[i]->Scale(scaleFactor,cg3d::Movable::Axis::Z);
-        bones[i]->Translate(1.6f*scaleFactor,cg3d::Movable::Axis::Z);
+        bones[i]->Translate(1.6f*scaleFactor*i,cg3d::Movable::Axis::Z);
         bones[i]->SetCenter(Eigen::Vector3f(0,0,-0.8f*scaleFactor));
         bones[i]->GetTreeWithOutCube();
-        //root->AddChild(bones[i]);
-        bones[i-1]->AddChild(bones[i]);
+        root->AddChild(bones[i]);
+        //bones[i-1]->AddChild(bones[i]);
     }
-    bones[0]->Translate({0,0,0.8f*scaleFactor});
+    //bones[0]->Translate({0,0,0.8f*scaleFactor});
     camera = std::move(_camera);
     //bones[0]->AddChild(camera);
-    auto snakeMesh{IglLoader::MeshFromFiles("snake_igl", "data/snake1.obj")};
-    snake = Model::Create("snake",snakeMesh,material);
+    snake = factory->CreateModel(PHONG_MATERIAL,SNAKE1,"snake");
     root->AddChild(snake);
     snake->showWireframe = true;
 
@@ -66,13 +62,14 @@ Snake::Snake(const std::shared_ptr<cg3d::Material>& material, const std::shared_
     std::cout<< joint_length << std::endl;
     //initJoints();
     //Calculates calculate = Calculates();
-    //std::vector<TexCoord> Vts = calculate.calculateTextureCoordinates(snake->GetMeshList()[0]->data[0].vertices,snake->GetMeshList()[0]->data[0].faces,"../tutorial/Final/snaketry.obj");
+    auto cubeMesh{IglLoader::MeshFromFiles("cube_igl","data/cube_old.obj")};
+    auto cube = Model::Create( "helpcube", cubeMesh, material);
+    std::vector<TexCoord> Vts = Calculates::getInstance()->getVertexTextureCoordinates(cube->GetMeshList()[0]->data[0].vertices,cube->GetMeshList()[0]->data[0].faces,"../tutorial/textures/bricks.jpg");
 //    bones[0]->Rotate(M_PI,Model::Axis::X);
 //    bones[0]->Translate({0,0,0.8f*scaleFactor*number_of_joints});
+    sphere1->Translate(-1.6f*scaleFactor*(number_of_joints - 0.5*number_of_joints),cg3d::Movable::Axis::Z);
+    root->AddChild(sphere1);
     initSnake();
-
-
-
 
 }
 
@@ -215,8 +212,8 @@ void Snake::calcWeight(Eigen::MatrixXd& V, double min_z){
 
 void Snake::skinning(Eigen::Vector3d t) {
     if (with_skinning) {
-        moveSnake2(std::move(t));
-        //IKFabric();
+        //moveSnake2(std::move(t));
+        IKFabric();
     }
     //moving the cyls here...
 
@@ -375,6 +372,7 @@ Eigen::Vector3f Snake::ikGetPosition(int id, float length){
 
 
 void Snake::IKFabric() {
+    sphere1->Translate(direction.cast<float>()/10);
     int num_of_cyls = number_of_joints;
     int lastLinkIndex = bones.size() - 1;
     int firstLinkIndex = 0;
@@ -384,6 +382,7 @@ void Snake::IKFabric() {
         p.resize(num_of_cyls + 1);
         Eigen::Vector3f target = sphere1->GetAggregatedTransform().col(3).head(3);
         Eigen::Vector3f p1 = ikGetPosition(firstLinkIndex, -link_len / 2);
+        target = ikGetPosition(lastLinkIndex,joint_length/2) + Eigen::Vector3f (0,0,-0.5);
 
         int curr = lastLinkIndex;
         while (curr != -1) {
@@ -400,12 +399,12 @@ void Snake::IKFabric() {
         lambdaI_Array.resize(num_of_cyls + 1);
 
         //if unreachable
-        if ((target - p1).norm() > link_len * float(num_of_cyls)) {
-            std::cout << "cannot reach" << std::endl;
-            //shouldAnimateFabrik = false;
-            return;
-        }
-    else  {
+//        if ((target - p1).norm() > link_len * float(num_of_cyls)) {
+//            std::cout << "cannot reach" << std::endl;
+//            //shouldAnimateFabrik = false;
+//            return;
+//        }
+    if(1)  {
             //1.10
             //the target is reachable
             Eigen::Vector3f b = p[firstLinkIndex];
@@ -420,7 +419,7 @@ void Snake::IKFabric() {
                 //shouldAnimateFabrik = false;
                 return;
         }
-                while (diffA > tolerance) {
+             //   while (diffA > tolerance) {
                     //	1.19 foward to reach
                     p[lastLinkIndex + 1] = target;
                     int parent = lastLinkIndex;
@@ -437,47 +436,26 @@ void Snake::IKFabric() {
                         p[parent] = (1 - lambdaI_Array[parent]) * p[child] + lambdaI_Array[parent] * p[parent];
                         child = parent;
                         parent = parent - 1;
-
                     }
-
-                    //Stage 2: 1.29 - reach backward
-                    //Set p1 p0 to its initial position
-                    p[firstLinkIndex] = b;
-                    parent = firstLinkIndex;
-                    child = firstLinkIndex + 1;
-                    while (child < num_of_cyls) {
-                        //1.33-1.36 Find the distance ri between the new joint position pi and the joint pi+1
-                        ris_Array[parent] = (p[child] - p[parent]).norm();
-                        lambdaI_Array[parent] = link_len / ris_Array[parent];
-                        //1.37
-                        p[child] = (1 - lambdaI_Array[parent]) * p[parent] + lambdaI_Array[parent] * p[child];
-                        parent = child;
-                        child = child + 1;
-                    }
-
-                    ris_Array[lastLinkIndex] = (p[lastLinkIndex + 1] - p[lastLinkIndex]).norm();
-                    lambdaI_Array[lastLinkIndex] = link_len / ris_Array[lastLinkIndex];
-                    //1.27
-                    p[lastLinkIndex + 1] = (1 - lambdaI_Array[lastLinkIndex]) * p[lastLinkIndex] +
-                                           lambdaI_Array[lastLinkIndex] * p[lastLinkIndex + 1];
-                    diffA = (p[lastLinkIndex + 1] - target).norm();
-                }
+      //          }
                 //rotate
                 int currLink = firstLinkIndex;
                 int target_id = firstLinkIndex + 1;
                 while (target_id < num_of_cyls) {
+                    bones[currLink]->Translate(p[target_id] - ikGetPosition(target_id,link_len/2));
                     ikRotateHelper(currLink, p[target_id]);
                     currLink = target_id;
                     target_id = target_id + 1;
                 }
                 ikRotateHelper(lastLinkIndex, p[lastLinkIndex + 1]);
-                double distance = (target - ikGetPosition(lastLinkIndex, link_len / 2)).norm();
+                bones[lastLinkIndex]->Translate(p[lastLinkIndex+1] - ikGetPosition(lastLinkIndex, link_len/2));
+
+            double distance = (target - ikGetPosition(lastLinkIndex, link_len / 2)).norm();
                 if (distance < tolerance) {
                     //shouldAnimateFabrik = false;
                     std::cout << "distance: " << distance << std::endl;
 
                 }
-
         }
     }
 }
@@ -486,9 +464,6 @@ void Snake::IKFabric() {
 
 
 void Snake::ikRotateHelper(int id, const Eigen::Vector3f& t){
-   Eigen::Matrix3f system = bones[id]->GetRotation().transpose();
-   bones[0]->TranslateInSystem(system,Eigen::Vector3f(0, 0, +0.04f));
-
     Eigen::Vector3f r = ikGetPosition(id, -joint_length/2);
     Eigen::Vector3f e = ikGetPosition(id, joint_length/2);
     Eigen::Vector3f rd = t - r;

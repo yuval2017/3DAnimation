@@ -17,10 +17,10 @@ namespace cg3d {
         void GenerateCubeObject(const std::shared_ptr<Material>& _material, std::string prefix);
         void GenerateSphereObject(const std::shared_ptr<Material>& _material, std::string prefix);
         void moveAccordingToBeizerCurve(Model *model);
-        void setModelBezier(Eigen::Vector3f vectors, Model *model);
-        void generateBeizerCurve(Model *model, Eigen::Vector3f vector);
-        void drawTheBeizerCurve(Model *model);
-        Eigen::Vector3f calcForDraw(float ti, Model *model);
+        void setModelBezier(Eigen::Vector3f vectors, std::shared_ptr<Model> model);
+        std::shared_ptr<Model> generateObjectBezier(int material_id, int model_id, std::string name, float scale);
+        void drawTheBeizerCurve(std::shared_ptr<Model> model);
+        Eigen::Vector3f calcForDraw(float ti, std::shared_ptr<Model> model);
         std::vector<double> linspace(float start_in, float end_in, int num_in);
     private:
         std::shared_ptr<Material> material;

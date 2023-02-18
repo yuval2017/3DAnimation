@@ -37,6 +37,7 @@ public:
 
     static const std::shared_ptr<Mesh>& Plane();
     static const std::shared_ptr<Mesh>& Cube();
+    static const std::shared_ptr<Mesh>& Cube2();
     static const std::shared_ptr<Mesh>& Tetrahedron();
     static const std::shared_ptr<Mesh>& Octahedron();
     static const std::shared_ptr<Mesh>& Cylinder();

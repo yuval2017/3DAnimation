@@ -35,6 +35,8 @@ struct ObjLoader
     static std::shared_ptr<Model> ModelFromObj(std::string name, std::istream& in, std::shared_ptr<Material> material);
     static std::shared_ptr<Model> ModelFromObjLoader(std::string name, objl::Loader& loader, std::shared_ptr<Material> material);
 
+    //add new load with texture
+    static std::shared_ptr<Mesh> LoadMeshWithTexture();
     template<typename... T> static std::shared_ptr<Mesh> MeshFromObjFiles(std::string name, const T&... files) {
         std::string strings[]{files...};
         return MeshFromObj(std::move(name), std::vector<std::string>({strings, strings + sizeof(strings) / sizeof(strings[0])}));

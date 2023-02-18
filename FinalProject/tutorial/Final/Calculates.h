@@ -13,7 +13,7 @@
 
 
 struct Vertex {
-    float x, y, z;
+    double x, y, z;
 };
 
 // Define a face structure
@@ -23,7 +23,7 @@ struct Face {
 
 // Define a texture coordinate structure
 struct TexCoord {
-    float u, v;
+    double u, v;
 };
 using namespace cg3d;
 class Calculates {
@@ -46,6 +46,9 @@ public:
     std::vector<double> linspace(float start_in, float end_in, int num_in);
     void generateRandomBeizierCurve(Eigen::Vector3f vector, Eigen::Matrix <float, 4, 3 > &MG_Result);
 
+    std::vector<TexCoord>
+    getVertexTextureCoordinates(std::vector<Vertex> vertices, std::vector<Face> faces, std::string imagePath);
+    std::vector<TexCoord> getVertexTextureCoordinates(Eigen::MatrixXd vertices, Eigen::MatrixXi faces, std::string imagePath);
 };
 
 

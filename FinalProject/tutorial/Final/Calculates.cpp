@@ -5,6 +5,9 @@
 #include "Calculates.h"
 #include <cmath>
 #include <random>
+#include <vector>
+#include <fstream>
+
 using namespace std;
 Calculates *Calculates::instancePtr = NULL;
 vector<TexCoord> Calculates::calculateTextureCoordinates(vector<Vertex> vertices, vector<Face> faces, const std::string& filename ) {
@@ -71,6 +74,51 @@ void Calculates::write_obj_file(const std::vector<Vertex>& vertices,std::vector<
     }
     out.close();
 }
+std::vector<TexCoord> Calculates::getVertexTextureCoordinates(Eigen::MatrixXd vertices, Eigen::MatrixXi faces, std::string imagePath) {
+    vector<Vertex> _vertices;
+    vector<Face> _faces;
+    for (int i = 0; i < vertices.rows(); i++) {
+        _vertices.push_back({vertices.row(i)[0], vertices.row(i)[1], vertices.row(i)[2]});
+    }
+    for (int i = 0; i < faces.rows(); i++) {
+        _faces.push_back({faces.row(i)[0], faces.row(i)[1]});
+    }
+    return getVertexTextureCoordinates(_vertices, _faces, imagePath);
+}
+#include <cmath>
+#include <algorithm>
+#include "stb_image.h"
+
+std::vector<TexCoord> Calculates::getVertexTextureCoordinates(vector<Vertex> vertices, vector<Face> faces, std::string imagePath) {
+    vector<TexCoord> textureCoordinates;
+    ifstream file(imagePath.c_str(), ios::binary);
+    int width, height, numChannels;
+    unsigned char* imageData = stbi_load(imagePath.c_str(), &width, &height, &numChannels, 0);
+    if (!imageData) {
+        cerr << "Error loading image" << endl;
+        return textureCoordinates;
+    }
+    for (int i = 0; i < vertices.size(); i++) {
+        Vertex vertex = vertices[i];
+        double u = (vertex.x + 1) * width / 2;
+        double v = (1 - vertex.y) * height / 2;
+        u = max(0.0, min(u, (double)width - 1));
+        v = max(0.0, min(v, (double)height - 1));
+        int pixelOffset = ((int)v * width + (int)u) * numChannels;
+        double b = (unsigned char)imageData[pixelOffset] / 255.0;
+        double g = (unsigned char)imageData[pixelOffset + 1] / 255.0;
+        double r = (unsigned char)imageData[pixelOffset + 2] / 255.0;
+        textureCoordinates.push_back({b, g});
+    }
+    stbi_image_free(imageData);
+    write_obj_file(vertices,faces,textureCoordinates,"../tutorial/Final/myCube.obj");
+    return textureCoordinates;
+}
+
+
+
+
+
 void Calculates::generateRandomBeizierCurve(Eigen::Vector3f vector, Eigen::Matrix <float, 4, 3 > &MG_Result){
     //Slide 15 Beizer_Curves_And_surfaces.pdf
     Eigen::Vector3f pRow1;

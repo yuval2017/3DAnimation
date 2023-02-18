@@ -62,6 +62,7 @@ public:
     float t = 0;
     Eigen::Vector3f GetPosition();
     std::shared_ptr <Model> bezier;
+    float bezier_speed = 1;
 
 
 
