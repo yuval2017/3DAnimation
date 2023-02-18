@@ -22,6 +22,10 @@ ModelsFactory::ModelsFactory(){
     materials[BRICKS_MATERIAL] = std::make_shared<Material>("basic_material", basicProgram);
     materials[BRICKS_MATERIAL]->AddTexture(0, "textures/bricks.jpg", 2);
 
+    //cube map shader material
+    materials[DAYLIGHT_MATERIAL] = {std::make_shared<Material>("daylight", "shaders/cubemapShader")};
+    materials[DAYLIGHT_MATERIAL]->AddTexture(0, "textures/cubemaps/Daylight Box_", 3);
+
     //meshes
     meshes[CUBE] = Mesh::Cube();
     meshes[CYL] = ObjLoader::MeshFromObj("Cyl", {"data/zcylinder.obj"});

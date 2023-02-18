@@ -9,6 +9,7 @@
 #include "Renderer.h"
 #include "IglMeshLoader.h"
 #include "imgui.h"
+#include "ModelsFactory.h"
 
 
 using namespace cg3d;
@@ -22,6 +23,7 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     highScores = new HighScores("./scores.ini");
     data->menu_flags[MainMenu_OP] = true;
     animate = false;
+
 
 }
 BasicScene::BasicScene(std::string name, Display* display) : SceneWithImGui(std::move(name), display)
@@ -183,7 +185,7 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
                 animate = true;
                 break;
             case GLFW_KEY_4:
-
+                snake->with_skinning = !snake->with_skinning;
                 break;
         }
     }
@@ -198,21 +200,17 @@ Eigen::Vector3f BasicScene::GetSpherePos()
 
 void BasicScene::init_objects() {
     AddChild(root = Movable::Create("root")); // a common (invisible) parent object for all the shapes
-    auto daylight{std::make_shared<Material>("daylight", "shaders/cubemapShader")};
-    daylight->AddTexture(0, "textures/cubemaps/Daylight Box_", 3);
-    auto background{Model::Create("background", Mesh::Cube(), daylight)};
+    auto background=ModelsFactory::getInstance()->CreateModel(DAYLIGHT_MATERIAL,CUBE,"background");
     AddChild(background);
     background->Scale(120, Axis::XYZ);
     background->SetPickable(false);
     background->SetStatic();
     auto program = std::make_shared<Program>("shaders/phongShader");
-    auto program1 = std::make_shared<Program>("shaders/pickingShader");
     material =  std::make_shared<Material>("material", program); // empty material
     material->AddTexture(0, "textures/box0.bmp", 2);
     snake = new Snake(material,root,camera);
-    camera->Translate(22,Movable::Axis::Z);
+    camera->Translate(44,Movable::Axis::Z);
     camera->Translate(10, Movable::Axis::Y);
-    camera->RotateByDegree(-10.f,Movable::Axis::X);
 }
 
 void BasicScene::startMenu() {

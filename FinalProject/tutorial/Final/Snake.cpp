@@ -65,7 +65,7 @@ Snake::Snake(const std::shared_ptr<cg3d::Material>& material, const std::shared_
     //Calculates calculate = Calculates();
     auto cubeMesh{IglLoader::MeshFromFiles("cube_igl","data/cube_old.obj")};
     auto cube = Model::Create( "helpcube", cubeMesh, material);
-    std::vector<TexCoord> Vts = Calculates::getInstance()->getVertexTextureCoordinates(cube->GetMeshList()[0]->data[0].vertices,cube->GetMeshList()[0]->data[0].faces,"../tutorial/textures/bricks.jpg");
+    //std::vector<TexCoord> Vts = Calculates::getInstance()->getVertexTextureCoordinates(cube->GetMeshList()[0]->data[0].vertices,cube->GetMeshList()[0]->data[0].faces,"../tutorial/textures/bricks.jpg");
 //    bones[0]->Rotate(M_PI,Model::Axis::X);
     bones[0]->Translate({0,0,0.8f*scaleFactor*number_of_joints});
     sphere1->Translate(-1.6f*scaleFactor*(number_of_joints - 0.5*number_of_joints),cg3d::Movable::Axis::Z);
