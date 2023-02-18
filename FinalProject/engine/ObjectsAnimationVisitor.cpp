@@ -11,6 +11,7 @@
 #include "../tutorial/Final/Calculates.h"
 #include "../tutorial/Final//ObjectsNames.h"
 #include "../tutorial/Final//ModelsFactory.h"
+#include "GameObject.h"
 
 void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
     basicScene = (BasicScene *)scene;
@@ -23,12 +24,10 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
         material->AddTexture(0, "textures/box0.bmp", 2);
 
 
-        GenerateSphereObject(material, BEZIER_OBJECT_NAME);
-        GenerateCubeObject(material, BEZIER_OBJECT_NAME);
         generateObjectBezier(BRICKS_MATERIAL,SPHERE, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
         generateObjectBezier(PHONG_MATERIAL,TRUCK, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
-
-
+        generateObjectBezier(PHONG_MATERIAL,SPHERE, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
+        generateObjectBezier(PHONG_MATERIAL,CUBE, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
     }
     Visitor::Run(scene, camera);
 }
@@ -36,13 +35,13 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
 void ObjectsAnimationVisitor::Visit(Model *model) {
     if(basicScene->animate && model->name.substr(0,strlen(BEZIER_OBJECT_NAME)) == std::string(BEZIER_OBJECT_NAME)) {
         if (model->t <= 1 && !model->moveBackwards) {
-            model->t += 0.004*model->bezier_speed;
+            model->t += 0.04*model->bezier_speed;
             moveAccordingToBeizerCurve(model);
         } else {
             if (!model->moveBackwards)
                 model->moveBackwards = true;
             if (model->moveBackwards) {
-                model->t -= 0.004;
+                model->t -= 0.04;
                 moveAccordingToBeizerCurve(model);
                 if (model->t <= 0)
                     model->moveBackwards = false;
@@ -71,8 +70,10 @@ void ObjectsAnimationVisitor::GenerateCubeObject(const std::shared_ptr<Material>
 }
 
 void ObjectsAnimationVisitor::GenerateSphereObject(const std::shared_ptr<Material>& _material, std::string prefix) {
-    auto sphereMesh{IglLoader::MeshFromFiles("sphere_igl", "../tutorial/data/sphere.obj")};
-    shared_ptr<Model> sphere1 = Model::Create( prefix + " sphere",sphereMesh, _material);
+    std::shared_ptr<Mesh> sphereMesh ={IglLoader::MeshFromFiles("sphere_igl", "../tutorial/data/sphere.obj")};
+    std::vector<std::shared_ptr<Mesh>> meshList;
+    meshList.push_back(sphereMesh);
+    std::shared_ptr<Model> sphere1 = Model::Create(prefix + " sphere", meshList, _material);
     basicScene->GetRoot()->AddChild(sphere1);
     sphere1->showWireframe = true;
     Eigen::Vector3f location = Eigen::Vector3f (generate_random_number(minx,maxx),generate_random_number(miny,maxy),generate_random_number(minz,maxz));
@@ -84,6 +85,7 @@ void ObjectsAnimationVisitor::GenerateSphereObject(const std::shared_ptr<Materia
 }
 void ObjectsAnimationVisitor::setModelBezier(Eigen::Vector3f vectors,std::shared_ptr<Model> model){
     Calculates::getInstance()->generateRandomBeizierCurve(std::move(vectors),model->MG_Result);
+    moveAccordingToBeizerCurve(model.get());
     drawTheBeizerCurve(model);
 }
 

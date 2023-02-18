@@ -30,7 +30,7 @@ Snake::Snake(const std::shared_ptr<cg3d::Material>& material, const std::shared_
     auto sphereMesh{IglLoader::MeshFromFiles("sphere_igl", "data/sphere.obj")};
     sphere1 = Model::Create( "sphere",sphereMesh, material);
     sphere1->showWireframe = true;
-
+    with_skinning = false;
 
     direction = {0, 0, 1.0f};
     bones.push_back(factory->CreateModel(BRICKS_MATERIAL, CYL, "bone 0"));
@@ -42,11 +42,12 @@ Snake::Snake(const std::shared_ptr<cg3d::Material>& material, const std::shared_
     {
         bones.push_back(factory->CreateModel(PHONG_MATERIAL, CYL, "bone " + std::to_string(i)));
         bones[i]->Scale(scaleFactor,cg3d::Movable::Axis::Z);
-        bones[i]->Translate(1.6f*scaleFactor*i,cg3d::Movable::Axis::Z);
+        bones[i]->Translate(1.6f*scaleFactor,cg3d::Movable::Axis::Z);
         bones[i]->SetCenter(Eigen::Vector3f(0,0,-0.8f*scaleFactor));
+        bones[i-1]->AddChild(bones[i]);
+
         bones[i]->GetTreeWithOutCube();
-        root->AddChild(bones[i]);
-        //bones[i-1]->AddChild(bones[i]);
+        //root->AddChild(bones[i]);
     }
     //bones[0]->Translate({0,0,0.8f*scaleFactor});
     camera = std::move(_camera);
@@ -66,7 +67,7 @@ Snake::Snake(const std::shared_ptr<cg3d::Material>& material, const std::shared_
     auto cube = Model::Create( "helpcube", cubeMesh, material);
     std::vector<TexCoord> Vts = Calculates::getInstance()->getVertexTextureCoordinates(cube->GetMeshList()[0]->data[0].vertices,cube->GetMeshList()[0]->data[0].faces,"../tutorial/textures/bricks.jpg");
 //    bones[0]->Rotate(M_PI,Model::Axis::X);
-//    bones[0]->Translate({0,0,0.8f*scaleFactor*number_of_joints});
+    bones[0]->Translate({0,0,0.8f*scaleFactor*number_of_joints});
     sphere1->Translate(-1.6f*scaleFactor*(number_of_joints - 0.5*number_of_joints),cg3d::Movable::Axis::Z);
     root->AddChild(sphere1);
     initSnake();
@@ -213,7 +214,7 @@ void Snake::calcWeight(Eigen::MatrixXd& V, double min_z){
 void Snake::skinning(Eigen::Vector3d t) {
     if (with_skinning) {
         //moveSnake2(std::move(t));
-        IKFabric();
+        //IKFabric();
     }
     //moving the cyls here...
 

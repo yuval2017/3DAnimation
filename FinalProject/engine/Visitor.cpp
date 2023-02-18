@@ -18,9 +18,6 @@ void Visitor::Visit(Movable* movable)
                 child->Accept(this);
         }
 }
-void Visitor::Visit(GameObject* gameObject){
-
-}
 
 void Visitor::Visit(Scene* scene)
 {
@@ -31,5 +28,10 @@ void Visitor::Visit(Model* model)
 {
     Visit(static_cast<Movable*>(model));
 }
+
+
+
+//void Visitor::Visit(GameObject *gameObject) {
+//}
 
 } // namespace cg3d

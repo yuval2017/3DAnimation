@@ -3,7 +3,6 @@
 #include "Eigen/Core"
 namespace cg3d
 {
-
 class Movable;
 class Model;
 class GameObject;
@@ -19,7 +18,7 @@ public:
     virtual void Visit(Scene* scene);
     virtual void Visit(Model* model);
     virtual void Visit(Movable* movable);
-    virtual void Visit(GameObject* gameObject);
+
 
     Eigen::Matrix4f proj;
     Eigen::Matrix4f view;

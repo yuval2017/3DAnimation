@@ -14,7 +14,7 @@ AutoMorphingModel::AutoMorphingModel(const Model& model, std::function<int(Model
 void AutoMorphingModel::Accept(Visitor* visitor)
 {
     meshIndex = CalcMeshIndexFunc(this, visitor);
-    Model::Accept(visitor);
+    Movable::Accept(visitor);
 }
 
 } // namespace cg3d
