@@ -25,7 +25,7 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
 
 
         generateObjectBezier(BRICKS_MATERIAL,SPHERE, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
-        generateObjectBezier(PHONG_MATERIAL,TRUCK, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
+        auto truck = generateObjectBezier(PHONG_MATERIAL,TRUCK, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
         generateObjectBezier(PHONG_MATERIAL,SPHERE, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
         generateObjectBezier(PHONG_MATERIAL,CUBE, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
     }
@@ -41,7 +41,7 @@ void ObjectsAnimationVisitor::Visit(Model *model) {
             if (!model->moveBackwards)
                 model->moveBackwards = true;
             if (model->moveBackwards) {
-                model->t -= 0.04;
+                model->t -= 0.04*model->bezier_speed;
                 moveAccordingToBeizerCurve(model);
                 if (model->t <= 0)
                     model->moveBackwards = false;
@@ -57,32 +57,11 @@ std::shared_ptr<Model> ObjectsAnimationVisitor::generateObjectBezier(int materia
     cube->Translate(location);
     cube->Scale(scale,Movable::Axis::XYZ);
     setModelBezier(location,cube);
+    cube->stopper.start();
+    cube->GetTreeWithCube();
     return cube;
 }
-void ObjectsAnimationVisitor::GenerateCubeObject(const std::shared_ptr<Material>& _material, std::string prefix) {
-    std::shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(BRICKS_MATERIAL,CUBE,prefix + " cube");
-    basicScene->GetRoot()->AddChild(cube);
-    cube->showWireframe = true;
-    Eigen::Vector3f location = Eigen::Vector3f (generate_random_number(minx,maxx),generate_random_number(miny,maxy),generate_random_number(minz,maxz));
-    cube->Translate(location);
-    cube->Scale(3.0f,Movable::Axis::XYZ);
-    setModelBezier(location,cube);
-}
 
-void ObjectsAnimationVisitor::GenerateSphereObject(const std::shared_ptr<Material>& _material, std::string prefix) {
-    std::shared_ptr<Mesh> sphereMesh ={IglLoader::MeshFromFiles("sphere_igl", "../tutorial/data/sphere.obj")};
-    std::vector<std::shared_ptr<Mesh>> meshList;
-    meshList.push_back(sphereMesh);
-    std::shared_ptr<Model> sphere1 = Model::Create(prefix + " sphere", meshList, _material);
-    basicScene->GetRoot()->AddChild(sphere1);
-    sphere1->showWireframe = true;
-    Eigen::Vector3f location = Eigen::Vector3f (generate_random_number(minx,maxx),generate_random_number(miny,maxy),generate_random_number(minz,maxz));
-    sphere1->Translate(location);
-    sphere1->Scale(3.0f,Movable::Axis::XYZ);
-    //call this for complicate meshes
-    sphere1->GetTreeWithCube();
-    setModelBezier(location,sphere1);
-}
 void ObjectsAnimationVisitor::setModelBezier(Eigen::Vector3f vectors,std::shared_ptr<Model> model){
     Calculates::getInstance()->generateRandomBeizierCurve(std::move(vectors),model->MG_Result);
     moveAccordingToBeizerCurve(model.get());
@@ -111,10 +90,15 @@ void ObjectsAnimationVisitor::drawTheBeizerCurve(std::shared_ptr<Model> model) {
     std::vector<double> line_space = Calculates::getInstance()->linspace(0,1,number_of_points_in_bezier);
     Eigen::Vector3d drawingColor = Eigen::RowVector3d(0, 0, 2);
 
-    Eigen::MatrixXd vertices(number_of_points_in_bezier,3);
+    Eigen::MatrixXf vertices(number_of_points_in_bezier,3);
     for (int i = 0; i < number_of_points_in_bezier; ++i) {
-        Eigen::Vector3d curr_v = calcForDraw(line_space[i],model).cast<double>();
-        vertices.row(i) = curr_v;
+        double ti = line_space[i];
+        Eigen::RowVector4f Ti;
+        Ti[0] = powf(ti, 3);
+        Ti[1] = powf(ti, 2);
+        Ti[2] = ti;
+        Ti[3] = 1;
+        vertices.row(i) = Ti * model->MG_Result;
     }
 
     Eigen::MatrixXi faces(number_of_points_in_bezier-1,2);
@@ -126,7 +110,7 @@ void ObjectsAnimationVisitor::drawTheBeizerCurve(std::shared_ptr<Model> model) {
     Eigen::MatrixXd vertexNormals = Eigen::MatrixXd::Ones(number_of_points_in_bezier,3);
     Eigen::MatrixXd textureCoords = Eigen::MatrixXd::Ones(number_of_points_in_bezier,2);// empty material
 
-    std::shared_ptr<Mesh> coordsys = std::make_shared<Mesh>("coordsys",vertices,faces,vertexNormals,textureCoords);
+    std::shared_ptr<Mesh> coordsys = std::make_shared<Mesh>("coordsys",vertices.cast<double>(),faces,vertexNormals,textureCoords);
     std::shared_ptr<Model> bezier = Model::Create("bez",coordsys,ModelsFactory::getInstance()->materials[BASIC_MATERIAL]);
     bezier->mode = 1;
     model->bezier = bezier;
@@ -134,14 +118,7 @@ void ObjectsAnimationVisitor::drawTheBeizerCurve(std::shared_ptr<Model> model) {
 
 
 }
-Eigen::Vector3f ObjectsAnimationVisitor::calcForDraw(float ti, std::shared_ptr<Model> model){
-    Eigen::RowVector4f Ti;
-    Ti[0] = powf(ti, 3);
-    Ti[1] = powf(ti, 2);
-    Ti[2] = ti;
-    Ti[3] = 1;
-    return Eigen::Vector3f(Ti * model->MG_Result);
-}
+
 
 
 

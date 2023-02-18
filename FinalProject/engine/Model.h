@@ -7,6 +7,7 @@
 #include "Material.h"
 #include "Movable.h"
 #include "ViewerData.h"
+#include "../tutorial/Final/Stopper.h"
 
 
 namespace cg3d
@@ -53,8 +54,7 @@ public:
     Eigen::Vector4f wireframeColor{0, 0, 0, 0};
     int meshIndex = 0;
     int mode = 0;
-
-
+    Stopper stopper;
 
     //add to engine for gameplay
     Eigen::Matrix <float, 4, 3 > MG_Result;

@@ -55,7 +55,7 @@ public:
 
 
     static ModelsFactory* getInstance();
-    ModelsFactory(ModelsFactory const&)               = delete;
+    ModelsFactory(ModelsFactory const&) = delete;
     void operator=(ModelsFactory const&)  = delete;
 
 

@@ -6,8 +6,8 @@
 #define BEZIER_OBJECT_NAME "CollisionObject bezier"
 #define COLLISION_OBJECT "CollisionObject"
 #define BONE_NAME "bone"
-class ObjectsNames {
-
-};
+#define SNAKE "snake"
+#define SPHERE "sphere"
+#define CUBE "CUBE"
 
 

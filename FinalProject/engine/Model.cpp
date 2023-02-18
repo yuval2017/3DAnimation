@@ -4,6 +4,7 @@
 #include "Movable.h"
 #include "ObjLoader.h"
 #include "../tutorial/Final/IglMeshLoader.h"
+#include "../tutorial/Final/ModelsFactory.h"
 #include <filesystem>
 #include <utility>
 
@@ -97,10 +98,8 @@ void Model::SetMeshList(std::vector<std::shared_ptr<Mesh>> _meshList)
 }
 //may do it in the game initiate
 igl::AABB<Eigen::MatrixXd, 3> *Model::GetTreeWithCube(){
-
     if(!is_tree_inited){
-        auto cubeMesh{IglLoader::MeshFromFiles("cube_igl","../tutorial/data/cube_old.obj")};
-        auto cube = Model::Create( "helpcube", cubeMesh, material);
+        shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(BASIC_MATERIAL,CUBE,"help_box");
         AddChild(cube);
         cube->isHidden = true;
         treeA1.init(cube->GetMeshList()[0]->data[0].vertices,cube->GetMeshList()[0]->data[0].faces);
