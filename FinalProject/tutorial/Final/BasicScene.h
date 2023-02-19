@@ -7,13 +7,14 @@
 #include "HighScores.h"
 #include <memory>
 #include <utility>
+#include "SoundManager.h"
 
 class BasicScene : public cg3d::SceneWithImGui
 {
 public:
     BasicScene(std::string name, cg3d::Display* display);
     void BuildImGui() override;
-
+    void dropEngine();
     void Init(float fov, int width, int height, float near, float far);
     void Update(const cg3d::Program& program, const Eigen::Matrix4f& proj, const Eigen::Matrix4f& view, const Eigen::Matrix4f& model) override;
     void MouseCallback(cg3d::Viewport* viewport, int x, int y, int button, int action, int mods, int buttonState[]) override;
@@ -30,6 +31,7 @@ public:
 private:
     Data* data;
     HighScores* highScores;
+    SoundManager* soundManager;
     std::shared_ptr<Movable> root;
     std::shared_ptr<Material> material;
     std::shared_ptr<Program> program;
@@ -51,5 +53,7 @@ private:
     void LoseMenu();
     void StoreMenu();
     void LeadersMenu();
+    void init_helpers();
+    //SoundManager* sound_manager;
 
 };

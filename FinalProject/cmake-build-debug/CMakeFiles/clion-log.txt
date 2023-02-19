@@ -1,4 +1,4 @@
-"/Users/ywblhytr/Library/Application Support/JetBrains/Toolbox/apps/CLion/ch-0/221.5787.29/CLion.app/Contents/bin/cmake/mac/bin/cmake" -DCMAKE_BUILD_TYPE=Debug "-DCMAKE_MAKE_PROGRAM=/Users/ywblhytr/Library/Application Support/JetBrains/Toolbox/apps/CLion/ch-0/221.5787.29/CLion.app/Contents/bin/ninja/mac/ninja" -G Ninja -S /Users/ywblhytr/Desktop/3dfkit/3DAnimation/FinalProject -B /Users/ywblhytr/Desktop/3dfkit/3DAnimation/FinalProject/cmake-build-debug
+/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/Applications/CLion.app/Contents/bin/ninja/mac/ninja -G Ninja -S /Users/bardamri/3DAnimation/FinalProject -B /Users/bardamri/3DAnimation/FinalProject/cmake-build-debug
 -- Found libtool - /usr/bin/libtool
 -- Creating target: igl::core (igl)
 -- Creating target: igl::opengl (igl_opengl)
@@ -12,4 +12,4 @@
 -- Creating target: Final
 -- Configuring done
 -- Generating done
--- Build files have been written to: /Users/ywblhytr/Desktop/3dfkit/3DAnimation/FinalProject/cmake-build-debug
+-- Build files have been written to: /Users/bardamri/3DAnimation/FinalProject/cmake-build-debug

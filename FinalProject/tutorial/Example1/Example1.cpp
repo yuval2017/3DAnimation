@@ -24,7 +24,7 @@ int main()
     auto scene = std::make_shared<SCENE>(STRINGIFY(SCENE), &display);
     std::cout.clear(); // re-enable output to console
     auto viewport = std::make_shared<Viewport>("viewport",0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT);
-    scene->Init(CAMERA_ANGLE, DISPLAY_WIDTH, DISPLAY_HEIGHT, NEAR, FAR);
+    scene->Init(CAMERA_ANGLE, DISPLAY_WIDTH, DISPLAY_HEIGHT, NEAR, FAR, nullptr);
     renderer.AddViewport(scene);
     display.LaunchRendering(true);
 
