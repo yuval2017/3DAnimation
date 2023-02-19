@@ -4,6 +4,7 @@
 #include "Snake.h"
 #include "CamModel.h"
 #include "Data.h"
+#include "GameStatistics.h"
 #include "HighScores.h"
 #include <memory>
 #include <utility>
@@ -30,6 +31,7 @@ public:
     bool done_inite = false;
 private:
     Data* data;
+    GameStatistics* statistics;
     HighScores* highScores;
     SoundManager* soundManager;
     std::shared_ptr<Movable> root;

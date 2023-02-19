@@ -4,7 +4,14 @@
 
 #include "Data.h"
 #include "iostream"
-
+#include <fstream>
+#include <string>
+#include <sstream>
+#define TOTAL_MONEY "total_money"
+#define LIFE_BOUGHT "life_bought"
+#define OBJECT_COLLISION "object_collision"
+#define SELF_COLLISION "self_collision"
+#define DOUBLE_SCORE "double_score"
 
 Data* Data::instance = 0;
 
@@ -22,111 +29,100 @@ Data* Data::getInstance()
 
 Data::Data() {
     msg = "";
-    level = 1;
-    speed =1;
-    score = 0;
-    life = 0 ;
     sound = true;
+    back_to_main = false;
+    init_vals();
+    //handler = new jsonHandler();
+
+}
+void Data::init_vals() {
+
+    fstream newfile;
+    newfile.open("data.txt",ios::in);
+    if (newfile.is_open()){ //checking whether the file is open
+        string tp;
+        while(getline(newfile, tp)){ //read data from file object and put it into string.
+            string arr[2];
+            stringstream ssin(tp);
+            int i=0;
+            while ( getline( ssin, arr[i++], '=' ) ) {}
+            put_val(arr[0],arr[1]);
+        }
+        newfile.close(); //close the file object.
+    }
+//    init_double_score();
+//    init_life_bought();
+//    init_object_collision();
+//    init_self_collision();
+//    init_total_money();
 }
 
+void Data::put_val(std::string s, std::string val) {
+    if( s.compare(TOTAL_MONEY) == 0){
+        total_money = std::stoi(val);
+    }
+    else  if( s.compare(LIFE_BOUGHT) == 0){
+        life_bought = std::stoi(val);
+    }
+    else  if( s.compare(OBJECT_COLLISION) == 0){
+        object_collision = std::stoi(val);
+    }
+    else  if( s.compare(SELF_COLLISION) == 0){
+        self_collision = std::stoi(val);
+    }
+    else  if( s.compare(DOUBLE_SCORE) == 0){
+        double_score= std::stoi(val);
+    }
 
-
-void Data::dec_Level() {
-
-    this->level--;
 }
+
+int Data::get_back_to(){
+    return this->back_to_main;
+}
+std::string Data::inc_life_bought(){
+
+    //handler->saveToData("life_bought", life_bought+1) ;
+    life_bought ++;
+    return "Life added successfully!";
+}
+
+void Data::init_double_score(){
+    //double_score = handler->get_double_score();
+}
+void Data::init_object_collision(){
+   // object_collision = handler->get_object_collision();
+}
+void Data::init_self_collision(){
+   // self_collision = handler->get_self_collision();
+}
+void Data::init_total_money(){
+    //total_money = handler->get_total_money();
+}
+void Data::init_life_bought(){
+   // life_bought = handler->get_life_bought();
+}
+
 
 void Data::set_message(std::string other) {
     this->msg = std::move(other);
 }
 
-void Data::add_Score(int s) {
-    this->score+=s;
+void Data::restart_game() {
+
+    this->msg="";
 }
 
-void Data::inc_Level() {
-    this->level++;
-}
-
-int Data::message_size() {
-    return msg.size();
+std::string Data::get_message(){
+    return this->msg;
 }
 
 const char * Data::msg_c_str(){
     return this->msg.c_str();
 }
-
-int Data::get_level() {
-    return this->level;
-}
-
-int Data::get_score() {
-    return this->score;
-}
-
-void Data::dec_Score(int s) {
-    this->score-=s;
-}
-
-int Data::get_life() {
-    return this->life;
-}
-
-void Data::set_life(int l) {
-    this->life = l;
-}
-
-float Data::get_progress() {
-    return this->level/this->num_of_levels;
-}
-
-int Data::get_Num_Of_Levels() {
-    return this->num_of_levels;
-}
-
-std::string Data::add_life() {
-    if (this->score>= LIFE_COST){
-        this->life ++;
-        this->score -= LIFE_COST;
-
-    } else{
-        return "you have not enough score to add a life.";
-    }
-}
-std::string Data::inc_speed(){
-    if (this->score>= SPEED_COST){
-        this->speed ++;
-        this->score -= SPEED_COST;
-
-    } else{
-        return "you have not enough score to purchase speed.";
-    }
-}
-
-int Data::get_speed() {
-    return this->speed;
-}
-
-void Data::reset_Speed() {
-
-    this->speed=1;
-}
-int Data::get_back_to(){
-    return this->back_to_main;
-}
 void Data::set_back(int val){
     this->back_to_main= val;
 }
-void Data::restart_game() {
 
-    this->score=0;
-    this->level=1;
-    this->speed=1;
-    this->life=0;
-    this->msg="";
+int Data::message_size(){
+    return this->msg.size();
 }
-
-
-
-
-

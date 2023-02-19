@@ -1,6 +1,7 @@
 //
 // Created by יובל היטר on 10/02/2023.
 //
+
 #pragma once
 #include <iostream>
 #define MainMenu_OP                 0
@@ -20,46 +21,41 @@ using namespace std;
 class Data {
 public:
 
-
-
-    void inc_Level();
-    void dec_Level();
-    int get_score();
     void set_message(std::string other);
-    void add_Score(int s);
-    void dec_Score(int s);
-    int get_speed();
-    void reset_Speed();
+    std::string get_message();
     int message_size();
-    const char * msg_c_str();
-    int get_level();
-    char characterName[256] = "";
-    bool menu_flags[10] = {false, false,false, false,false, false,false, false,false, false};
-    bool back_to_main=false;
-    int get_life();
-    void set_life(int l);
-    float get_progress();
-    void set_Num_of_levels(int n);
-    int get_Num_Of_Levels();
-    std::string inc_speed();
-    std::string add_life();
-    int get_back_to();
-    void set_back(int val);
-    void restart_game();
-    void init_sound_engine();
+    bool back_to_main ;
     static Data* getInstance();
+    void restart_game();
+    void set_back(int val);
+    const char * msg_c_str();
     bool sound;
+    std::string inc_life_bought();
+    int get_back_to();
+    int total_money;
+    void init_double_score();
+    void init_object_collision();
+    void init_self_collision();
+    void init_total_money();
+    void init_life_bought();
+    void put_val(string s , string val);
+    void init_vals();
 private :
+    //singleton methods.
     static Data* instance;
-    Data();
-    std::string msg;
-    int level;
-    const int num_of_levels =3;
-    int score ;
-    int life ;
-    int speed;
     Data(Data const&);              // Don't Implement.
     void operator=(Data const&); // Don't implement
+
+    //methods
+
+    Data();
+    //properties
+    std::string msg;
+    int life_bought;
+    int object_collision;
+    int self_collision;
+    int double_score;
+
 };
 
 
