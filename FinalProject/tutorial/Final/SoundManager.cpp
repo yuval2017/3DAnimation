@@ -1,5 +1,7 @@
 #include "SoundManager.h"
 
+#include <utility>
+
 
 
 std::string python_exe = "python3.10.app";
@@ -30,48 +32,25 @@ SoundManager::SoundManager() {
 
 }
 SoundManager::~SoundManager(){
-    fputs("d", pipe);
-    fflush(pipe);
-    pclose(pipe);
+    drop();
 }
 void SoundManager::drop(){
-    fputs("d", pipe);
-    fflush(pipe);
+    send_to_pipe("d");
     pclose(pipe);
 }
-void SoundManager::pauseSound(){
-    fputs("c", pipe);
-    fflush(pipe);
-
-}
-void SoundManager::continueSound(){
-    fputs("c", pipe);
+void SoundManager::send_to_pipe(std::string to_send){
+    fputs(to_send.c_str(), pipe);
     fflush(pipe);
 }
-
-void SoundManager::playGameSound() {
-
-
-// Calling a script to play the music
-    const auto& PlayMusic = [&]() {
-        std::string command = "python ../tutorial/Final/sounds/scripts/GameSound.py";
-        system(command.c_str());
-    };
-    python_thread = std::thread (PlayMusic);
-
+void SoundManager::change_game_music(std::string new_music){
+    send_to_pipe(std::move(new_music));
 }
-void SoundManager::playGameNextLevel () {
-	//engine->play2D("./tutorial/music/success.mp3");
+void SoundManager::stop_game_music(){
+    send_to_pipe(std::string(STOP_BACKGROUND_MUSIC));
 }
-void SoundManager::playGameHit() {
-	//engine->play2D("./tutorial/music/hit.mp3");
+void SoundManager::play_game_music(){
+    send_to_pipe(std::string(START_BACKGROUND_MUSIC));
 }
-void SoundManager::playGameLose() {
-	//engine->play2D("./tutorial/music/fail.mp3");
-}
-void SoundManager::playGameHealth() {
-	//engine->play2D("./tutorial/music/Health.mp3");
-}
-void SoundManager::playGameProgress() {
-	//engine->play2D("./tutorial/music/progress.mp3");
+void SoundManager::play_sound(int sound){
+    send_to_pipe(std::to_string(sound));
 }

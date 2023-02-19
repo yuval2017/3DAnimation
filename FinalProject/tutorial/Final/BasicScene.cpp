@@ -277,14 +277,14 @@ void BasicScene::startMenu() {
         if(data->sound) {
             if(ImGui::Button("Sound off")){
                 data->sound = false;
-                soundManager->pauseSound();
+                soundManager->stop_game_music();
             }
             ImGui::Spacing();
             ImGui::Spacing();
         } else{
             if (ImGui::Button("Sound on")){
                 data->sound = true;
-                soundManager->continueSound();
+                soundManager->play_game_music();
             }
             ImGui::Spacing();
             ImGui::Spacing();
@@ -300,7 +300,7 @@ void BasicScene::init_helpers(){
     this->highScores = new HighScores("./scores.ini");
     this->data->menu_flags[MainMenu_OP] = true;
     this->soundManager = SoundManager::getInstance();
-    this->soundManager->continueSound();
+    soundManager->play_game_music();
 
 }
 
@@ -358,14 +358,14 @@ void BasicScene::PausedMenu()
         if(data->sound) {
             if(ImGui::Button("Sound off")){
                 data->sound = false;
-                soundManager->pauseSound();
+                soundManager->stop_game_music();
             }
             ImGui::Spacing();
             ImGui::Spacing();
         } else{
             if (ImGui::Button("Sound on")){
                 data->sound = true;
-                soundManager->continueSound();
+                soundManager->play_game_music();
             }
             ImGui::Spacing();
             ImGui::Spacing();
@@ -556,4 +556,7 @@ void BasicScene::dropEngine() {
         this->soundManager->drop();
     }
 
+}
+BasicScene::~BasicScene(){
+    delete soundManager;
 }

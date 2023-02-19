@@ -28,6 +28,7 @@ public:
     std::vector<std::shared_ptr<cg3d::Model>> game_models;
     void create_menu();
     bool done_inite = false;
+    ~BasicScene();
 private:
     Data* data;
     HighScores* highScores;
