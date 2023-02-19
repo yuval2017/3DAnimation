@@ -3,7 +3,11 @@
 #include <assert.h>
 #include <chrono>
 #include <future>
-
+#include <string>
+#include <iostream>
+#include <cstdlib>
+#include <cstdio>
+#include <unistd.h>
 
 class SoundManager {
 public:
@@ -20,6 +24,7 @@ public:
     void continueSound();
     std::thread python_thread;
     std::string id ;
+    ~SoundManager();
 
 private:
     bool* run;
@@ -27,4 +32,5 @@ private:
     static SoundManager* instance;
     SoundManager(SoundManager const&);              // Don't Implement.
     void operator=(SoundManager const&); // Don't implement
+    FILE* pipe;
 };

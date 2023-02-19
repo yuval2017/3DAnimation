@@ -1,5 +1,5 @@
 #include "SoundManager.h"
-#include <string>
+
 
 
 std::string python_exe = "python3.10.app";
@@ -18,18 +18,35 @@ SoundManager* SoundManager::getInstance()
 SoundManager::SoundManager() {
     python_exe = "python3.10.exe";
     run = new bool(true);
-}
+    // Build the command to execute the Python script with the given parameter
+    std::string command = "python3.10 ../tutorial/Final/sounds/scripts/GameSound.py";
 
+    // Open a pipe to the command process for input and output
+    pipe = popen(command.c_str(), "r+");
+    if (!pipe) {
+        std::cerr << "Error: Could not open pipe to Python process." << std::endl;
+        return;
+    }
+
+}
+SoundManager::~SoundManager(){
+    fputs("d", pipe);
+    fflush(pipe);
+    pclose(pipe);
+}
 void SoundManager::drop(){
-    system("pkill -f ../tutorial/Final/sounds/scripts/GameSound.py");
+    fputs("d", pipe);
+    fflush(pipe);
+    pclose(pipe);
 }
 void SoundManager::pauseSound(){
-
-    system("killall python");
+    fputs("c", pipe);
+    fflush(pipe);
 
 }
 void SoundManager::continueSound(){
-    playGameSound();
+    fputs("c", pipe);
+    fflush(pipe);
 }
 
 void SoundManager::playGameSound() {
@@ -41,7 +58,6 @@ void SoundManager::playGameSound() {
         system(command.c_str());
     };
     python_thread = std::thread (PlayMusic);
-    python_thread.detach();
 
 }
 void SoundManager::playGameNextLevel () {

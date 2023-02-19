@@ -300,7 +300,7 @@ void BasicScene::init_helpers(){
     this->highScores = new HighScores("./scores.ini");
     this->data->menu_flags[MainMenu_OP] = true;
     this->soundManager = SoundManager::getInstance();
-    this->soundManager->playGameSound();
+    this->soundManager->continueSound();
 
 }
 
