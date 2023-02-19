@@ -107,6 +107,14 @@ igl::AABB<Eigen::MatrixXd, 3> *Model::GetTreeWithCube(){
     }
     return &treeA1;
 }
+void Model::setMeshData(std::string name,  Eigen::MatrixXd _V,  Eigen::MatrixXi _F,Eigen::MatrixXd _VN, Eigen::MatrixXd textureCoords){
+    std::shared_ptr<cg3d::Mesh> new_mesh = std::make_shared<cg3d::Mesh>(name,
+                                                                        _V,
+                                                                        _F,
+                                                                        _VN,
+                                                                        textureCoords);
+    SetMeshList({new_mesh});
+}
 igl::AABB<Eigen::MatrixXd, 3> *Model::GetTreeWithOutCube(){
 
         if(!is_tree_inited){

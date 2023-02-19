@@ -27,8 +27,24 @@ Snake::Snake(){
 Snake::Snake(const std::shared_ptr<cg3d::Material>& material, const std::shared_ptr<cg3d::Movable>& root, std::shared_ptr<cg3d::Camera> _camera){
     ModelsFactory *factory = ModelsFactory::getInstance();
 
-    auto sphereMesh{IglLoader::MeshFromFiles("sphere_igl", "data/sphere.obj")};
-    sphere1 = Model::Create( "sphere",sphereMesh, material);
+    //for check
+    auto program1 = std::make_shared<Program>("shaders/pickingShader");
+    auto material1{ std::make_shared<Material>("material", program1)};
+    Eigen::MatrixXd vertices(6,3);
+    vertices << -1,0,0,1,0,0,0,-1,0,0,1,0,0,0,-1,0,0,1;
+    Eigen::MatrixXi faces(3,2);
+    faces << 0,1,2,3,4,5;
+    Eigen::MatrixXd vertexNormals = Eigen::MatrixXd::Ones(6,3);
+    Eigen::MatrixXd textureCoords = Eigen::MatrixXd::Ones(6,2);
+    auto coordsys = std::make_shared<Mesh>("coordsys",vertices,faces,vertexNormals,textureCoords);
+    auto axis = (Model::Create("axis",coordsys,material1));
+    axis->mode = 1;
+    axis->Scale(4,Model::Axis::XYZ);
+    root->AddChild(axis);
+
+
+
+    sphere1 = ModelsFactory::getInstance()->CreateModel(PHONG_MATERIAL,SPHERE,"junk_sphere");
     sphere1->showWireframe = true;
     with_skinning = false;
 
@@ -45,11 +61,9 @@ Snake::Snake(const std::shared_ptr<cg3d::Material>& material, const std::shared_
         bones[i]->Translate(1.6f*scaleFactor,cg3d::Movable::Axis::Z);
         bones[i]->SetCenter(Eigen::Vector3f(0,0,-0.8f*scaleFactor));
         bones[i-1]->AddChild(bones[i]);
-
         bones[i]->GetTreeWithOutCube();
         //root->AddChild(bones[i]);
     }
-    //bones[0]->Translate({0,0,0.8f*scaleFactor});
     camera = std::move(_camera);
     //bones[0]->AddChild(camera);
     snake = factory->CreateModel(PHONG_MATERIAL,SNAKE1,"snake");
@@ -57,9 +71,8 @@ Snake::Snake(const std::shared_ptr<cg3d::Material>& material, const std::shared_
     snake->showWireframe = true;
 
 
-    float lengthOfSnake = snake->GetMeshList()[0]->data[0].vertices.colwise().maxCoeff()[2] - snake->GetMeshList()[0]->data[0].vertices.colwise().minCoeff()[2];
-    std::cout<< lengthOfSnake << std::endl;
     joint_length = bones[0]->GetMeshList()[0]->data[0].vertices.colwise().maxCoeff()[2] - bones[0]->GetMeshList()[0]->data[0].vertices.colwise().minCoeff()[2];
+    float snake_length = joint_length * number_of_joints;
     std::cout<< joint_length << std::endl;
     //initJoints();
     //Calculates calculate = Calculates();
@@ -67,7 +80,7 @@ Snake::Snake(const std::shared_ptr<cg3d::Material>& material, const std::shared_
     auto cube = Model::Create( "helpcube", cubeMesh, material);
     //std::vector<TexCoord> Vts = Calculates::getInstance()->getVertexTextureCoordinates(cube->GetMeshList()[0]->data[0].vertices,cube->GetMeshList()[0]->data[0].faces,"../tutorial/textures/bricks.jpg");
 //    bones[0]->Rotate(M_PI,Model::Axis::X);
-    bones[0]->Translate({0,0,0.8f*scaleFactor*number_of_joints});
+    bones[0]->Translate({0,0,0.8f*scaleFactor});
     sphere1->Translate(-1.6f*scaleFactor*(number_of_joints - 0.5*number_of_joints),cg3d::Movable::Axis::Z);
     root->AddChild(sphere1);
     initSnake();
@@ -148,27 +161,24 @@ void Snake::initJoints(){
 }
 void Snake::restartSnake(){
     int bones_size = number_of_joints;
-   // viewer->data(0).set_vertices(V);
+    snake->setMeshData(snake->name,
+                       V_new,
+                       snake->GetMeshList()[0]->data[0].faces,
+                       snake->GetMeshList()[0]->data[0].vertexNormals,
+                       snake->GetMeshList()[0]->data[0].textureCoords);
+
+
     Eigen::Vector3d min = snake->GetMeshList()[0]->data[0].vertices.colwise().minCoeff();
-    Eigen::Vector3d max = snake->GetMeshList()[0]->data[0].vertices.colwise().maxCoeff();
     float min_z = min[2];
-    float max_z = max[2];
     Eigen::Vector3d pos(0, 0, min_z);
     Eigen::MatrixXd points(17, 3);
     for (int i = 0; i < bones_size + 1; i++) {
-        vC[i] = pos.cast<double>();
+        vC[i] = pos;
         vT[i] = pos;
         points.row(i) = pos;
         pos = pos + Eigen::Vector3d(0, 0, joint_length);
     }
-//    for (int i = 0; i < bones_size; i++) {
-//
-//        bones[i]->Tout = Eigen::Affine3f::Identity();
-//        bones[i]->Tin = Eigen::Affine3f::Identity();
-//        bones[i]->Tout.pretranslate(Eigen::Vector3f(0, 0, min_z + (i - 1) * bones_size));
-//        bones[i]->Tin.pretranslate(-Eigen::Vector3f(0, 0, min_z + (i - 1) * bones_size));
-//        bones[i]->Tout.pretranslate(vC[i - 1].cast<float>());
-//    }
+
     for (int i = 0; i < bones_size + 1; i++) {
         Cp.row(i) = vC[i];
     }
@@ -218,8 +228,6 @@ void Snake::skinning(Eigen::Vector3d t) {
     }
     //moving the cyls here...
 
-
-
     for (int i = 0; i < number_of_joints; i++) {
         vT[i] = ikGetPosition(i, -joint_length / 2).cast<double>() - (Eigen::Vector3d) Cp.row(i);
     }
@@ -242,12 +250,12 @@ void Snake::skinning(Eigen::Vector3d t) {
     //igl::deform_skeleton(Cp, BE, T, CT, BET);
 
 
-    std::shared_ptr<cg3d::Mesh> new_mesh = std::make_shared<cg3d::Mesh>(snake->name,
-                                                                        U,
-                                                                        snake->GetMeshList()[0]->data[0].faces,
-                                                                        snake->GetMeshList()[0]->data[0].vertexNormals,
-                                                                        snake->GetMeshList()[0]->data[0].textureCoords);
-    snake->SetMeshList({new_mesh});
+    snake->setMeshData(snake->name,
+                    U,
+                    snake->GetMeshList()[0]->data[0].faces,
+                    snake->GetMeshList()[0]->data[0].vertexNormals,
+                    snake->GetMeshList()[0]->data[0].textureCoords);
+
 
 
     for (int i = 0; i < number_of_joints + 1; i++)
@@ -336,7 +344,7 @@ void Snake::initSnake(){
     U = V_new;
 
     Eigen::Vector3d min = snake->GetMeshList()[0]->data[0].vertices.colwise().minCoeff();
-    float min_z = min[2];
+    double min_z = min[2];
     Eigen::Vector3d pos(0, 0, min_z);
     // Init C
     Cp.resize(number_of_joints + 1, 3);
@@ -345,14 +353,11 @@ void Snake::initSnake(){
         Cp.row(i) = pos;
         pos = pos + Eigen::Vector3d(0, 0, joint_length);
     }
-
-
-    std::shared_ptr<cg3d::Mesh> new_mesh = std::make_shared<cg3d::Mesh>(snake->name,
-                                                                        V_new,
-                                                                        snake->GetMeshList()[0]->data[0].faces,
-                                                                        snake->GetMeshList()[0]->data[0].vertexNormals,
-                                                                        snake->GetMeshList()[0]->data[0].textureCoords);
-    snake->SetMeshList({new_mesh});
+    snake->setMeshData(snake->name,
+                       V_new,
+                       snake->GetMeshList()[0]->data[0].faces,
+                       snake->GetMeshList()[0]->data[0].vertexNormals,
+                       snake->GetMeshList()[0]->data[0].textureCoords);
     Eigen::Vector3d min_vec = V_new.colwise().minCoeff();
     double minz = min_vec[2];
     calcWeight(V_new,minz);
@@ -366,7 +371,8 @@ void Snake::initSnake(){
 Eigen::Vector3f Snake::ikGetPosition(int id, float length){
     Eigen::Vector3f cen = bones[id]->GetAggregatedTransform().col(3).head(3);
     Eigen::Vector3f mov = Eigen::Vector3f(0,0,length);
-    return (cen+(bones[id]->GetRotation()*mov));
+    Eigen::Vector3f res = (cen+(bones[id]->GetRotation()*mov));
+    return res;
 }
 
 

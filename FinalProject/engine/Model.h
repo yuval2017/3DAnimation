@@ -71,6 +71,7 @@ public:
     void SetMeshList(std::vector<std::shared_ptr<Mesh>> _meshList);
     void UpdateDataAndDrawMeshes(const Program& program, bool _showFaces, bool bindTextures); // helper function
     void AddOverlay(const OverlayData& data, bool drawPoints);
+    void setMeshData(std::string name,  Eigen::MatrixXd _V,  Eigen::MatrixXi _F,Eigen::MatrixXd _VN, Eigen::MatrixXd textureCoords);
 private:
     static void UpdateDataAndBindMesh(igl::opengl::ViewerData& viewerData, const Program& program); // helper function
 
