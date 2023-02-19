@@ -1,6 +1,6 @@
 #include "Renderer.h"
 #include "Display.h"
-
+#include "iostream"
 #define SCENE BasicScene // the scene (class name) to display
 
 #define STRINGIFY(X) #X
@@ -11,6 +11,7 @@
 
 using namespace cg3d;
 
+
 int main()
 {
     const int DISPLAY_WIDTH = 800;
@@ -18,7 +19,6 @@ int main()
     const float CAMERA_ANGLE = 45.0f;
     const float NEAR = 0.1f;
     const float FAR = 120.0f;
-
     Renderer renderer;
     Display display("Example1", DISPLAY_WIDTH, DISPLAY_HEIGHT, &renderer);
     std::cout.setstate(std::ios_base::failbit); // suppress junk output to console from igl::opengl::glfw::Viewer
@@ -28,6 +28,6 @@ int main()
     scene->Init(CAMERA_ANGLE, DISPLAY_WIDTH, DISPLAY_HEIGHT, NEAR, FAR);
     renderer.AddViewport(scene);
     display.LaunchRendering(true);
-
+    scene->dropEngine();
     return 0;
 }

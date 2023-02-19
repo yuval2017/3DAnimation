@@ -11,7 +11,6 @@
 #include "../tutorial/Final/Calculates.h"
 #include "../tutorial/Final//ObjectsNames.h"
 #include "../tutorial/Final//ModelsFactory.h"
-#include "GameObject.h"
 
 void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
     basicScene = (BasicScene *)scene;

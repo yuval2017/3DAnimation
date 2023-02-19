@@ -26,7 +26,7 @@ Data::Data() {
     speed =1;
     score = 0;
     life = 0 ;
-
+    sound = true;
 }
 
 
@@ -125,6 +125,7 @@ void Data::restart_game() {
     this->life=0;
     this->msg="";
 }
+
 
 
 

@@ -1,6 +1,5 @@
 #include "BasicScene.h"
 #include <Eigen/src/Core/Matrix.h>
-
 #include <memory>
 #include "SceneWithImGui.h"
 #include "GLFW/glfw3.h"
@@ -10,8 +9,9 @@
 #include "IglMeshLoader.h"
 #include "imgui.h"
 #include "ModelsFactory.h"
-
-
+//#include "sounds/irrKlang.h"
+//#pragma comment(lib, "sounds/irrKlang.lib") // link with irrKlang.dll
+//using namespace irrklang;
 using namespace cg3d;
 
 void BasicScene::Init(float fov, int width, int height, float near, float far)
@@ -20,12 +20,12 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     camera = Camera::Create( "camera", fov, float(width) / height, near, far);
     init_objects();
     data = Data::getInstance();
-    highScores = new HighScores("./scores.ini");
-    data->menu_flags[MainMenu_OP] = true;
-    animate = false;
+    init_helpers();
+    this->animate = false;
 
 
 }
+
 BasicScene::BasicScene(std::string name, Display* display) : SceneWithImGui(std::move(name), display)
 {
     ImGui::GetIO().IniFilename = nullptr;
@@ -34,13 +34,13 @@ BasicScene::BasicScene(std::string name, Display* display) : SceneWithImGui(std:
     style.FrameRounding = 5.0f;
 }
 void BasicScene::BuildImGui(){
-//    startMenu();
-//    PausedMenu();
-//    NextLevelMenu();
-//    WinMenu();
-//    LoseMenu();
-//    StoreMenu();
-//    LeadersMenu();
+    startMenu();
+    PausedMenu();
+    NextLevelMenu();
+    WinMenu();
+    LoseMenu();
+    StoreMenu();
+    LeadersMenu();
 }
 void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, const Eigen::Matrix4f& view, const Eigen::Matrix4f& model)
 {
@@ -274,9 +274,34 @@ void BasicScene::startMenu() {
         ImGui::Spacing();
         ImGui::Spacing();
         ImGui::Spacing();
+        if(data->sound) {
+            if(ImGui::Button("Sound off")){
+                data->sound = false;
+                soundManager->pauseSound();
+            }
+            ImGui::Spacing();
+            ImGui::Spacing();
+        } else{
+            if (ImGui::Button("Sound on")){
+                data->sound = true;
+                soundManager->continueSound();
+            }
+            ImGui::Spacing();
+            ImGui::Spacing();
+        }
         ImGui::BulletText("Snake Game By Yuval Hitter & Bar Damri. \n3D Animation Course\n");
         ImGui::End();
     }
+}
+
+
+void BasicScene::init_helpers(){
+
+    this->highScores = new HighScores("./scores.ini");
+    this->data->menu_flags[MainMenu_OP] = true;
+    this->soundManager = SoundManager::getInstance();
+    this->soundManager->playGameSound();
+
 }
 
 void BasicScene::PausedMenu()
@@ -330,6 +355,21 @@ void BasicScene::PausedMenu()
         ImGui::Spacing();
         ImGui::Spacing();
         ImGui::Spacing();
+        if(data->sound) {
+            if(ImGui::Button("Sound off")){
+                data->sound = false;
+                soundManager->pauseSound();
+            }
+            ImGui::Spacing();
+            ImGui::Spacing();
+        } else{
+            if (ImGui::Button("Sound on")){
+                data->sound = true;
+                soundManager->continueSound();
+            }
+            ImGui::Spacing();
+            ImGui::Spacing();
+        }
         ImGui::BulletText("Snake Game By Yuval Hitter & Bar Damri. \n3D Animation Course\n");
         ImGui::End();
     }
@@ -508,4 +548,12 @@ void BasicScene::LeadersMenu() {
             data ->menu_flags[MainMenu_OP] = true;
         }
     }
+}
+
+void BasicScene::dropEngine() {
+
+    if (this->soundManager != NULL){
+        this->soundManager->drop();
+    }
+
 }

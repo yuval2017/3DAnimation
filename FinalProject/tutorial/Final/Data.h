@@ -46,9 +46,10 @@ public:
     int get_back_to();
     void set_back(int val);
     void restart_game();
+    void init_sound_engine();
     static Data* getInstance();
+    bool sound;
 private :
-
     static Data* instance;
     Data();
     std::string msg;
@@ -57,7 +58,6 @@ private :
     int score ;
     int life ;
     int speed;
-
     Data(Data const&);              // Don't Implement.
     void operator=(Data const&); // Don't implement
 };

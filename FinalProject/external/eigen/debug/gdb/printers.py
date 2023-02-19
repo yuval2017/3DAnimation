@@ -16,7 +16,7 @@
 
 # To use it:
 #
-# * Create a directory and put the file as well as an empty __init__.py in 
+# * Create a directory and put the file as well as an empty GameSound.py in
 #   that directory.
 # * Create a ~/.gdbinit file, that contains the following:
 #      python

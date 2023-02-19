@@ -2,7 +2,7 @@
 
 using namespace cg3d;
 
-void BasicScene::Init(float fov, int width, int height, float near, float far)
+void BasicScene::Init(float fov, int width, int height, float near, float far, SoundManager *pManager)
 {
     camera = Camera::Create("camera", fov, float(width) / float(height), near, far);
     auto program = std::make_shared<Program>("shaders/basicShader");
