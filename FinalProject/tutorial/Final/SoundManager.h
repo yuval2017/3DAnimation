@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 #include "thread"
 #include <assert.h>
@@ -8,25 +9,29 @@
 #include <cstdlib>
 #include <cstdio>
 #include <unistd.h>
+#define FAIL_SOUND 1
+#define HEALTH_SOUND 2
+#define HIT_SOUND 3
+#define PROGRESS_SOUND 4
+#define GAME_MUSIC q
+#define START_BACKGROUND_MUSIC "c"
+#define STOP_BACKGROUND_MUSIC "s"
 
 class SoundManager {
 public:
 
     static SoundManager* getInstance();
-	void playGameSound();
-	void playGameNextLevel();
-	void playGameHit();
-	void playGameLose();
-	void playGameProgress();
-	void playGameHealth();
     void drop();
-    void pauseSound();
-    void continueSound();
     std::thread python_thread;
     std::string id ;
     ~SoundManager();
+    void play_sound(int sound);
+    void change_game_music(std::string new_music);
+    void stop_game_music();
+    void play_game_music();
 
 private:
+    void send_to_pipe(std::string to_send);
     bool* run;
     SoundManager();
     static SoundManager* instance;
