@@ -3,7 +3,6 @@
 #include "HighScores.h"
 
 HighScores::HighScores() {
-    this->fileName = fileName;
     this->maxScoresInTable = 3;
     this->numOfScoresInTable = 0;
     this->grabCurrentHighScores();
@@ -68,10 +67,10 @@ void HighScores::saveToHighScores(std::string playerName, int score) {
         this->grabCurrentHighScores();
         /*High Scores File Exists*/
 
-        bool hasPassedLimit = true;
-        if (highscoreRows.size() < maxScoresInTable)
-            //We can add another entry since table is still not full
-            hasPassedLimit = false;
+
+        //if We can add another entry since table is still not full
+       bool hasPassedLimit = highscoreRows.size() >= maxScoresInTable ;
+
 
         std::ofstream fileWriter(fileName);
         if (!hasPassedLimit) {

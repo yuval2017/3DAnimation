@@ -27,7 +27,7 @@ public:
 private :
 
 
-	const char* fileName ="./scores.ini";
+	const char* fileName ="./scores.json";
 	nlohmann::json j;
     int maxScoresInTable;
 	int numOfScoresInTable;

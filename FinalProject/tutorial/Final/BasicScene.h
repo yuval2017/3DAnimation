@@ -59,4 +59,5 @@ private:
     void init_helpers();
     //SoundManager* sound_manager;
 
+    void SettingsMenu();
 };
