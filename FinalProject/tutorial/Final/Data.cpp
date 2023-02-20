@@ -21,8 +21,10 @@ Data* Data::getInstance()
 Data::Data()
 {
     msg = "";
-    soundOn = true;
-    volume = 0.5f;
+    gameMusic = true;
+    gameSound = true;
+    musicVolume = 0.5f;
+    soundVolume = 0.5f;
     back_to_main = false;
     load_data();
 }

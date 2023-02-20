@@ -57,6 +57,7 @@ private:
     void StoreMenu();
     void LeadersMenu();
     void init_helpers();
+    void PlayMenu();
     //SoundManager* sound_manager;
 
     void SettingsMenu();
