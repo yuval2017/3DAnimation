@@ -14,6 +14,7 @@
 #define LevelMenu_OP                5
 #define GameOverMenu_OP             6
 #define WinMenu_OP                  7
+#define PlayMenu_OP                 8
 #define SPEED_COST                  50
 #define LIFE_COST                   30
 //#include "Stopper.h"

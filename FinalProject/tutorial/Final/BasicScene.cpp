@@ -41,6 +41,7 @@ void BasicScene::BuildImGui(){
     StoreMenu();
     LeadersMenu();
     SettingsMenu();
+    //PlayMenu();
 }
 void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, const Eigen::Matrix4f& view, const Eigen::Matrix4f& model)
 {
@@ -364,12 +365,45 @@ void BasicScene::PausedMenu()
 }
 
 
+
+void BasicScene::PlayMenu()
+{
+    if(animate) {
+        int flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize;
+        bool* pOpen = nullptr;
+
+        ImGui::Begin("Menu", pOpen, flags);
+        ImGui::SetWindowPos(ImVec2(0, 0), ImGuiCond_Always);
+        ImGui::SetWindowSize(ImVec2(0, 0), ImGuiCond_Always);
+        ImGui::Text("Camera: ");
+        //TODO: replace cameras.
+//        for (int i = 0; i < camList.size(); i++) {
+//            ImGui::SameLine(0);
+//            bool selectedCamera = camList[i] == camera;
+//            if (selectedCamera)
+//                ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive));
+//            if (ImGui::Button(std::to_string(i + 1).c_str()))
+//                SetCamera(i);
+//            if (selectedCamera)
+//                ImGui::PopStyleColor();
+//        }
+
+
+        ImGui::Spacing();
+        ImGui::Spacing();
+        ImGui::Spacing();
+        ImGui::End();
+    }
+}
+
+
+
 void BasicScene::SettingsMenu()
 {
     if(statistics->menu_flags[SettingsMenu_OP]) {
         ImGui::Begin("Snake Game - 3D Animation Course", nullptr, ImGuiWindowFlags_NoMove);
         ImGui::SetNextWindowPos(ImVec2(200, 200));
-        ImGui::SetNextWindowSize(ImVec2(400, 400));
+        ImGui::SetNextWindowSize(ImVec2(500, 400));
         ImGui::SetNextWindowSizeConstraints(ImVec2(400, -1.0f), ImVec2(400, -1.0f));
         ImGui::Spacing();
         ImGui::Spacing();
@@ -379,28 +413,69 @@ void BasicScene::SettingsMenu()
         ImGui::Spacing();
         ImGui::Spacing();
         // Checkbox for sound on/off
-        if (ImGui::Checkbox("Sound On", &data->soundOn)) {
-            data->soundOn = false;
-            soundManager->stop_game_music();
+        if ( data->gameMusic){
+            if (ImGui::Checkbox("Music Off", &data->gameMusic)) {
+                data->gameMusic = false;
+                soundManager->stop_game_music();
+            }
         }
-        else {
-            data->soundOn = true;
-            soundManager->play_game_music();
+        else{
+            if (ImGui::Checkbox("Music On", &data->gameMusic)) {
+                data->gameMusic = true;
+                soundManager->play_game_music();
+            }
         }
-
+        ImGui::Spacing();
+        ImGui::Spacing();
+        ImGui::Spacing();
+        if ( data->gameSound){
+            if (ImGui::Checkbox("Sound Off", &data->gameSound)) {
+                data->gameSound = false;
+                soundManager->stop_all_game_sounds();
+            }
+        }
+        else{
+            if (ImGui::Checkbox("Sound On", &data->gameSound)) {
+                data->gameSound = true;
+                soundManager->restart_game_sounds();
+            }
+        }
         ImGui::Spacing();
         ImGui::Spacing();
         ImGui::Spacing();
 
-
-        // Slider for volume control
-        float tmp = data->volume ;
-        if(ImGui::SliderFloat("Volume", &data->volume, 0.0f, 1.0f) ){
+        // Slider for music volume control
+        if(ImGui::SliderFloat("Music Volume", &data->musicVolume, 0.0f, 1.0f) ){
            //TODO: CHAnge volume.
         }
+        // Slider for sound volume control
+        if(ImGui::SliderFloat("Game Sounds Volume", &data->soundVolume, 0.0f, 1.0f) ){
+            //TODO: CHAnge volume.
+        }
         ImGui::Spacing();
         ImGui::Spacing();
         ImGui::Spacing();
+        if (ImGui::Button("Fail sound", ImVec2(-1, 0))) {
+            std::cout << "Fail sound button pressed in win menu." << endl;
+            soundManager->play_sound(std::to_string(FAIL_SOUND));
+        }
+        if (ImGui::Button("Health sound", ImVec2(-1, 0))) {
+            std::cout << "Health sound button pressed in win menu." << endl;
+            soundManager->play_sound(std::to_string(HEALTH_SOUND));
+        }
+        if (ImGui::Button("Hit sound", ImVec2(-1, 0))) {
+            std::cout << "Hit sound button pressed in win menu." << endl;
+            soundManager->play_sound(std::to_string(HIT_SOUND));
+        }
+        if (ImGui::Button("Progress sound", ImVec2(-1, 0))) {
+            std::cout << "Progress sound button pressed in win menu." << endl;
+            soundManager->play_sound(std::to_string(PROGRESS_SOUND));
+        }
+        if (ImGui::Button("Back to menu", ImVec2(-1, 0))) {
+            std::cout << "Back to menu button pressed in win menu." << endl;
+            statistics->menu_flags[WinMenu_OP] =false;
+            statistics->menu_flags[MainMenu_OP] =true;
+        }
         ImGui::End();
 
         ImGui::BulletText("Snake Game By Yuval Hitter & Bar Damri. \n3D Animation Course\n");
@@ -466,7 +541,6 @@ void BasicScene::WinMenu() {
         ImGui::Spacing();
         ImGui::Spacing();
         if (ImGui::Button("Back to menu", ImVec2(-1, 0))) {
-            //TODO: GO TO MENU.
             std::cout << "Back to menu button pressed in win menu." << endl;
             //highScores->saveToHighScores(characterName, game->getTotalMoney());
             statistics->menu_flags[WinMenu_OP] =false;

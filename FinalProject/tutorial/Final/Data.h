@@ -37,8 +37,10 @@ public:
 
 
     //game variables.
-    bool soundOn ;
-    float volume ;
+    bool gameMusic ;
+    bool gameSound;
+    float musicVolume ;
+    float soundVolume ;
     bool back_to_main;
 
 private:
