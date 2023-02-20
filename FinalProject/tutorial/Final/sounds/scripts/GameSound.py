@@ -65,7 +65,7 @@ def main():
             is_sound_mute = True
             # this is all sounds
         elif pip_input == '1':
-            curr_sound = sound1
+            curr_sound = sound2
             play_sound = True
         elif pip_input == '2':
             curr_sound = sound3
