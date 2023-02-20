@@ -7,6 +7,10 @@ stop_music = True
 terminate = False
 play_sound = False
 is_sound_mute = False
+sound_volume_changes = True
+game_play_volume_changed = True
+sound_number: float = 0.5
+game_music_number: float = 0.5
 audio_file = "../tutorial/Final/sounds/scripts/music/Game.mp3"
 audio_file1 = "../tutorial/Final/sounds/scripts/music/fail.mp3"
 audio_file2 = "../tutorial/Final/sounds/scripts/music/Health.mp3"
@@ -22,6 +26,8 @@ sound5 = pygame.mixer.Sound(audio_file4)
 sound6 = pygame.mixer.Sound(audio_file5)
 curr_sound = sound2
 curr_background = sound1
+sounds = {sound2, sound3, sound4, sound5, sound6}
+game_musics = {sound1}
 
 
 # Initialize Pygame
@@ -39,6 +45,12 @@ def main():
     global sound4
     global sound5
     global sound6
+    global sounds
+    global game_musics
+    global sound_number
+    global game_music_number
+    global sound_volume_changes
+    global game_play_volume_changed
 
     curr_sound = sound2
     curr_background = sound1
@@ -46,11 +58,14 @@ def main():
     thread1.start()
     thread2 = Thread(target=game_sound)
     thread2.start()
+    thread3 = Thread(target=game_play_music_volume)
+    thread3.start()
+    thread4 = Thread(target=game_sounds_volume)
+    thread4.start()
     while True:
         # this is to play backround
         pip_input = read_pipe_input()
         # here is to break the loop
-
         if pip_input == 'd':
             pygame.quit()
             break
@@ -82,6 +97,12 @@ def main():
         # here is to change the game sound
         elif pip_input == 'q':
             play_sound = sound1
+        elif pip_input[0:1] == 'n':
+            sound_number = float(pip_input[2:6])
+            sound_volume_changes = True
+        elif pip_input[0:1] == 'm':
+            sound_number = float(pip_input[2:6])
+            game_play_volume_changed = True
 
 
 
@@ -99,16 +120,19 @@ def game_music():
     # Set the audio file name
     global stop_music
     global terminate
-
+    one_time_stop_music = True
     one_time_play = True
     while not terminate:
         if stop_music:
-            curr_background.stop()
-            one_time_play = True
+            if one_time_stop_music:
+                curr_background.stop()
+                one_time_play = True
+                one_time_stop_music = False
         else:
             if one_time_play:
                 curr_background.play(loops=-1)
                 one_time_play = False
+                one_time_stop_music = True
     # Quit Pygame
 
 
@@ -123,11 +147,34 @@ def read_pipe_input():
 
 
 def read_pipe_input_line():
-    while True:
+    global terminate
+    while not terminate:
         line = sys.stdin.readline().strip()
         if not line:
             break
     return line
+
+
+def game_sounds_volume():
+    global terminate
+    global sounds
+    global sound_volume_changes
+    while not terminate:
+        if sound_volume_changes:
+            sound_volume_changes = False
+            for s in sounds:
+                s.set_volume(sound_number)
+
+
+def game_play_music_volume():
+    global terminate
+    global game_musics
+    global game_play_volume_changed
+    while not terminate:
+        if game_play_volume_changed:
+            game_play_volume_changed = False
+            for g in game_musics:
+                g.set_volume(game_music_number)
 
 
 if __name__ == "__main__":

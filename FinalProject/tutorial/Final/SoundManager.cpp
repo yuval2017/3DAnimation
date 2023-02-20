@@ -74,3 +74,9 @@ void SoundManager::restart_game_sounds() {
         sound_on = true;
     }
 }
+void SoundManager::set_sounds_volume(std::string new_vulume){
+    send_to_pipe(std::string(SOUNDS_VOLUME) + new_vulume);
+}
+void SoundManager::set_game_play_music(std::string new_vulume){
+    send_to_pipe(std::string(GAME_PLAY_MUSIC_VOLUME) + new_vulume);
+}
