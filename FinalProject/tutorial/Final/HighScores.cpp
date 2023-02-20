@@ -2,7 +2,7 @@
 #include <sys/stat.h>
 #include "HighScores.h"
 
-HighScores::HighScores(char* fileName) {
+HighScores::HighScores() {
     this->fileName = fileName;
     this->maxScoresInTable = 3;
     this->numOfScoresInTable = 0;
@@ -49,8 +49,7 @@ void HighScores::grabCurrentHighScores() {
 
             std::string indexStr = std::to_string(i);
             std::string currentName = j[indexStr]["name"];
-            int         currentScore = j[indexStr]["score"];
-
+            int  currentScore = j[indexStr]["score"];
             Score* row = new Score();
             row->name = currentName;
             row->score = currentScore;

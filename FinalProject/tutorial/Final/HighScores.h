@@ -13,7 +13,7 @@ typedef struct {
 
 class HighScores {
 public:
-	HighScores(char* fileName);
+	HighScores();
 	
 	void saveToHighScores (std::string playerName, int score);
 	void grabCurrentHighScores();
@@ -22,11 +22,12 @@ public:
 		return highscoreRows;
 	}
 	int getHighestScore();
-
 	std::vector <std::string> getTopHighScoreNames();
-	std::vector <int>         getTopHighScores();
+	std::vector <int> getTopHighScores();
 private :
-	char* fileName; 
+
+
+	const char* fileName ="./scores.ini";
 	nlohmann::json j;
     int maxScoresInTable;
 	int numOfScoresInTable;
