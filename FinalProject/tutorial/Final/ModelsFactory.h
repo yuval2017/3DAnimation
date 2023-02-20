@@ -22,9 +22,10 @@
 #define LINES 3
 #define TRUCK 4
 #define SNAKE1 5
+#define COIN 6
 //increment every mesh or material
 #define NUMBER_OF_MATERIALS 4
-#define NUMBER_OF_MESHES 6
+#define NUMBER_OF_MESHES 7
 
 using namespace cg3d;
 class ModelsFactory {

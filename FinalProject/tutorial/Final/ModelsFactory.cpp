@@ -31,6 +31,8 @@ ModelsFactory::ModelsFactory(){
     meshes[CYL] = ObjLoader::MeshFromObj("Cyl", {"data/zcylinder.obj"});
     meshes[SPHERE] = ObjLoader::MeshFromObj("sphere_mesh", {"data/sphere.obj"});
     meshes[TRUCK] = ObjLoader::MeshFromObj("sphere_mesh", {"data/truck.obj"});
+    meshes[COIN] = ObjLoader::MeshFromObj("coin_mesh", {"data/coin.obj"});
+
 
     //need to implement but not in lines
     meshes[LINES] = NULL;
