@@ -16,7 +16,8 @@
 #define GAME_MUSIC q
 #define START_BACKGROUND_MUSIC "c"
 #define STOP_BACKGROUND_MUSIC "s"
-
+#define STOP_SOUNDS "b"
+#define RESTART_SOUNDS "v"
 class SoundManager {
 public:
 
@@ -29,6 +30,8 @@ public:
     void change_game_music(std::string new_music);
     void stop_game_music();
     void play_game_music();
+    void stop_all_game_sounds();
+    void restart_game_sounds();
 
 private:
     void send_to_pipe(std::string to_send);

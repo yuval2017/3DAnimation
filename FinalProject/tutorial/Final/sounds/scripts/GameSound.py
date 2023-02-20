@@ -6,6 +6,7 @@ import sys
 stop_music = True
 terminate = False
 play_sound = False
+is_sound_mute = False
 audio_file = "../tutorial/Final/sounds/scripts/music/Game.mp3"
 audio_file1 = "../tutorial/Final/sounds/scripts/music/fail.mp3"
 audio_file2 = "../tutorial/Final/sounds/scripts/music/Health.mp3"
@@ -22,6 +23,7 @@ sound6 = pygame.mixer.Sound(audio_file5)
 curr_sound = sound2
 curr_background = sound1
 
+
 # Initialize Pygame
 
 def main():
@@ -30,6 +32,7 @@ def main():
     global curr_sound
     global curr_background
     global play_sound
+    global is_sound_mute
     global sound1
     global sound2
     global sound3
@@ -48,8 +51,13 @@ def main():
         pip_input = read_pipe_input()
         if pip_input == 'c':
             stop_music = False
-        if pip_input == 's':
+        elif pip_input == 's':
             stop_music = True
+        # this is to mute sounds
+        elif pip_input == 'v':
+            is_sound_mute = False
+        elif pip_input == 'b':
+            is_sound_mute = True
             # this is all sounds
         elif pip_input == '1':
             curr_background = sound1
@@ -69,7 +77,7 @@ def main():
         # here is to change the game sound
         elif pip_input == 'q':
             play_sound = sound1
-        #here is to break the loop
+        # here is to break the loop
         elif pip_input == 'd':
             break
     pygame.quit()
@@ -78,25 +86,18 @@ def main():
 def game_sound():
     global curr_sound
     global play_sound
+    global is_sound_mute
     while True:
-        if play_sound:
+        if play_sound and not is_sound_mute:
             play_sound = False
             curr_sound.play()
-
 
 
 def game_music():
     # Set the audio file name
     global stop_music
     global terminate
-    # Load the audio file
 
-    # pygame.mixer.music.load(audio_file)
-
-    # Play the audio file
-    # pygame.mixer.music.play()
-
-    # Keep the program running until the audio finishes playing
     one_time_play = True
     while not terminate:
         if stop_music:
@@ -110,6 +111,7 @@ def game_music():
 
 
 def read_pipe_input():
+    global terminate
     while not terminate:
         char = sys.stdin.read(1)
         if char:

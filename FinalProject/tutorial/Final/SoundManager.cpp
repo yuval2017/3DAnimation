@@ -54,3 +54,11 @@ void SoundManager::play_game_music(){
 void SoundManager::play_sound(int sound){
     send_to_pipe(std::to_string(sound));
 }
+
+void SoundManager::stop_all_game_sounds() {
+    send_to_pipe(std::string(STOP_SOUNDS));
+}
+
+void SoundManager::restart_game_sounds() {
+    send_to_pipe(std::string(RESTART_SOUNDS));
+}
