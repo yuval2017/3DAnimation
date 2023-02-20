@@ -27,6 +27,16 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
         auto truck = generateObjectBezier(PHONG_MATERIAL,TRUCK, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
         generateObjectBezier(PHONG_MATERIAL,SPHERE, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
         generateObjectBezier(PHONG_MATERIAL,CUBE, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
+//        auto coin = ModelsFactory::getInstance()->CreateModel(BASIC_MATERIAL,COIN,"coin");
+//       auto program = std::make_shared<Program>("shaders/basicShader");
+//
+        // health
+//        auto material1 = std::make_shared<Material>("material", program);
+//        auto coin = Model::Create("health", "data/coin.obj", material1);
+//        basicScene->GetRoot()->AddChild(coin);
+//        coin->Translate(Eigen::Vector3f(0.0f,0.0f,0.0f) - coin->GetPosition());
+//        coin->Scale(3.0f);
+
     }
     Visitor::Run(scene, camera);
 }
