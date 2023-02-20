@@ -36,9 +36,11 @@ SoundManager::~SoundManager(){
 }
 void SoundManager::drop(){
     send_to_pipe("d");
-    pclose(pipe);
+    usleep(1000);
+    fclose(pipe);
 }
 void SoundManager::send_to_pipe(const std::string& to_send){
+    std::cout<< "sent to pipe : "<< to_send + "\n" << std::endl;
     fputs((to_send + "\n").c_str() , pipe);
     fflush(pipe);
 }

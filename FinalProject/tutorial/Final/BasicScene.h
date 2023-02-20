@@ -7,6 +7,7 @@
 #include "GameStatistics.h"
 #include "HighScores.h"
 #include <memory>
+#include "imgui.h"
 #include <utility>
 #include "SoundManager.h"
 
@@ -59,6 +60,8 @@ private:
     void init_helpers();
     void PlayMenu();
     //SoundManager* sound_manager;
-
+    ImFont* headerFont = nullptr;
+    ImFont* regularFont = nullptr;
+    ImFont* messageFont = nullptr;
     void SettingsMenu();
 };

@@ -21,6 +21,9 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     data = Data::getInstance();
     init_helpers();
     this->animate = false;
+//    headerFont = ;
+//    messageFont = ;
+//    regularFont = ;
 
 
 }
@@ -221,18 +224,28 @@ void BasicScene::startMenu() {
         ImGui::SetNextWindowSize(ImVec2(400, 400));
         ImGui::SetNextWindowSizeConstraints(ImVec2(400, -1.0f), ImVec2(400, -1.0f));
         ImGui::Begin("Snake Game - 3D Animation Course", nullptr, ImGuiWindowFlags_NoMove);
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
+        ImGui::SetCursorPosX((ImGui::GetWindowSize().x - ImGui::CalcTextSize("Centered Text").x) / 2.0f);
+        ImGui::Text("3D Snake");
+        for (int i = 0; i < 3; ++i) {
+            ImGui::Spacing();
+        }
+        ImGui::Separator();
+        for (int i = 0; i < 3; ++i) {
+            ImGui::Spacing();
+        }
+
         if (ImGui::Button("Start Game", ImVec2(-1, 0))) {
             std::cout << "new game button pressed in start menu ." << endl;
             statistics->menu_flags[MainMenu_OP] = false;
             animate = true;
 
         }
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
         if (ImGui::Button("Tutorial", ImVec2(-1, 0))) {
             if (data->message_size() == 0)
                 data->set_message(
@@ -241,27 +254,27 @@ void BasicScene::startMenu() {
             else
                 data->set_message("");
         }
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
         if (ImGui::Button("Store", ImVec2(-1, 0))) {
             std::cout << "store button pressed in start menu  ." << endl;
             statistics->menu_flags[MainMenu_OP] = false;
             data->set_back(MainMenu_OP);
             statistics->menu_flags[StoreMenu_OP] = true;
         }
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
         if (ImGui::Button("Leaders", ImVec2(-1, 0))) {
             std::cout << "leaders button pressed in start menu  ." << endl;
             statistics->menu_flags[MainMenu_OP] = false;
             data->set_back(MainMenu_OP);
             statistics->menu_flags[LeadersMenu_OP] = true;
         }
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
         if (ImGui::Button("Settings", ImVec2(-1, 0))) {
             if (data->message_size() == 0)
             {
@@ -273,13 +286,20 @@ void BasicScene::startMenu() {
                 data->set_message("");
             }
         }
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
+        if (ImGui::Button("Exit", ImVec2(-1, 0))) {
+            delete soundManager;
+            exit(0);
+        }
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
         ImGui::Text("%s", data->msg_c_str());
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
         ImGui::BulletText("Snake Game By Yuval Hitter & Bar Damri. \n3D Animation Course\n");
         ImGui::End();
     }
@@ -303,15 +323,16 @@ void BasicScene::PausedMenu()
         ImGui::SetNextWindowSize(ImVec2(400, 400));
         ImGui::SetNextWindowSizeConstraints(ImVec2(400, -1.0f), ImVec2(400, -1.0f));
         ImGui::Text("%s", statistics->characterName);
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
+        ImGui::SetCursorPosX((ImGui::GetWindowSize().x - ImGui::CalcTextSize("Centered Text").x) / 2.0f);
         ImGui::ProgressBar(statistics->get_progress(), ImVec2(0.0f, 0.0f));
         ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
         ImGui::Text("Progress Bar");
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
 
         ImGui::Text("Total score ");
         ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
@@ -325,27 +346,26 @@ void BasicScene::PausedMenu()
         ImGui::Text("Snake speed ");
         ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
         tmp = std::to_string(statistics->speed);
-        ImGui::Text("%s", tmp.c_str());
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
         if (ImGui::Button("Continue", ImVec2(-1, 0))) {
             std::cout << "continue button pressed in pause menu ." << endl;
             statistics->menu_flags[PauseMenu_OP] = false;
             animate = true;
         }
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
         if (ImGui::Button("Store", ImVec2(-1, 0))) {
             std::cout << "store menu button pressed in pause menu." << endl;
             statistics->menu_flags[PauseMenu_OP] = false;
             data->set_back(PauseMenu_OP);
             statistics->menu_flags[StoreMenu_OP] = true;
         }
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
         if (ImGui::Button("Settings", ImVec2(-1, 0))) {
             if (data->message_size() == 0) {
                 std::cout << "setting menu button pressed in pause menu." << endl;
@@ -356,9 +376,9 @@ void BasicScene::PausedMenu()
             else
                 data->set_message("");
         }
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
         ImGui::BulletText("Snake Game By Yuval Hitter & Bar Damri. \n3D Animation Course\n");
         ImGui::End();
     }
@@ -371,7 +391,6 @@ void BasicScene::PlayMenu()
     if(animate) {
         int flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize;
         bool* pOpen = nullptr;
-
         ImGui::Begin("Menu", pOpen, flags);
         ImGui::SetWindowPos(ImVec2(0, 0), ImGuiCond_Always);
         ImGui::SetWindowSize(ImVec2(0, 0), ImGuiCond_Always);
@@ -389,9 +408,9 @@ void BasicScene::PlayMenu()
 //        }
 
 
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
         ImGui::End();
     }
 }
@@ -405,79 +424,101 @@ void BasicScene::SettingsMenu()
         ImGui::SetNextWindowPos(ImVec2(200, 200));
         ImGui::SetNextWindowSize(ImVec2(500, 400));
         ImGui::SetNextWindowSizeConstraints(ImVec2(400, -1.0f), ImVec2(400, -1.0f));
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
         ImGui::Begin("Settings");
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
+        ImGui::SetCursorPosX((ImGui::GetWindowSize().x - ImGui::CalcTextSize("Centered Text").x) / 2.0f);
+        ImGui::Text("Settings");
+        for (int i = 0; i < 3; ++i) {
+            ImGui::Spacing();
+        }
+        ImGui::Separator();
+        for (int i = 0; i < 5; ++i) {
+            ImGui::Spacing();
+        }
         // Checkbox for sound on/off
         if ( data->gameMusic){
-            if (ImGui::Checkbox("Music Off", &data->gameMusic)) {
+            if (ImGui::Checkbox("Music On", &data->gameMusic)) {
                 data->gameMusic = false;
                 soundManager->stop_game_music();
             }
         }
         else{
-            if (ImGui::Checkbox("Music On", &data->gameMusic)) {
+            if (ImGui::Checkbox("Music Off", &data->gameMusic)) {
                 data->gameMusic = true;
                 soundManager->play_game_music();
             }
         }
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
-        if ( data->gameSound){
-            if (ImGui::Checkbox("Sound Off", &data->gameSound)) {
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
+        if (data->gameSound){
+            if (ImGui::Checkbox("Sound On", &data->gameSound)) {
                 data->gameSound = false;
                 soundManager->stop_all_game_sounds();
             }
         }
         else{
-            if (ImGui::Checkbox("Sound On", &data->gameSound)) {
+            if (ImGui::Checkbox("Sound Off", &data->gameSound)) {
                 data->gameSound = true;
                 soundManager->restart_game_sounds();
             }
         }
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
-
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
         // Slider for music volume control
         if(ImGui::SliderFloat("Music Volume", &data->musicVolume, 0.0f, 1.0f) ){
-           //TODO: CHAnge volume.
+            std::cout<< "Music Volume value changed to : " << data->musicVolume <<endl;
+           soundManager->set_game_play_music(std::to_string(data->musicVolume));
         }
         // Slider for sound volume control
         if(ImGui::SliderFloat("Game Sounds Volume", &data->soundVolume, 0.0f, 1.0f) ){
-            //TODO: CHAnge volume.
+            std::cout<< "Sounds Volume value changed to : " << data->musicVolume <<endl;
+            soundManager->set_sounds_volume(std::to_string(data->soundVolume));
         }
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
         if (ImGui::Button("Fail sound", ImVec2(-1, 0))) {
             std::cout << "Fail sound button pressed in win menu." << endl;
             soundManager->play_sound(std::to_string(FAIL_SOUND));
+        }
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
         }
         if (ImGui::Button("Health sound", ImVec2(-1, 0))) {
             std::cout << "Health sound button pressed in win menu." << endl;
             soundManager->play_sound(std::to_string(HEALTH_SOUND));
         }
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
         if (ImGui::Button("Hit sound", ImVec2(-1, 0))) {
             std::cout << "Hit sound button pressed in win menu." << endl;
             soundManager->play_sound(std::to_string(HIT_SOUND));
+        }
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
         }
         if (ImGui::Button("Progress sound", ImVec2(-1, 0))) {
             std::cout << "Progress sound button pressed in win menu." << endl;
             soundManager->play_sound(std::to_string(PROGRESS_SOUND));
         }
+        for(int i = 0; i< 5 ; i++){
+            ImGui::Spacing();
+        }
+
         if (ImGui::Button("Back to menu", ImVec2(-1, 0))) {
             std::cout << "Back to menu button pressed in win menu." << endl;
-            statistics->menu_flags[WinMenu_OP] =false;
+            statistics->menu_flags[SettingsMenu_OP] =false;
             statistics->menu_flags[MainMenu_OP] =true;
         }
         ImGui::End();
-
         ImGui::BulletText("Snake Game By Yuval Hitter & Bar Damri. \n3D Animation Course\n");
         ImGui::End();
     }
@@ -489,9 +530,15 @@ void BasicScene::NextLevelMenu() {
         ImGui::SetNextWindowPos(ImVec2(200, 200));
         ImGui::SetNextWindowSize(ImVec2(400, 400));
         ImGui::SetNextWindowSizeConstraints(ImVec2(400, -1.0f), ImVec2(400, -1.0f));
-        ImGui::Text("%s", statistics->characterName);
-        ImGui::Spacing();
+        ImGui::SetCursorPosX((ImGui::GetWindowSize().x - ImGui::CalcTextSize("Centered Text").x) / 2.0f);
         ImGui::Text("Congratulations You passed level");
+        for (int i = 0; i < 3; ++i) {
+            ImGui::Spacing();
+        }
+        ImGui::Separator();
+        for (int i = 0; i < 5; ++i) {
+            ImGui::Spacing();
+        }
         ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
         std::string tmp = std::to_string(statistics->level);
         ImGui::Text("%s", tmp.c_str());
@@ -500,18 +547,17 @@ void BasicScene::NextLevelMenu() {
         ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
         tmp = std::to_string(statistics->score);
         ImGui::Text("%s", tmp.c_str());
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
         if (ImGui::Button("Next level", ImVec2(-1, 0))) {
             //TODO: START NEXT LEVEL.
             std::cout << "Next level button pressed in next level menu." << endl;
             //highScores->saveToHighScores(characterName, game->getTotalMoney());
-
         }
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
         if (ImGui::Button("Back to menu", ImVec2(-1, 0))) {
             //TODO: END GAME.
             std::cout << "Next level button pressed in next level menu." << endl;
@@ -529,17 +575,24 @@ void BasicScene::WinMenu() {
         ImGui::SetNextWindowPos(ImVec2(200, 200));
         ImGui::SetNextWindowSize(ImVec2(400, 400));
         ImGui::SetNextWindowSizeConstraints(ImVec2(400, -1.0f), ImVec2(400, -1.0f));
-        ImGui::Text("%s", statistics->characterName);
-        ImGui::Spacing();
+        ImGui::SetCursorPosX((ImGui::GetWindowSize().x - ImGui::CalcTextSize("Centered Text").x) / 2.0f);
+        ImGui::Text("%s", "You won!");
+        for (int i = 0; i < 3; ++i) {
+            ImGui::Spacing();
+        }
+        ImGui::Separator();
+        for (int i = 0; i < 5; ++i) {
+            ImGui::Spacing();
+        }
         ImGui::Text("Congratulations You ended the game!!");
         ImGui::Spacing();
         ImGui::Text("Your total score until now is ");
         ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
         std::string tmp = std::to_string(statistics->score);
         ImGui::Text("%s", tmp.c_str());
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
         if (ImGui::Button("Back to menu", ImVec2(-1, 0))) {
             std::cout << "Back to menu button pressed in win menu." << endl;
             //highScores->saveToHighScores(characterName, game->getTotalMoney());
@@ -559,11 +612,19 @@ void BasicScene::LoseMenu() {
         ImGui::SetNextWindowSize(ImVec2(400, 400));
         ImGui::SetNextWindowSizeConstraints(ImVec2(400, -1.0f), ImVec2(400, -1.0f));
         ImGui::Text("%s", statistics->characterName);
-        ImGui::Spacing();
+        ImGui::SetCursorPosX((ImGui::GetWindowSize().x - ImGui::CalcTextSize("Centered Text").x) / 2.0f);
+        ImGui::Text("Game Over!");
+        for (int i = 0; i < 3; ++i) {
+            ImGui::Spacing();
+        }
+        ImGui::Separator();
+        for (int i = 0; i < 5; ++i) {
+            ImGui::Spacing();
+        }
         ImGui::Text("ohhh you died...");
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
         if (ImGui::Button("Back to menu", ImVec2(-1, 0))) {
             std::cout << "Back to menu button pressed in loose menu." << endl;
             //highScores->saveToHighScores(characterName, game->getTotalMoney());
@@ -583,30 +644,37 @@ void BasicScene::StoreMenu() {
         ImGui::SetNextWindowSizeConstraints(ImVec2(400, -1.0f), ImVec2(400, -1.0f));
         ImGui::Text("%s", statistics->characterName);
         ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
-        ImGui::Text("welcome to the store");
-        ImGui::Spacing();
+        ImGui::SetCursorPosX((ImGui::GetWindowSize().x - ImGui::CalcTextSize("Centered Text").x) / 2.0f);
+        ImGui::Text("welcome to the store! ");
+        for (int i = 0; i < 3; ++i) {
+            ImGui::Spacing();
+        }
+        ImGui::Separator();
+        for (int i = 0; i < 5; ++i) {
+            ImGui::Spacing();
+        }
         ImGui::Text("You have total money of ");
         ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
         std::string tmp = std::to_string(data->get_total_money());
         ImGui::Text("%s", tmp.c_str());
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
         if (ImGui::Button("extra speed - 50 coins", ImVec2(-1, 0))) {
             statistics->speed += 1;
 
         }
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
         if (ImGui::Button("refill health - 30 coins", ImVec2(-1, 0))) {
             data->inc_life_bought();
             data->set_message(std::to_string(data->get_life_bought()));
         }
 
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
         if (ImGui::Button("Back to game", ImVec2(-1, 0))) {
             std::cout << "Back to game button pressed in store menu." << endl;
             statistics->menu_flags[StoreMenu_OP] = false;
@@ -618,12 +686,13 @@ void BasicScene::StoreMenu() {
                 data->set_back(-1);
             }
         }
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
         ImGui::Text("%s", data->msg_c_str());
-        ImGui::Spacing();
-        ImGui::Spacing();
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
         ImGui::BulletText("Snake Game By Yuval Hitter & Bar Damri. \n3D Animation Course\n");
         ImGui::End();
     }
@@ -636,12 +705,15 @@ void BasicScene::LeadersMenu() {
         ImGui::SetNextWindowSize(ImVec2(400, 400));
         ImGui::SetNextWindowSizeConstraints(ImVec2(400, -1.0f), ImVec2(400, -1.0f));
         ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
+        ImGui::SetCursorPosX((ImGui::GetWindowSize().x - ImGui::CalcTextSize("Centered Text").x) / 2.0f);
         ImGui::Text("Leaders board");
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
+        for (int i = 0; i < 3; ++i) {
+            ImGui::Spacing();
+        }
+        ImGui::Separator();
+        for (int i = 0; i < 5; ++i) {
+            ImGui::Spacing();
+        }
         std::vector<std::string> names = highScores->getTopHighScoreNames();
         std::vector<int> scores = highScores->getTopHighScores();
         if (names.size() == 0) {
@@ -652,10 +724,9 @@ void BasicScene::LeadersMenu() {
                 ImGui::BulletText("%s", text.c_str());
             }
         }
-
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
         if (ImGui::Button("Back", ImVec2(-1, 0))) {
             std::cout << "Back button pressed in store menu." << endl;
             statistics->menu_flags[LeadersMenu_OP] = false;
@@ -667,9 +738,9 @@ void BasicScene::LeadersMenu() {
                 data->set_back(-1);
             }
         }
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
         ImGui::BulletText("Snake Game By Yuval Hitter & Bar Damri. \n3D Animation Course\n");
         ImGui::End();
     }
@@ -677,9 +748,7 @@ void BasicScene::LeadersMenu() {
 
 void BasicScene::dropEngine() {
 
-    if (this->soundManager != NULL){
-        this->soundManager->drop();
-    }
+    this->soundManager->drop();
 
 }
 BasicScene::~BasicScene(){

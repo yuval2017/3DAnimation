@@ -67,7 +67,9 @@ def main():
         pip_input = read_pipe_input_line()
         # here is to break the loop
         if pip_input == 'd':
+            terminate = True
             pygame.quit()
+            thread1
             break
         elif pip_input == 'c':
             stop_music = False
@@ -98,10 +100,10 @@ def main():
         elif pip_input == 'q':
             play_sound = sound1
         elif pip_input[0:1] == 'n':
-            sound_number = float(pip_input[2:6])
+            sound_number = float(pip_input[1:6])
             sound_volume_changes = True
         elif pip_input[0:1] == 'm':
-            sound_number = float(pip_input[2:6])
+            game_music_number = float(pip_input[1:6])
             game_play_volume_changed = True
 
 
@@ -110,7 +112,8 @@ def game_sound():
     global curr_sound
     global play_sound
     global is_sound_mute
-    while True:
+    global terminate
+    while not terminate:
         if play_sound and not is_sound_mute:
             play_sound = False
             curr_sound.play()
