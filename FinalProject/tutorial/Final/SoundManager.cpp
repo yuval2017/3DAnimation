@@ -39,7 +39,7 @@ void SoundManager::drop(){
     pclose(pipe);
 }
 void SoundManager::send_to_pipe(const std::string& to_send){
-    fputs(to_send.c_str(), pipe);
+    fputs((to_send + "\n").c_str() , pipe);
     fflush(pipe);
 }
 void SoundManager::change_game_music(const std::string& new_music){
