@@ -65,10 +65,10 @@ def main():
             is_sound_mute = True
             # this is all sounds
         elif pip_input == '1':
-            curr_background = sound1
+            curr_sound = sound1
             play_sound = True
         elif pip_input == '2':
-            curr_background = sound3
+            curr_sound = sound3
             play_sound = True
         elif pip_input == '3':
             curr_sound = sound4
@@ -125,7 +125,7 @@ def read_pipe_input():
 def read_pipe_input_line():
     while True:
         line = sys.stdin.readline().strip()
-        if line:
+        if not line:
             break
     return line
 
