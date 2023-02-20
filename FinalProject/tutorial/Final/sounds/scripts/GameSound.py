@@ -64,7 +64,7 @@ def main():
     thread4.start()
     while True:
         # this is to play backround
-        pip_input = read_pipe_input()
+        pip_input = read_pipe_input_line()
         # here is to break the loop
         if pip_input == 'd':
             pygame.quit()
@@ -150,7 +150,7 @@ def read_pipe_input_line():
     global terminate
     while not terminate:
         line = sys.stdin.readline().strip()
-        if not line:
+        if line:
             break
     return line
 
