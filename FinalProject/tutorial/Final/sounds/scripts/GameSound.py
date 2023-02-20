@@ -49,7 +49,12 @@ def main():
     while True:
         # this is to play backround
         pip_input = read_pipe_input()
-        if pip_input == 'c':
+        # here is to break the loop
+
+        if pip_input == 'd':
+            pygame.quit()
+            break
+        elif pip_input == 'c':
             stop_music = False
         elif pip_input == 's':
             stop_music = True
@@ -77,10 +82,7 @@ def main():
         # here is to change the game sound
         elif pip_input == 'q':
             play_sound = sound1
-        # here is to break the loop
-        elif pip_input == 'd':
-            break
-    pygame.quit()
+
 
 
 def game_sound():
