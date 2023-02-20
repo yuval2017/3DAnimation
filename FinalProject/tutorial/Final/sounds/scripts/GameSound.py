@@ -17,6 +17,8 @@ audio_file2 = "../tutorial/Final/sounds/scripts/music/Health.mp3"
 audio_file3 = "../tutorial/Final/sounds/scripts/music/hit.mp3"
 audio_file4 = "../tutorial/Final/sounds/scripts/music/progress.mp3"
 audio_file5 = "../tutorial/Final/sounds/scripts/music/success.mp3"
+audio_file6 = "../tutorial/Final/sounds/scripts/music/menuMusic.mp3"
+audio_file7 = "../tutorial/Final/sounds/scripts/music/gameMusic.mp3"
 pygame.init()
 sound1 = pygame.mixer.Sound(audio_file)
 sound2 = pygame.mixer.Sound(audio_file1)
@@ -24,11 +26,14 @@ sound3 = pygame.mixer.Sound(audio_file2)
 sound4 = pygame.mixer.Sound(audio_file3)
 sound5 = pygame.mixer.Sound(audio_file4)
 sound6 = pygame.mixer.Sound(audio_file5)
+sound7 = pygame.mixer.Sound(audio_file6)
+sound8 = pygame.mixer.Sound(audio_file7)
 curr_sound = sound2
 curr_background = sound1
 sounds = {sound2, sound3, sound4, sound5, sound6}
-game_musics = {sound1}
-
+game_musics = {sound1,sound7, sound8}
+one_time_stop_music = True
+one_time_play = True
 
 # Initialize Pygame
 
@@ -45,13 +50,16 @@ def main():
     global sound4
     global sound5
     global sound6
+    global sound7
+    global sound8
     global sounds
     global game_musics
     global sound_number
     global game_music_number
     global sound_volume_changes
     global game_play_volume_changed
-
+    global one_time_stop_music
+    global one_time_play
     curr_sound = sound2
     curr_background = sound1
     thread1 = Thread(target=game_music)
@@ -96,6 +104,18 @@ def main():
         elif pip_input == '5':
             curr_sound = sound6
             play_sound = True
+        elif pip_input == '$':
+            curr_background.stop()
+            curr_background = sound1
+            one_time_play = True
+        elif pip_input == '@':
+            curr_background.stop()
+            curr_background = sound7
+            one_time_play = True
+        elif pip_input == '@@':
+            curr_background.stop()
+            curr_background = sound8
+            one_time_play = True
         # here is to change the game sound
         elif pip_input == 'q':
             play_sound = sound1
@@ -123,8 +143,8 @@ def game_music():
     # Set the audio file name
     global stop_music
     global terminate
-    one_time_stop_music = True
-    one_time_play = True
+    global one_time_stop_music
+    global one_time_play
     while not terminate:
         if stop_music:
             if one_time_stop_music:

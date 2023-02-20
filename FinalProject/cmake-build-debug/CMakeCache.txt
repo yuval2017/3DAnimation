@@ -437,6 +437,9 @@ engine_LIB_DEPENDS:STATIC=general;igl;general;igl_opengl;general;igl_opengl_glfw
 //Value Computed by CMake
 engine_SOURCE_DIR:STATIC=/Users/bardamri/3DAnimation/FinalProject/tutorial
 
+//The directory containing a CMake configuration file for gl3w.
+gl3w_DIR:PATH=gl3w_DIR-NOTFOUND
+
 //Value Computed by CMake
 glad_BINARY_DIR:STATIC=/Users/bardamri/3DAnimation/FinalProject/cmake-build-debug/tutorial/glad
 

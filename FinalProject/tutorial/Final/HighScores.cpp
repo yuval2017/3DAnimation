@@ -61,16 +61,23 @@ int sortScores(Score a, Score b) {
     return (a.score - b.score < 0);
 }
 
+int HighScores::nextLeaderPos()
+{
+    if (maxScoresInTable> highscoreRows.size()){
+       return highscoreRows.size();
+    }
+    else{
+        return -1;
+    }
+}
 
 void HighScores::saveToHighScores(std::string playerName, int score) {
     if (fileExists(fileName)) {
         this->grabCurrentHighScores();
         /*High Scores File Exists*/
 
-
         //if We can add another entry since table is still not full
        bool hasPassedLimit = highscoreRows.size() >= maxScoresInTable ;
-
 
         std::ofstream fileWriter(fileName);
         if (!hasPassedLimit) {
@@ -78,12 +85,11 @@ void HighScores::saveToHighScores(std::string playerName, int score) {
             Score* newRow = new Score();
             newRow->score = score;
             newRow->name = playerName;
-
             highscoreRows.push_back(*newRow);
             std::sort(highscoreRows.begin(), highscoreRows.end(), sortScores);
 
-            j["numOfScores"] = highscoreRows.size();
-            for (int i = 0; i < highscoreRows.size(); i++) {
+            j["numOfScores"] = maxScoresInTable;
+            for (int i = 0; i < maxScoresInTable ; i++) {
                 std::string indexStr = std::to_string(i);
                 j[indexStr]["name"] = highscoreRows[i].name;
                 j[indexStr]["score"] = highscoreRows[i].score;

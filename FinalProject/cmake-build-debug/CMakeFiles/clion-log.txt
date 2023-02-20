@@ -1,15 +1,21 @@
 /Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/Applications/CLion.app/Contents/bin/ninja/mac/ninja -G Ninja -S /Users/bardamri/3DAnimation/FinalProject -B /Users/bardamri/3DAnimation/FinalProject/cmake-build-debug
--- Found libtool - /usr/bin/libtool
--- Creating target: igl::core (igl)
--- Creating target: igl::opengl (igl_opengl)
--- Creating target: igl::opengl_glfw (igl_opengl_glfw)
--- Using Cocoa for window creation
--- Creating target: igl::opengl_glfw_imgui (igl_opengl_glfw_imgui)
--- Creating target: igl::png (igl_png)
--- Creating target: engine
--- Creating target: Demo
--- Creating target: Example1
--- Creating target: Final
--- Configuring done
--- Generating done
--- Build files have been written to: /Users/bardamri/3DAnimation/FinalProject/cmake-build-debug
+CMake Error at tutorial/CMakeLists.txt:4 (find_package):
+  By not providing "Findgl3w.cmake" in CMAKE_MODULE_PATH this project has
+  asked CMake to find a package configuration file provided by "gl3w", but
+  CMake did not find one.
+
+  Could not find a package configuration file provided by "gl3w" with any of
+  the following names:
+
+    gl3wConfig.cmake
+    gl3w-config.cmake
+
+  Add the installation prefix of "gl3w" to CMAKE_PREFIX_PATH or set
+  "gl3w_DIR" to a directory containing one of the above files.  If "gl3w"
+  provides a separate development package or SDK, be sure it has been
+  installed.
+
+
+-- Configuring incomplete, errors occurred!
+See also "/Users/bardamri/3DAnimation/FinalProject/cmake-build-debug/CMakeFiles/CMakeOutput.log".
+See also "/Users/bardamri/3DAnimation/FinalProject/cmake-build-debug/CMakeFiles/CMakeError.log".

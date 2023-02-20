@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
 project(libigl_tutorials)
-
 ### Compile libigl in header-only mode for Python bindings
 option(LIBIGL_USE_STATIC_LIBRARY "Use LibIGL as static library" OFF)
 

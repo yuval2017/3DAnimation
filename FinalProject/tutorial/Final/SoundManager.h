@@ -14,6 +14,9 @@
 #define HIT_SOUND 3
 #define PROGRESS_SOUND 4
 #define GAME_MUSIC q
+#define FIRST_MUSIC "$"
+#define SECOND_MUSIC "@"
+#define THIRD_MUSIC "@@"
 #define START_BACKGROUND_MUSIC "c"
 #define STOP_BACKGROUND_MUSIC "s"
 #define STOP_SOUNDS "b"
@@ -29,7 +32,7 @@ public:
     std::string id ;
     ~SoundManager();
     void play_sound(const std::string& sound);
-    void change_game_music(const std::string& new_music);
+    void change_game_music(const int num);
     void stop_game_music();
     void play_game_music();
     void stop_all_game_sounds();
@@ -37,6 +40,7 @@ public:
     void switch_game_music(std::string new_game_music);
     void set_sounds_volume(std::string new_vulume);
     void set_game_play_music(std::string new_vulume);
+
 
 private:
     void send_to_pipe(const std::string& to_send);
@@ -47,6 +51,6 @@ private:
     void operator=(SoundManager const&); // Don't implement
     FILE* pipe;
     bool sound_on = true;
-    bool game_music_on = false;
+    bool game_music_on = true;
 
 };

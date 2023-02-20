@@ -14,7 +14,7 @@ typedef struct {
 class HighScores {
 public:
 	HighScores();
-	
+	int nextLeaderPos();
 	void saveToHighScores (std::string playerName, int score);
 	void grabCurrentHighScores();
 
