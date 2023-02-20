@@ -45,18 +45,7 @@ void SoundManager::send_to_pipe(const std::string& to_send){
     fflush(pipe);
 }
 void SoundManager::change_game_music(const int num){
-
-    std::string val;
-    if(num == 0 ){
-        val = FIRST_MUSIC;
-    }
-    else if (num == 1 ){
-        val = SECOND_MUSIC;
-    }
-    else if (num == 2){
-        val = THIRD_MUSIC;
-    }
-    send_to_pipe(val);
+    send_to_pipe("@"+std::to_string(num));
 }
 void SoundManager::stop_game_music(){
     if (game_music_on) {

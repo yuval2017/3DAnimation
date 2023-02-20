@@ -104,15 +104,15 @@ def main():
         elif pip_input == '5':
             curr_sound = sound6
             play_sound = True
-        elif pip_input == '$':
+        elif pip_input == '@1':
             curr_background.stop()
             curr_background = sound1
             one_time_play = True
-        elif pip_input == '@':
+        elif pip_input == '@2':
             curr_background.stop()
             curr_background = sound7
             one_time_play = True
-        elif pip_input == '@@':
+        elif pip_input == '@3':
             curr_background.stop()
             curr_background = sound8
             one_time_play = True

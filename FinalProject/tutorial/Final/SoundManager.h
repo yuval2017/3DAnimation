@@ -14,9 +14,9 @@
 #define HIT_SOUND 3
 #define PROGRESS_SOUND 4
 #define GAME_MUSIC q
-#define FIRST_MUSIC "$"
-#define SECOND_MUSIC "@"
-#define THIRD_MUSIC "@@"
+#define FIRST_MUSIC "@1"
+#define SECOND_MUSIC "@2"
+#define THIRD_MUSIC "@3"
 #define START_BACKGROUND_MUSIC "c"
 #define STOP_BACKGROUND_MUSIC "s"
 #define STOP_SOUNDS "b"
