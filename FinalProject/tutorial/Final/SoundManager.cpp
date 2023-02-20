@@ -38,27 +38,39 @@ void SoundManager::drop(){
     send_to_pipe("d");
     pclose(pipe);
 }
-void SoundManager::send_to_pipe(std::string to_send){
+void SoundManager::send_to_pipe(const std::string& to_send){
     fputs(to_send.c_str(), pipe);
     fflush(pipe);
 }
-void SoundManager::change_game_music(std::string new_music){
-    send_to_pipe(std::move(new_music));
+void SoundManager::change_game_music(const std::string& new_music){
+    send_to_pipe(new_music);
 }
 void SoundManager::stop_game_music(){
-    send_to_pipe(std::string(STOP_BACKGROUND_MUSIC));
+    if (game_music_on) {
+        game_music_on = false;
+        send_to_pipe(std::string(STOP_BACKGROUND_MUSIC));
+    }
 }
 void SoundManager::play_game_music(){
-    send_to_pipe(std::string(START_BACKGROUND_MUSIC));
+    if(!game_music_on) {
+        game_music_on = true;
+        send_to_pipe(std::string(START_BACKGROUND_MUSIC));
+    }
 }
-void SoundManager::play_sound(int sound){
-    send_to_pipe(std::to_string(sound));
+void SoundManager::play_sound(const std::string& sound){
+    if(sound_on) {
+        send_to_pipe(sound);
+    }
 }
 
 void SoundManager::stop_all_game_sounds() {
-    send_to_pipe(std::string(STOP_SOUNDS));
+    if(sound_on) {
+        sound_on = false;
+    }
 }
 
 void SoundManager::restart_game_sounds() {
-    send_to_pipe(std::string(RESTART_SOUNDS));
+    if(!sound_on) {
+        sound_on = true;
+    }
 }

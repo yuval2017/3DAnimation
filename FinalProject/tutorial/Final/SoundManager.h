@@ -26,19 +26,23 @@ public:
     std::thread python_thread;
     std::string id ;
     ~SoundManager();
-    void play_sound(int sound);
-    void change_game_music(std::string new_music);
+    void play_sound(const std::string& sound);
+    void change_game_music(const std::string& new_music);
     void stop_game_music();
     void play_game_music();
     void stop_all_game_sounds();
     void restart_game_sounds();
+    void switch_game_music(std::string new_game_music);
 
 private:
-    void send_to_pipe(std::string to_send);
+    void send_to_pipe(const std::string& to_send);
     bool* run;
     SoundManager();
     static SoundManager* instance;
     SoundManager(SoundManager const&);              // Don't Implement.
     void operator=(SoundManager const&); // Don't implement
     FILE* pipe;
+    bool sound_on = true;
+    bool game_music_on = false;
+
 };
