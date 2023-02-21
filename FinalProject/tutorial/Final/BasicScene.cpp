@@ -3,6 +3,7 @@
 #include <memory>
 #include "SceneWithImGui.h"
 #include "GLFW/glfw3.h"
+#include <random>
 #include "Mesh.h"
 #include "PickVisitor.h"
 #define IMGUI_DEFINE_MATH_OPERATORS
@@ -301,9 +302,25 @@ void BasicScene::startMenu() {
 
         if (ImGui::Button("Store", ImVec2(-1, 0))) {
             std::cout << "store button pressed in start menu  ." << endl;
-            statistics->menu_flags[MainMenu_OP] = false;
-            data->set_back(MainMenu_OP);
-            statistics->menu_flags[StoreMenu_OP] = true;
+
+            //start menu check .
+            //TODO: replace.
+            Score* scor = generateRandomScore();
+            int pos = highScores->nextLeaderPos();
+            if( pos == -1) {
+                std::vector<int> scores = this->highScores->extractScores();
+                for (int i = 0; i < scores.size(); i++) {
+                    if (scor->score > scores[i]) {
+                        pos = i;
+                    }
+                }
+            }
+            if (pos != -1){
+                highScores->saveToHighScores(scor,pos);
+            }
+//            statistics->menu_flags[MainMenu_OP] = false;
+//            data->set_back(MainMenu_OP);
+//            statistics->menu_flags[StoreMenu_OP] = true;
         }
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
@@ -598,7 +615,7 @@ void BasicScene::NextLevelMenu() {
             ImGui::Spacing();
         }
         if (ImGui::Button("Back to menu", ImVec2(-1, 0))) {
-            //TODO: END GAME.
+            init();
             std::cout << "Next level button pressed in next level menu." << endl;
             statistics->menu_flags[LevelMenu_OP] = false;
             statistics->menu_flags[MainMenu_OP] = true;
@@ -627,13 +644,19 @@ void BasicScene::WinMenu() {
             ImGui::Text("Please type your name to save in\nleader board: ");
             char buffer[1024] = "";  // buffer to store the input string
             ImGui::InputText("Input", buffer, sizeof(buffer));
-
+            ImGui::Spacing();
+            ImGui::Spacing();
             if (ImGui::Button("Save", ImVec2(-1, 0))) {
-                highScores->saveToHighScores(buffer, statistics->score);
+                Score* scor = new Score ();
+                scor->name = buffer;
+                scor->score = statistics->score;
+                highScores->saveToHighScores(scor,pos);
             }
 
         }
-
+        for(int i = 0 ; i< 3 ; i++){
+            ImGui::Spacing();
+        }
         if (ImGui::Button("Back to menu", ImVec2(-1, 0))) {
             std::cout << "Back to menu button pressed in win menu." << endl;
             statistics->menu_flags[WinMenu_OP] =false;
@@ -655,10 +678,28 @@ void BasicScene::LoseMenu() {
             ImGui::Spacing();
         }
         buttonStyle();
-        if (ImGui::Button("Back to menu", ImVec2(-1, 0))) {
+        int pos = isLeader(statistics->score);
+        if(pos != -1) {
+            ImGui::Text("Please type your name to save in\nleader board: ");
+            char buffer[1024] = "";  // buffer to store the input string
+            ImGui::InputText("Input", buffer, sizeof(buffer));
+            ImGui::Spacing();
+            ImGui::Spacing();
+            if (ImGui::Button("Save", ImVec2(-1, 0))) {
+                Score* scor = new Score ();
+                scor->name = buffer;
+                scor->score = statistics->score;
+                highScores->saveToHighScores(scor,pos);
+            }
+
+            for(int i = 0 ; i< 3 ; i++){
+                ImGui::Spacing();
+            }
+        }
+            if (ImGui::Button("Back to menu", ImVec2(-1, 0))) {
             std::cout << "Back to menu button pressed in loose menu." << endl;
             //highScores->saveToHighScores(characterName, game->getTotalMoney());
-            statistics->menu_flags[WinMenu_OP] =false;
+            statistics->menu_flags[GameOverMenu_OP] =false;
             statistics->menu_flags[MainMenu_OP] =true;
         }
         ImGui::PopStyleColor(3);
@@ -725,9 +766,9 @@ void BasicScene::LeadersMenu() {
     if (statistics->menu_flags[LeadersMenu_OP]) {
         setWindow("Leader Board");
         ImGui::PushFont(regularFont);
-        this->highScores->grabCurrentHighScores();
-        std::vector<std::string> names = highScores->getTopHighScoreNames();
-        std::vector<int> scores = highScores->getTopHighScores();
+        this->highScores->loadHighScores();
+        std::vector<std::string> names = highScores->extractPlayerNames();
+        std::vector<int> scores = highScores->extractScores();
         if (names.size() == 0) {
             ImGui::BulletText("No Saved Scores!");
         } else {
@@ -761,16 +802,16 @@ void BasicScene::LeadersMenu() {
 }
 
 bool BasicScene::isLeader(int score){
-    if(highScores->nextLeaderPos() == -1){
-        return highScores->nextLeaderPos();
-    }
-    std::vector <int> scores = this->highScores->getTopHighScores();
-    for (int i=0 ; i<scores.size() ; i++){
-        if(score > scores[i]){
-            return i;
+    int ret = highScores->nextLeaderPos();
+    if( ret == -1) {
+        std::vector<int> scores = this->highScores->extractScores();
+        for (int i = 0; i < scores.size(); i++) {
+            if (score > scores[i]) {
+                ret = i;
+            }
         }
     }
-    return -1;
+    return ret;
 }
 void BasicScene::buttonStyle() {
     // Set button color to dark green
@@ -820,7 +861,7 @@ void BasicScene::setWindow(const char* header) {
     }
     ImGui::SetCursorPosX((ImGui::GetWindowSize().x - ImGui::CalcTextSize("Centered Text").x) / 2.0f);
     ImGui::PushFont(headerFont);
-    ImGui::Text(header);
+    ImGui::Text("%s", header);
 
     for (int i = 0; i < 3; ++i) {
         ImGui::Spacing();
@@ -833,4 +874,23 @@ void BasicScene::setWindow(const char* header) {
 }
 BasicScene::~BasicScene(){
     delete soundManager;
+}
+
+Score* BasicScene::generateRandomScore() {
+    // Generate random score between 0 and 100
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> scoreDist(0, 10000);
+    int score = scoreDist(gen);
+
+    // Generate random player name
+    std::uniform_int_distribution<> nameDist(0, 25);
+    std::string playerName;
+    for (int i = 0; i < 8; ++i) {
+        playerName += static_cast<char>('a' + nameDist(gen));
+    }
+    Score * ret = new Score ();
+    ret->name = playerName;
+    ret->score = score;
+    return ret;
 }

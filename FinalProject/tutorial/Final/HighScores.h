@@ -15,21 +15,22 @@ class HighScores {
 public:
 	HighScores();
 	int nextLeaderPos();
-	void saveToHighScores (std::string playerName, int score);
-	void grabCurrentHighScores();
-
-	std::vector<Score>& getHighScoreRows() {
-		return highscoreRows;
-	}
+	void saveToHighScores ( Score* score, int index);
+	void loadHighScores();
 	int getHighestScore();
-	std::vector <std::string> getTopHighScoreNames();
-	std::vector <int> getTopHighScores();
-private :
+	std::vector <Score> getHighScores();
+    std::vector<std::string> extractPlayerNames();
+    std::vector<int> extractScores();
 
+
+private :
 
 	const char* fileName ="./scores.json";
 	nlohmann::json j;
-    int maxScoresInTable;
+    int maxScoresInTable = 10;
 	int numOfScoresInTable;
-	std::vector <Score> highscoreRows;
+	std::vector <Score> scores;
+    void replaceScoreAtIndex(int index, std::vector<Score> &scores, const Score &newScore);
+
+
 };
