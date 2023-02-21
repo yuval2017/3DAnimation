@@ -47,6 +47,7 @@ private:
     float joint_length;
     Eigen::MatrixXd V_new;
     void load_snake(std::string& path);
+    void Calc_Next_Position(std::vector<Eigen::Vector3f> &p, std::vector<double> &ris_Array, std::vector<double> &lambdaI_Array, Eigen::Vector3d t);
 
 
 
