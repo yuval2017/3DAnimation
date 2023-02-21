@@ -113,6 +113,7 @@ int HighScores::nextLeaderPos()
 
 void HighScores::saveToHighScores(Score* score,int index) {
     // check that the file exists.
+
     std::filesystem::path filePath(fileName);
     if (!std::filesystem::exists(filePath)) {
         // Create scores.json if it doesn't exist.
@@ -131,6 +132,9 @@ void HighScores::saveToHighScores(Score* score,int index) {
     }
     //empty the file.
     j.clear();
+    if(numOfScoresInTable > maxScoresInTable){
+        numOfScoresInTable = numOfScoresInTable%maxScoresInTable;
+    }
     j["numOfScores"] = numOfScoresInTable;
     for (int i = 0; i < numOfScoresInTable; i++) {
         std::string indexStr = std::to_string(i);

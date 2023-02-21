@@ -10,16 +10,9 @@
 #include "imgui_internal.h"
 #include "Renderer.h"
 #include "IglMeshLoader.h"
-#include "imgui.h"
 #include "ModelsFactory.h"
-#include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-#include "imgui.h"
-#include "imgui_impl_sdl.h"
-#include "imgui_impl_opengl3.h"
 #include <glad/glad.h>
 
 using namespace cg3d;
@@ -772,7 +765,7 @@ void BasicScene::LeadersMenu() {
         if (names.size() == 0) {
             ImGui::BulletText("No Saved Scores!");
         } else {
-            for (int i = names.size() - 1; i >= 0; i--) {
+            for (int i = 0; i <= names.size() - 1; i++) {
                 std::string text = names[i] + "\t|\t" + std::to_string(scores[i]) + "\n";
                 ImGui::BulletText("%s", text.c_str());
             }

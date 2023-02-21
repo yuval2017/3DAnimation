@@ -27,7 +27,7 @@ private :
 
 	const char* fileName ="./scores.json";
 	nlohmann::json j;
-    int maxScoresInTable = 10;
+    int maxScoresInTable = 5;
 	int numOfScoresInTable;
 	std::vector <Score> scores;
     void replaceScoreAtIndex(int index, std::vector<Score> &scores, const Score &newScore);
