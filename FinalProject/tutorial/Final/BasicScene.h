@@ -81,6 +81,7 @@ private:
     void endWindow();
     void buttonStyle();
     void setBoxes();
+    Score* generateRandomScore();
     GLuint backgroundImageTexture;
     ImVec2 startPos ;
     int windowFlags;
