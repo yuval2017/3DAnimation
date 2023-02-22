@@ -14,6 +14,7 @@
 class BasicScene : public cg3d::SceneWithImGui
 {
 public:
+    std::shared_ptr<Model> level1;
     BasicScene(std::string name, cg3d::Display* display);
     void BuildImGui() override;
     void dropEngine();

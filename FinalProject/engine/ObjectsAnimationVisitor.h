@@ -8,6 +8,9 @@
 #include "Visitor.h"
 #include "Model.h"
 #include <vector>
+#include <random>
+#include <algorithm>
+#include <cmath>
 namespace cg3d {
     class ObjectsAnimationVisitor : public Visitor {
 
@@ -22,6 +25,10 @@ namespace cg3d {
         void drawTheBeizerCurve(std::shared_ptr<Model> model);
         Eigen::Vector3f calcForDraw(float ti, std::shared_ptr<Model> model);
         std::vector<double> linspace(float start_in, float end_in, int num_in);
+        void CreateLevel1(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords);
+        bool doCubesIntersect(const Eigen::Vector3d& c1, const Eigen::Vector3d& c2, double cubeSize);
+        void setRandomCubeLocations(double domainX, double domainY, double domainZ,
+                                    int numCubes, double cubeSize, std::vector<Eigen::Vector3d> &cubes);
     private:
         std::shared_ptr<Material> material;
         std::shared_ptr<Program> program;

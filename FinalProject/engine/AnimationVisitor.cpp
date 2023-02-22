@@ -19,7 +19,7 @@ namespace cg3d
 
     void AnimationVisitor::Visit(Model* model)
     {
-        if(model->name == std::string("snake")){
+        if(basicScene->animate && model->name == std::string("snake")){
             basicScene->snake->skinning(basicScene->snake->direction);
         }
         Eigen::Matrix3f system = model->GetRotation().transpose();

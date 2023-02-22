@@ -24,7 +24,7 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
 
 
         generateObjectBezier(BRICKS_MATERIAL,SPHERE, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
-        auto truck = generateObjectBezier(PHONG_MATERIAL,TRUCK, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
+        std::shared_ptr<Model> truck = generateObjectBezier(PHONG_MATERIAL,TRUCK, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
         generateObjectBezier(PHONG_MATERIAL,SPHERE, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
         generateObjectBezier(PHONG_MATERIAL,CUBE, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
 //        auto coin = ModelsFactory::getInstance()->CreateModel(BASIC_MATERIAL,COIN,"coin");
@@ -36,6 +36,9 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
 //        basicScene->GetRoot()->AddChild(coin);
 //        coin->Translate(Eigen::Vector3f(0.0f,0.0f,0.0f) - coin->GetPosition());
 //        coin->Scale(3.0f);
+        std::vector<std::shared_ptr<Model>> models;
+        std::vector<Eigen::Vector3f> coords;
+        //CreateLevel1(models, coords);
 
     }
     Visitor::Run(scene, camera);
@@ -73,7 +76,6 @@ std::shared_ptr<Model> ObjectsAnimationVisitor::generateObjectBezier(int materia
 
 void ObjectsAnimationVisitor::setModelBezier(Eigen::Vector3f vectors,std::shared_ptr<Model> model){
     Calculates::getInstance()->generateRandomBeizierCurve(std::move(vectors),model->MG_Result);
-    moveAccordingToBeizerCurve(model.get());
     drawTheBeizerCurve(model);
 }
 
@@ -125,8 +127,40 @@ void ObjectsAnimationVisitor::drawTheBeizerCurve(std::shared_ptr<Model> model) {
     model->bezier = bezier;
     basicScene->GetRoot()->AddChild(bezier);
 
+}
+
+void ObjectsAnimationVisitor::CreateLevel1(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords) {
+    int n = 200;
+
+    Eigen::Vector3d max = basicScene->level1->GetMeshList()[0]->data[0].vertices.colwise().maxCoeff();
+    Eigen::Vector3d min = basicScene->level1->GetMeshList()[0]->data[0].vertices.colwise().minCoeff();
+
+    double z_length = max[2]*basicScene->level1->scale_factor[2] - min[2]*basicScene->level1->scale_factor[2];
+    double y_length = max[1]*basicScene->level1->scale_factor[1] - min[1]*basicScene->level1->scale_factor[1];
+    double x_length = max[0]*basicScene->level1->scale_factor[0] - min[0]*basicScene->level1->scale_factor[0];
+    double dist_between_objects_z = z_length/n;
+    double dist_between_objects_y = y_length/n;
+    double dist_between_objects_x = x_length/n;
+    std::vector<double> objects_in_space_z = Calculates::getInstance()->linspace(5,z_length/2,n);
+    std::vector<double> objects_in_space_y = Calculates::getInstance()->linspace(5,y_length/2,n);
+    std::vector<double> objects_in_space_x = Calculates::getInstance()->linspace(5,x_length/2,n);
+    int scale = 3;
+    std::vector<Eigen::Vector3d> cubes;
+    Calculates::getInstance()->setRandomCubeLocations(x_length, y_length, z_length, n,  scale, cubes);
+
+
+    for (int i = 0; i < n; i++) {
+        //Eigen::Vector3f position = {objects_in_space_x[i],objects_in_space_y[i],objects_in_space_z[i]};
+        Eigen::Vector3f position = cubes[i].cast<float>();
+        coords.push_back(position);
+        std::shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(BRICKS_MATERIAL,CUBE,"test");
+        basicScene->GetRoot()->AddChild(cube);
+        cube->Translate(position);
+        cube->Scale(scale);
+    }
 
 }
+
 
 
 

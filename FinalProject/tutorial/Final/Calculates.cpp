@@ -373,3 +373,104 @@ bool Calculates::isBoxesIntersect(Eigen::AlignedBox<double, 3>& boxA, Eigen::Ali
                      (a(0) * abs(C.row(1)(2)) + a(1) * abs(C.row(0)(2)) + b(0) * abs(C.row(2)(1)) + b(1) * abs(C.row(2)(0)) < abs(R)))
     );
 }
+
+void Calculates::setRandomCubeLocations(double domainX, double domainY, double domainZ,
+                                                     int numCubes, double cubeSize, std::vector<Eigen::Vector3d> &cubes) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> disX(-domainX/2 + cubeSize/2, domainX/2 - cubeSize/2);
+    std::uniform_real_distribution<> disY(-domainY/2 + cubeSize/2, domainY/2 - cubeSize/2);
+    std::uniform_real_distribution<> disZ(-domainZ/2 + cubeSize/2, domainZ/2 - cubeSize/2);
+
+    std::vector<Eigen::Vector3d> cubeCenters;
+    cubeCenters.reserve(numCubes);
+
+    while (cubeCenters.size() < numCubes) {
+        // Generate random cube center
+        double x = disX(gen);
+        double y = disY(gen);
+        double z = disZ(gen);
+        Eigen::Vector3d p = {x, y, z};
+
+        // Check if cube is inside the domain and is at least 10 units from the origin
+        double distFromOrigin = std::sqrt(x*x + y*y + z*z);
+        if (std::abs(x) > domainX/2 || std::abs(y) > domainY/2 || std::abs(z) > domainZ/2 ||
+            distFromOrigin < 10.0) {
+            continue;
+        }
+
+        // Check if cube intersects with any other cubes
+        bool intersects = false;
+        for (const auto& c : cubeCenters) {
+            if (doCubesIntersect(p, c, cubeSize)) {
+                intersects = true;
+                break;
+            }
+        }
+        if (intersects) {
+            continue;
+        }
+
+        // Add cube center to vector
+        cubeCenters.push_back(p);
+    }
+    cubes = cubeCenters;
+
+}
+
+bool Calculates::doCubesIntersect(const Eigen::Vector3d& c1, const Eigen::Vector3d& c2, double cubeSize) {
+    double d = std::sqrt((c1.x() - c2.x()) * (c1.x() - c2.x()) +
+                         (c1.y() - c2.y()) * (c1.y() - c2.y()) +
+                         (c1.z() - c2.z()) * (c1.z() - c2.z()));
+    return d < 2 * cubeSize;
+}
+void Calculates::setUniformCubeLocations(double domainX, double domainY, double domainZ,
+                                          int numCubes, double cubeSize, std::vector<Eigen::Vector3d> &cubes) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+
+    int cellsX = std::max(static_cast<int>(std::floor(domainX / cubeSize)), 1);
+    int cellsY = std::max(static_cast<int>(std::floor(domainY / cubeSize)), 1);
+    int cellsZ = std::max(static_cast<int>(std::floor(domainZ / cubeSize)), 1);
+
+    std::vector<Eigen::Vector3d> cubeCenters;
+    cubeCenters.reserve(numCubes);
+
+    for (int i = 0; i < cellsX; ++i) {
+        for (int j = 0; j < cellsY; ++j) {
+            for (int k = 0; k < cellsZ; ++k) {
+                double x = domainX / cellsX * (i + 0.5) - domainX / 2.0;
+                double y = domainY / cellsY * (j + 0.5) - domainY / 2.0;
+                double z = domainZ / cellsZ * (k + 0.5) - domainZ / 2.0;
+                Eigen::Vector3d p = {x, y, z};
+                double distFromOrigin = std::sqrt(x*x + y*y + z*z);
+                if (distFromOrigin < 10.0) {
+                    continue;
+                }
+
+                bool intersects = false;
+                for (const auto& c : cubeCenters) {
+                    if (doCubesIntersect(p, c, cubeSize)) {
+                        intersects = true;
+                        break;
+                    }
+                }
+
+                if (!intersects) {
+                    cubeCenters.push_back(p);
+                }
+
+                if (cubeCenters.size() >= numCubes) {
+                    break;
+                }
+            }
+            if (cubeCenters.size() >= numCubes) {
+                break;
+            }
+        }
+        if (cubeCenters.size() >= numCubes) {
+            break;
+        }
+    }
+    cubes = cubeCenters;
+}

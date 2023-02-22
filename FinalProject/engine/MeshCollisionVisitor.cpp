@@ -16,20 +16,19 @@ void cg3d::MeshCollisionVisitor::Run(cg3d::Scene *scene, cg3d::Camera *camera) {
 
 
 void cg3d::MeshCollisionVisitor::Visit(Model *model) {
-
+    int snake_head =basicScene->snake->bones.size()-1;
     Visitor::Visit(model);
-    if (basicScene->animate && model != nullptr && model->name != std::string(std::string(BONE_NAME) + " 1") && (model->name != std::string(std::string(BONE_NAME) + " 0")) && (model->name.substr(0,
+    if (basicScene->animate && model != nullptr && model->name != std::string(std::string(BONE_NAME) +" "+ std::to_string(snake_head)) && (model->name != std::string(std::string(BONE_NAME) + " " + std::to_string(snake_head- 1))) && (model->name.substr(0,
                                                                                                                                                          strlen(COLLISION_OBJECT)) == COLLISION_OBJECT || model->name.substr(0,strlen(BONE_NAME)) == BONE_NAME)) {
-
         //std::cout << "collision with " <<model->name <<" time elapse "<< std::to_string(model->stopper.getElapsedTime()) << " \n" << std::endl;
-        std::shared_ptr<Model> snake = basicScene->snake->GetSnakeBones()[0];
+        std::shared_ptr<Model> snake = basicScene->snake->GetSnakeBones()[snake_head];
         if (Calculates::getInstance()->isMeshCollision(snake, model, ((snake)->GetTreeWithOutCube()), model->GetTreeWithOutCube())) {
             if(model->name.substr(0, strlen(BONE_NAME)) == BONE_NAME){
                 std::cout << "collision with " << model->name << " \n" << std::endl;
 
                 basicScene->animate = false;
             }else if(model->name.substr(0, strlen(COLLISION_OBJECT)) == COLLISION_OBJECT){
-                std::string name = model->name.substr(15,model->name.size()-1);
+                std::string model_name = model->name.substr(15,model->name.size()-1);
                 //to make sure it was deleted
                 std::cout << "collision with " << model->name << " \n" << std::endl;
                 basicScene->GetRoot()->RemoveChild(model->bezier);

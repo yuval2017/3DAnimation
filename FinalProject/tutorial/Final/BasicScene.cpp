@@ -271,11 +271,11 @@ Eigen::Vector3f BasicScene::GetSpherePos()
 
 void BasicScene::init_objects() {
     AddChild(root = Movable::Create("root")); // a common (invisible) parent object for all the shapes
-    auto background=ModelsFactory::getInstance()->CreateModel(DAYLIGHT_MATERIAL,CUBE,"background");
-    AddChild(background);
-    background->Scale(1000, Axis::XYZ);
-    background->SetPickable(false);
-    background->SetStatic();
+    level1 = ModelsFactory::getInstance()->CreateModel(DAYLIGHT_MATERIAL,CUBE,"background");
+    AddChild(level1);
+    level1->Scale(200, Axis::XYZ);
+    level1->SetPickable(false);
+    level1->SetStatic();
     auto program = std::make_shared<Program>("shaders/phongShader");
     material =  std::make_shared<Material>("material", program); // empty material
     material->AddTexture(0, "textures/box0.bmp", 2);
