@@ -1,0 +1,7 @@
+{
+  "total_money" : 0,
+  "life_bought": 0,
+  "object_collision" : 0,
+  "self_collision" : 0,
+  "double_score" : 0
+}
