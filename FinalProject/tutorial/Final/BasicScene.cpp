@@ -649,7 +649,7 @@ void BasicScene::WinMenu() {
             ImGui::InputText("Input", buffer, sizeof(buffer));
             ImGui::Spacing();
             ImGui::Spacing();
-            if (ImGui::Button("Save", ImVec2(-1, 0))) {
+            if (ImGui::Button("Save", ImVec2(-1, 0)) && strlen(buffer) > 0) {
                 Score* scor = new Score ();
                 scor->name = buffer;
                 scor->score = statistics->score;
@@ -703,7 +703,7 @@ void BasicScene::LoseMenu() {
             ImGui::InputText("Input", buffer, sizeof(buffer));
             ImGui::Spacing();
             ImGui::Spacing();
-            if (ImGui::Button("Save", ImVec2(-1, 0))) {
+            if (ImGui::Button("Save", ImVec2(-1, 0)) && strlen(buffer) > 0) {
                 Score* scor = new Score ();
                 scor->name = buffer;
                 scor->score = statistics->score;
