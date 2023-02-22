@@ -31,7 +31,7 @@ public:
     void inc_self_collision();
     void inc_double_score();
     void set_back(int val);
-    int get_back_to_main();
+    std::vector<int> get_back_to_main();
     int message_size();
     void restart_game();
 
@@ -41,7 +41,7 @@ public:
     bool gameSound;
     float musicVolume ;
     float soundVolume ;
-    bool back_to_main;
+    std::vector<int> back_to_main;
 
 private:
     void load_data();

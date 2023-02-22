@@ -17,7 +17,6 @@ public:
     BasicScene(std::string name, cg3d::Display* display);
     void BuildImGui() override;
     void dropEngine();
-    bool isLeader(int score);
     void Init(float fov, int width, int height, float near, float far);
     void Update(const cg3d::Program& program, const Eigen::Matrix4f& proj, const Eigen::Matrix4f& view, const Eigen::Matrix4f& model) override;
     void MouseCallback(cg3d::Viewport* viewport, int x, int y, int button, int action, int mods, int buttonState[]) override;
@@ -81,6 +80,7 @@ private:
     void endWindow();
     void buttonStyle();
     void setBoxes();
+    void initProperties( int width, int height);
     Score* generateRandomScore();
     GLuint backgroundImageTexture;
     ImVec2 startPos ;

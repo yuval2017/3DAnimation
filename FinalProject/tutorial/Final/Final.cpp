@@ -18,7 +18,7 @@ int main()
     const int DISPLAY_HEIGHT = 800;
     const float CAMERA_ANGLE = 45.0f;
     const float NEAR = 0.1f;
-    const float FAR = 120.0f;
+    const float FAR = 1200.0f;
     Renderer renderer;
     Display display("Example1", DISPLAY_WIDTH, DISPLAY_HEIGHT, &renderer);
     std::cout.setstate(std::ios_base::failbit); // suppress junk output to console from igl::opengl::glfw::Viewer

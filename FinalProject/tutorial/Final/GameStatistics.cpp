@@ -22,10 +22,14 @@ float GameStatistics::get_progress(){
 GameStatistics::GameStatistics() {
 
     level = 1;
-    speed =1.0;
+    speed = 1.0;
     score = 0;
     num_of_strikes = 0 ;
     object_collision = true;
     self_collision = true;
     double_score = false;
+}
+
+void GameStatistics::reset_game() {
+//TODO: IMPLEMENT.
 }

@@ -40,6 +40,8 @@ public:
     void reset_level_data();
     float get_progress();
 
+    void reset_game();
+
 private :
     static GameStatistics* instance;
     GameStatistics();

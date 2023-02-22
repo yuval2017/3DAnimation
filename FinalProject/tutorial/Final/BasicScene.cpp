@@ -22,20 +22,13 @@ using namespace cg3d;
 void BasicScene::Init(float fov, int width, int height, float near, float far) {
 
     camera = Camera::Create("camera", fov, float(width) / height, near, far);
-    screen_height= height;
-    screen_width = width;
+    initProperties(width, height);
     init_objects();
-    statistics = GameStatistics::getInstance();
-    data = Data::getInstance();
     init_helpers();
-    this->animate = false;
     setFonts();
     setStartPos();
-    windowSize = ImVec2(window_width, window_height);
     setImage();
-    windowFlags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar |
-            ImGuiWindowFlags_NoResize |ImGuiWindowFlags_NoBringToFrontOnFocus  |
-            ImGuiWindowFlags_NoScrollbar;
+
 }
 
 BasicScene::BasicScene(std::string name, Display* display) : SceneWithImGui(std::move(name), display)
@@ -45,6 +38,29 @@ BasicScene::BasicScene(std::string name, Display* display) : SceneWithImGui(std:
     ImGuiStyle& style = ImGui::GetStyle();
     style.FrameRounding = 5.0f;
 }
+
+void BasicScene::initProperties( int width, int height){
+    windowFlags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar |
+                  ImGuiWindowFlags_NoResize |ImGuiWindowFlags_NoBringToFrontOnFocus  |
+                  ImGuiWindowFlags_NoScrollbar;
+
+    screen_height= height;
+    screen_width = width;
+    statistics = GameStatistics::getInstance();
+    data = Data::getInstance();
+    windowSize = ImVec2(window_width, window_height);
+}
+
+void BasicScene::init_helpers(){
+
+    this->highScores = new HighScores();
+    this->statistics->menu_flags[MainMenu_OP] = true;
+    this->soundManager = SoundManager::getInstance();
+    soundManager->play_game_music();
+    this->animate = false;
+
+}
+
 void BasicScene::setImage(){
     backgroundImage = stbi_load("../tutorial/Final/images/7x7.jpg", &image_width , &image_height, &channels, STBI_rgb_alpha);
     if (backgroundImage == NULL) {
@@ -63,6 +79,7 @@ void BasicScene::setImage(){
         std::cout << "image loaded successfully! " << std::endl;
     }
 }
+
 void BasicScene::setFonts() {
     ImGuiIO &io = ImGui::GetIO();
     ImFontConfig font_config;
@@ -83,6 +100,7 @@ void BasicScene::setStartPos() {
      width = (screen_width - image_width)/2.0f ;
 
 }
+
 void BasicScene::BuildImGui(){
     startMenu();
     PausedMenu();
@@ -94,6 +112,7 @@ void BasicScene::BuildImGui(){
     SettingsMenu();
     //PlayMenu();
 }
+
 void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, const Eigen::Matrix4f& view, const Eigen::Matrix4f& model)
 {
     Scene::Update(program, proj, view, model);
@@ -234,7 +253,7 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
                 done_inite = true;
                 break;
             case GLFW_KEY_3:
-                animate = true;
+                animate = !animate;
                 break;
             case GLFW_KEY_4:
                 snake->with_skinning = !snake->with_skinning;
@@ -254,15 +273,15 @@ void BasicScene::init_objects() {
     AddChild(root = Movable::Create("root")); // a common (invisible) parent object for all the shapes
     auto background=ModelsFactory::getInstance()->CreateModel(DAYLIGHT_MATERIAL,CUBE,"background");
     AddChild(background);
-    background->Scale(120, Axis::XYZ);
+    background->Scale(1000, Axis::XYZ);
     background->SetPickable(false);
     background->SetStatic();
     auto program = std::make_shared<Program>("shaders/phongShader");
     material =  std::make_shared<Material>("material", program); // empty material
     material->AddTexture(0, "textures/box0.bmp", 2);
     snake = new Snake(material,root,camera);
-    camera->Translate(44,Movable::Axis::Z);
-    camera->Translate(10, Movable::Axis::Y);
+    camera->Translate(50,Movable::Axis::Z);
+    camera->Translate(5, Movable::Axis::Y);
 }
 
 void BasicScene::startMenu() {
@@ -322,7 +341,7 @@ void BasicScene::startMenu() {
         if (ImGui::Button("Leaders", ImVec2(-1, 0))) {
             std::cout << "leaders button pressed in start menu  ." << endl;
             statistics->menu_flags[MainMenu_OP] = false;
-            data->set_back(MainMenu_OP);
+            data->back_to_main.push_back(MainMenu_OP);
             statistics->menu_flags[LeadersMenu_OP] = true;
         }
         for(int i = 0; i< 3 ; i++){
@@ -333,7 +352,7 @@ void BasicScene::startMenu() {
             if (data->message_size() == 0)
             {
                 statistics->menu_flags[MainMenu_OP] = false;
-                data->set_back(MainMenu_OP);
+                data->back_to_main.push_back(MainMenu_OP);
                 statistics->menu_flags[SettingsMenu_OP] = true;
             }
             else {
@@ -364,17 +383,6 @@ void BasicScene::startMenu() {
 
     }
 }
-
-
-void BasicScene::init_helpers(){
-
-    this->highScores = new HighScores();
-    this->statistics->menu_flags[MainMenu_OP] = true;
-    this->soundManager = SoundManager::getInstance();
-    soundManager->play_game_music();
-
-}
-
 void BasicScene::PausedMenu()
 {
     if(statistics->menu_flags[PauseMenu_OP]) {
@@ -387,18 +395,19 @@ void BasicScene::PausedMenu()
             ImGui::Spacing();
         }
 
-        ImGui::Text("Total score ");
+        ImGui::Text("Total score: ");
         ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
         std::string tmp = std::to_string(statistics->score);
         ImGui::Text("%s", tmp.c_str());
         ImGui::Spacing();
-        ImGui::Text("Level ");
+        ImGui::Text("Level: ");
         ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
         std::string tmp2 = std::to_string(statistics->level);
         ImGui::Text("%s", tmp2.c_str());
-        ImGui::Text("Snake speed ");
+        ImGui::Text("Snake speed: ");
         ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
-        tmp = std::to_string(statistics->speed);
+        std::string tmp3 = std::to_string(statistics->speed);
+        ImGui::Text("%s", tmp3.c_str());
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
@@ -415,7 +424,7 @@ void BasicScene::PausedMenu()
         if (ImGui::Button("Store", ImVec2(-1, 0))) {
             std::cout << "store menu button pressed in pause menu." << endl;
             statistics->menu_flags[PauseMenu_OP] = false;
-            data->set_back(PauseMenu_OP);
+            data->back_to_main.push_back(PauseMenu_OP);
             statistics->menu_flags[StoreMenu_OP] = true;
         }
         for(int i = 0; i< 3 ; i++){
@@ -423,14 +432,25 @@ void BasicScene::PausedMenu()
         }
 
         if (ImGui::Button("Settings", ImVec2(-1, 0))) {
-            if (data->message_size() == 0) {
-                std::cout << "setting menu button pressed in pause menu." << endl;
-                statistics->menu_flags[PauseMenu_OP] = false;
-                data->set_back(PauseMenu_OP);
-                statistics->menu_flags[SettingsMenu_OP] = true;
-            }
-            else
-                data->set_message("");
+
+            data->set_message("");
+            std::cout << "setting menu button pressed in pause menu." << endl;
+            statistics->menu_flags[PauseMenu_OP] = false;
+            data->back_to_main.push_back(PauseMenu_OP);
+            statistics->menu_flags[SettingsMenu_OP] = true;
+
+
+        }
+        if (ImGui::Button("Surrender", ImVec2(-1, 0))) {
+            data->set_message("");
+            std::cout << "Surrender button pressed in pause menu." << endl;
+            statistics->menu_flags[PauseMenu_OP] = false;
+            statistics->menu_flags[MainMenu_OP] = true;
+            data->back_to_main.clear();
+            //TODO:init statistic and game.
+            statistics->reset_game();
+
+
         }
         ImGui::PopStyleColor(3);
         for(int i = 0; i< 3 ; i++){
@@ -441,40 +461,6 @@ void BasicScene::PausedMenu()
         endWindow();
     }
 }
-
-
-
-void BasicScene::PlayMenu()
-{
-    if(animate) {
-        int flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize;
-        bool* pOpen = nullptr;
-        ImGui::Begin("Menu", pOpen, flags);
-        ImGui::SetWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-        ImGui::SetWindowSize(ImVec2(0, 0), ImGuiCond_Always);
-        ImGui::Text("Camera: ");
-        //TODO: replace cameras.
-//        for (int i = 0; i < camList.size(); i++) {
-//            ImGui::SameLine(0);
-//            bool selectedCamera = camList[i] == camera;
-//            if (selectedCamera)
-//                ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive));
-//            if (ImGui::Button(std::to_string(i + 1).c_str()))
-//                SetCamera(i);
-//            if (selectedCamera)
-//                ImGui::PopStyleColor();
-//        }
-
-
-        for(int i = 0; i< 3 ; i++){
-            ImGui::Spacing();
-        }
-        ImGui::End();
-    }
-}
-
-
-
 void BasicScene::SettingsMenu()
 {
     if(statistics->menu_flags[SettingsMenu_OP]) {
@@ -517,7 +503,7 @@ void BasicScene::SettingsMenu()
         // Slider for music volume control
         if(ImGui::SliderFloat("Music Volume", &data->musicVolume, 0.0f, 1.0f) ){
             std::cout<< "Music Volume value changed to : " << data->musicVolume <<endl;
-           soundManager->set_game_play_music(std::to_string(data->musicVolume));
+            soundManager->set_game_play_music(std::to_string(data->musicVolume));
         }
         // Slider for sound volume control
         if(ImGui::SliderFloat("Game Sounds Volume", &data->soundVolume, 0.0f, 1.0f) ){
@@ -536,7 +522,7 @@ void BasicScene::SettingsMenu()
                 bool is_selected = (current_music_index == i);
                 if (ImGui::Selectable(music_names[i], is_selected)) {
                     current_music_index = i;
-                    soundManager->change_game_music(current_music_index);
+                    soundManager->change_game_music(current_music_index+1);
                 }
                 if (is_selected) {
                     ImGui::SetItemDefaultFocus();
@@ -574,10 +560,18 @@ void BasicScene::SettingsMenu()
         for(int i = 0; i< 5 ; i++){
             ImGui::Spacing();
         }
-        if (ImGui::Button("Back to menu", ImVec2(-1, 0))) {
-            std::cout << "Back to menu button pressed in win menu." << endl;
-            statistics->menu_flags[SettingsMenu_OP] =false;
-            statistics->menu_flags[MainMenu_OP] =true;
+        if (ImGui::Button("Back", ImVec2(-1, 0))) {
+            std::cout << "Back button pressed in win menu." << endl;
+            if(data->back_to_main.size() == 0 ){
+                statistics->menu_flags[SettingsMenu_OP] =false;
+                animate = true;
+            }
+            else{
+                statistics->menu_flags[SettingsMenu_OP] =false;
+                int ret = data->back_to_main.back();
+                data->back_to_main.pop_back();
+                statistics->menu_flags[ret] =true;
+            }
         }
         ImGui::PopStyleColor(3);
         ImGui::PopFont();
@@ -607,11 +601,19 @@ void BasicScene::NextLevelMenu() {
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
-        if (ImGui::Button("Back to menu", ImVec2(-1, 0))) {
+        if (ImGui::Button("Back ", ImVec2(-1, 0))) {
             init();
-            std::cout << "Next level button pressed in next level menu." << endl;
-            statistics->menu_flags[LevelMenu_OP] = false;
-            statistics->menu_flags[MainMenu_OP] = true;
+            std::cout << "Back button pressed in next level menu." << endl;
+            if(data->back_to_main.size() == 0 ){
+                statistics->menu_flags[SettingsMenu_OP] =false;
+                animate = true;
+            }
+            else{
+                statistics->menu_flags[SettingsMenu_OP] =false;
+                int ret = data->back_to_main.back();
+                data->back_to_main.pop_back();
+                statistics->menu_flags[ret] =true;
+            }
         }
         ImGui::PopStyleColor(3);
         ImGui::PopFont();
@@ -632,7 +634,15 @@ void BasicScene::WinMenu() {
             ImGui::Spacing();
         }
         buttonStyle();
-        int pos = isLeader(statistics->score);
+        int pos = highScores->nextLeaderPos();
+        if( pos == -1) {
+            std::vector<int> scores = this->highScores->extractScores();
+            for (int i = 0; i < scores.size(); i++) {
+                if (statistics->score > scores[i]) {
+                    pos = i;
+                }
+            }
+        }
         if(pos != -1){
             ImGui::Text("Please type your name to save in\nleader board: ");
             char buffer[1024] = "";  // buffer to store the input string
@@ -650,17 +660,24 @@ void BasicScene::WinMenu() {
         for(int i = 0 ; i< 3 ; i++){
             ImGui::Spacing();
         }
-        if (ImGui::Button("Back to menu", ImVec2(-1, 0))) {
-            std::cout << "Back to menu button pressed in win menu." << endl;
-            statistics->menu_flags[WinMenu_OP] =false;
-            statistics->menu_flags[MainMenu_OP] =true;
+        if (ImGui::Button("Back ", ImVec2(-1, 0))) {
+            std::cout << "Back button pressed in win menu." << endl;
+            if(data->back_to_main.size() == 0 ){
+                statistics->menu_flags[SettingsMenu_OP] =false;
+                animate = true;
+            }
+            else{
+                statistics->menu_flags[SettingsMenu_OP] =false;
+                int ret = data->back_to_main.back();
+                data->back_to_main.pop_back();
+                statistics->menu_flags[ret] =true;
+            }
         }
         ImGui::PopStyleColor(3);
         ImGui::PopFont();
         endWindow();
     }
 }
-
 void BasicScene::LoseMenu() {
 
     if (statistics->menu_flags[GameOverMenu_OP]) {
@@ -671,7 +688,15 @@ void BasicScene::LoseMenu() {
             ImGui::Spacing();
         }
         buttonStyle();
-        int pos = isLeader(statistics->score);
+        int pos = highScores->nextLeaderPos();
+        if( pos == -1) {
+            std::vector<int> scores = this->highScores->extractScores();
+            for (int i = 0; i < scores.size(); i++) {
+                if (statistics->score > scores[i]) {
+                    pos = i;
+                }
+            }
+        }
         if(pos != -1) {
             ImGui::Text("Please type your name to save in\nleader board: ");
             char buffer[1024] = "";  // buffer to store the input string
@@ -689,11 +714,19 @@ void BasicScene::LoseMenu() {
                 ImGui::Spacing();
             }
         }
-            if (ImGui::Button("Back to menu", ImVec2(-1, 0))) {
-            std::cout << "Back to menu button pressed in loose menu." << endl;
+        if (ImGui::Button("Back ", ImVec2(-1, 0))) {
+            std::cout << "Back button pressed in loose menu." << endl;
             //highScores->saveToHighScores(characterName, game->getTotalMoney());
-            statistics->menu_flags[GameOverMenu_OP] =false;
-            statistics->menu_flags[MainMenu_OP] =true;
+            if(data->back_to_main.size() == 0 ){
+                statistics->menu_flags[SettingsMenu_OP] =false;
+                animate = true;
+            }
+            else{
+                statistics->menu_flags[SettingsMenu_OP] =false;
+                int ret = data->back_to_main.back();
+                data->back_to_main.pop_back();
+                statistics->menu_flags[ret] =true;
+            }
         }
         ImGui::PopStyleColor(3);
         ImGui::PopFont();
@@ -728,15 +761,15 @@ void BasicScene::StoreMenu() {
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
-        if (ImGui::Button("Back to game", ImVec2(-1, 0))) {
-            std::cout << "Back to game button pressed in store menu." << endl;
+        if (ImGui::Button("Back", ImVec2(-1, 0))) {
+            std::cout << "Back button pressed in store menu." << endl;
             statistics->menu_flags[StoreMenu_OP] = false;
-            if(data->get_back_to_main() ==-1){
+            if(data->back_to_main.size() == 0 ){
                 animate =true;
             }
             else{
-                statistics->menu_flags[data->get_back_to_main()] = true;
-                data->set_back(-1);
+                statistics->menu_flags[data->back_to_main.back()] = true;
+                data->back_to_main.pop_back();
             }
         }
         for(int i = 0; i< 3 ; i++){
@@ -750,10 +783,9 @@ void BasicScene::StoreMenu() {
         }
         ImGui::PopStyleColor(3);
         ImGui::PopFont();
-       endWindow();
+        endWindow();
     }
 }
-
 void BasicScene::LeadersMenu() {
 
     if (statistics->menu_flags[LeadersMenu_OP]) {
@@ -777,12 +809,12 @@ void BasicScene::LeadersMenu() {
         if (ImGui::Button("Back", ImVec2(-1, 0))) {
             std::cout << "Back button pressed in store menu." << endl;
             statistics->menu_flags[LeadersMenu_OP] = false;
-            if(data->get_back_to_main() ==-1){
+            if(data->back_to_main.size() == 0){
                 animate =true;
             }
             else{
-                statistics->menu_flags[data->get_back_to_main()] = true;
-                data->set_back(-1);
+                statistics->menu_flags[data->back_to_main.back()] = true;
+                data->back_to_main.pop_back();
             }
         }
         ImGui::PopStyleColor(3);
@@ -793,19 +825,37 @@ void BasicScene::LeadersMenu() {
         endWindow();
     }
 }
+void BasicScene::PlayMenu()
+{
+    if(animate) {
+        int flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize;
+        bool* pOpen = nullptr;
+        ImGui::Begin("Menu", pOpen, flags);
+        ImGui::SetWindowPos(ImVec2(0, 0), ImGuiCond_Always);
+        ImGui::SetWindowSize(ImVec2(0, 0), ImGuiCond_Always);
+        ImGui::Text("Camera: ");
+        //TODO: replace cameras.
+//        for (int i = 0; i < camList.size(); i++) {
+//            ImGui::SameLine(0);
+//            bool selectedCamera = camList[i] == camera;
+//            if (selectedCamera)
+//                ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive));
+//            if (ImGui::Button(std::to_string(i + 1).c_str()))
+//                SetCamera(i);
+//            if (selectedCamera)
+//                ImGui::PopStyleColor();
+//        }
 
-bool BasicScene::isLeader(int score){
-    int ret = highScores->nextLeaderPos();
-    if( ret == -1) {
-        std::vector<int> scores = this->highScores->extractScores();
-        for (int i = 0; i < scores.size(); i++) {
-            if (score > scores[i]) {
-                ret = i;
-            }
+
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
         }
+        ImGui::End();
     }
-    return ret;
 }
+
+
+
 void BasicScene::buttonStyle() {
     // Set button color to dark green
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.5f, 0.0f, 1.0f));
@@ -813,7 +863,6 @@ void BasicScene::buttonStyle() {
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.0f, 0.3f, 0.0f, 1.0f));
 
 }
-
 void BasicScene::setBoxes() {
     ImGuiStyle& style = ImGui::GetStyle();
     style.Colors[ImGuiCol_CheckMark] = ImVec4(0.0f, 0.5f, 0.0f, 1.0f);
@@ -868,7 +917,6 @@ void BasicScene::setWindow(const char* header) {
 BasicScene::~BasicScene(){
     delete soundManager;
 }
-
 Score* BasicScene::generateRandomScore() {
     // Generate random score between 0 and 100
     std::random_device rd;

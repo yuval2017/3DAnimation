@@ -25,7 +25,6 @@ Data::Data()
     gameSound = true;
     musicVolume = 0.5f;
     soundVolume = 0.5f;
-    back_to_main = false;
     load_data();
 }
 
@@ -175,12 +174,7 @@ const char* Data::msg_c_str() const
     return this->msg.c_str();
 }
 
-void Data::set_back(int val)
-{
-    this->back_to_main = val;
-}
-
-int Data::get_back_to_main()
+std::vector<int> Data::get_back_to_main()
 {
     return this->back_to_main;
 }
