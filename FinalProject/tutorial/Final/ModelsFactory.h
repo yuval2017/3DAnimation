@@ -16,7 +16,7 @@
 #define PHONG_MATERIAL 1
 #define BRICKS_MATERIAL 2
 #define DAYLIGHT_MATERIAL 3
-//1. add model name
+#define GREEN_MATERIAL 4
 #define CUBE 0
 #define CYL 1
 #define SPHERE 2
@@ -24,10 +24,12 @@
 #define TRUCK 4
 #define SNAKE1 5
 #define COIN 6
-#define RABBIT 7
-//2. increment every mesh or material
-#define NUMBER_OF_MATERIALS 4
-#define NUMBER_OF_MESHES 8
+#define TREE 7
+#define FROG 8
+#define MOUSE 9
+//increment every mesh or material
+#define NUMBER_OF_MATERIALS 5
+#define NUMBER_OF_MESHES 10
 
 using namespace cg3d;
 class ModelsFactory {
@@ -46,14 +48,19 @@ public:
     //2) phong
     //3) bricks
     //4) cube map shader
-    //3. meshes
+    //5) frog material
+    //meshes
     std::shared_ptr<Mesh> meshes[NUMBER_OF_MESHES];
-    //1) cube
-    //2) cyls
-    //3) sphere
-    //4 truck
+    //0) cube
+    //1) cyls
+    //2) sphere
+    //3) lines
+    //4) truck
     //5) snake
-    //6) rabbit
+    //6) coin
+    //7) tree
+    //8) frog
+    //9) mouse
 
     std::shared_ptr<Model> CreateModel(int material_id, int mesh_id, std::string name);
     std::shared_ptr<Model> CreateBricksCubeModel();
