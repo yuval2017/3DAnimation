@@ -20,12 +20,17 @@
 #include <vector>
 #include "ModelsFactory.h"
 #include "Calculates.h"
+#include "ObjLoader.h"
 
 Snake::Snake(){
     std::cout<< "Snake :) " << " \n"<< std::endl;
+
 }
 Snake::Snake(const std::shared_ptr<cg3d::Material>& material, const std::shared_ptr<cg3d::Movable>& root, std::shared_ptr<cg3d::Camera> _camera){
     ModelsFactory *factory = ModelsFactory::getInstance();
+
+    auto frog =  factory->CreateModel(GREEN_MATERIAL , FROG , "collision_object");
+    root->AddChild(frog);
 
     //for check
     auto program1 = std::make_shared<Program>("shaders/pickingShader");
