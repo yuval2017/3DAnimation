@@ -54,10 +54,10 @@ void SoundManager::stop_game_music(){
     }
 }
 void SoundManager::play_game_music(){
-    if(!game_music_on) {
+
+        sound_on = true;
         game_music_on = true;
         send_to_pipe(std::string(START_BACKGROUND_MUSIC));
-    }
 }
 void SoundManager::play_sound(const std::string& sound){
     if(sound_on) {
