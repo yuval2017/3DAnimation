@@ -30,7 +30,7 @@ namespace cg3d
         Eigen::Vector3f vector1y = Eigen::Vector3f(0, 1, 0);
         Eigen::Vector3f vector2y;
 
-        if (!basicScene->snake->with_skinning && basicScene->animate)
+        if (false && !basicScene->snake->with_skinning && basicScene->animate)
         {
 
             if (model->name.find("bone") != std::string::npos)
