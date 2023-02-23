@@ -14,6 +14,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include <glad/glad.h>
+#include "ObjLoader.h"
 
 using namespace cg3d;
 
@@ -269,6 +270,9 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
             case GLFW_KEY_B:
                 camera->TranslateInSystem(system, {0, 0, 0.1f});
                 break;
+            case GLFW_KEY_C:
+                statistics->score += 10;
+                break;
             case GLFW_KEY_F:
                 camera->TranslateInSystem(system, {0, 0, -0.1f});
                 break;
@@ -359,24 +363,6 @@ void BasicScene::startMenu() {
 //                highScores->saveToHighScores(scor,pos);
 //            }
 
-            //start menu check .
-            //TODO: replace.
-            Score* scor = generateRandomScore();
-            int pos = highScores->nextLeaderPos();
-            if( pos == -1) {
-                std::vector<int> scores = this->highScores->extractScores();
-                for (int i = 0; i < scores.size(); i++) {
-                    if (scor->score > scores[i]) {
-                        pos = i;
-                    }
-                }
-            }
-            if (pos != -1){
-                highScores->saveToHighScores(scor,pos);
-            }
-//            statistics->menu_flags[MainMenu_OP] = false;
-//            data->set_back(MainMenu_OP);
-//            statistics->menu_flags[StoreMenu_OP] = true;
         }
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
@@ -444,6 +430,11 @@ void BasicScene::PausedMenu()
         std::string tmp = std::to_string(statistics->score);
         ImGui::Text("%s", tmp.c_str());
         ImGui::Spacing();
+        ImGui::Text("Life remain: ");
+        ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
+        std::string tmp11 = std::to_string(data->get_life_bought());
+        ImGui::Text("%s", tmp11.c_str());
+        ImGui::Spacing();
         ImGui::Text("Level: ");
         ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
         std::string tmp2 = std::to_string(statistics->level);
@@ -491,7 +482,6 @@ void BasicScene::PausedMenu()
             statistics->menu_flags[PauseMenu_OP] = false;
             statistics->menu_flags[MainMenu_OP] = true;
             data->back_to_main.clear();
-            //TODO:init statistic and game.
             statistics->reset_game();
 
 
@@ -640,7 +630,10 @@ void BasicScene::NextLevelMenu() {
         buttonStyle();
         if (ImGui::Button("Next level", ImVec2(-1, 0))) {
             //TODO: START NEXT LEVEL.
+            //CHECK INIT SNAKE.
             std::cout << "Next level button pressed in next level menu." << endl;
+            statistics->levelUp = true;
+            statistics->level = statistics->level +1;
         }
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
@@ -732,6 +725,12 @@ void BasicScene::LoseMenu() {
             ImGui::Spacing();
         }
         buttonStyle();
+        if (ImGui::Button("Back to main menu", ImVec2(-1, 0))) {
+            std::cout << "Back button pressed in loose menu." << endl;
+            statistics->menu_flags[GameOverMenu_OP] =false;
+            statistics->menu_flags[MainMenu_OP] =true;
+
+        }
         int pos = highScores->nextLeaderPos();
         if( pos == -1) {
             std::vector<int> scores = this->highScores->extractScores();
@@ -758,20 +757,7 @@ void BasicScene::LoseMenu() {
                 ImGui::Spacing();
             }
         }
-        if (ImGui::Button("Back ", ImVec2(-1, 0))) {
-            std::cout << "Back button pressed in loose menu." << endl;
-            //highScores->saveToHighScores(characterName, game->getTotalMoney());
-            if(data->back_to_main.size() == 0 ){
-                statistics->menu_flags[SettingsMenu_OP] =false;
-                animate = true;
-            }
-            else{
-                statistics->menu_flags[SettingsMenu_OP] =false;
-                int ret = data->back_to_main.back();
-                data->back_to_main.pop_back();
-                statistics->menu_flags[ret] =true;
-            }
-        }
+
         ImGui::PopStyleColor(3);
         ImGui::PopFont();
         endWindow();
@@ -978,4 +964,13 @@ Score* BasicScene::generateRandomScore() {
     ret->name = playerName;
     ret->score = score;
     return ret;
+}
+
+
+
+GameStatistics* BasicScene::getStatistics(){
+    return this->statistics;
+}
+Data* BasicScene::getData(){
+    return this->data;
 }
