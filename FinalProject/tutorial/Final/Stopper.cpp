@@ -30,7 +30,7 @@ void Stopper::resume() {
     start_time_ = std::chrono::high_resolution_clock::now() - elapsed_time_;
     is_running_ = true;
 }
-
+//second and miilisecond
 std::pair<int, int> Stopper::ElapsedSecondsAndMilliseconds() const {
     std::chrono::time_point<std::chrono::high_resolution_clock> end_time;
     if (is_running_) {
