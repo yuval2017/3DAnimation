@@ -148,34 +148,33 @@ void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, con
 
 void BasicScene::MouseCallback(Viewport* viewport, int x, int y, int button, int action, int mods, int buttonState[])
 {
-    // note: there's a (small) chance the button state here precedes the mouse press/release event
-
-    if (action == GLFW_PRESS && animate) { // default mouse button press behavior
-        PickVisitor visitor;
-        visitor.Init();
-        renderer->RenderViewportAtPos(x, y, &visitor); // pick using fixed colors hack
-        auto modelAndDepth = visitor.PickAtPos(x, renderer->GetWindowHeight() - y);
-        renderer->RenderViewportAtPos(x, y); // draw again to avoid flickering
-        pickedModel = modelAndDepth.first ? std::dynamic_pointer_cast<Model>(modelAndDepth.first->shared_from_this()) : nullptr;
-        pickedModelDepth = modelAndDepth.second;
-        camera->GetRotation().transpose();
-        xAtPress = x;
-        yAtPress = y;
-
+//    // note: there's a (small) chance the button state here precedes the mouse press/release event
+//
+//    if (action == GLFW_PRESS && animate) { // default mouse button press behavior
+//        PickVisitor visitor;
+//        visitor.Init();
+//        renderer->RenderViewportAtPos(x, y, &visitor); // pick using fixed colors hack
+//        auto modelAndDepth = visitor.PickAtPos(x, renderer->GetWindowHeight() - y);
+//        renderer->RenderViewportAtPos(x, y); // draw again to avoid flickering
+//        pickedModel = modelAndDepth.first ? std::dynamic_pointer_cast<Model>(modelAndDepth.first->shared_from_this()) : nullptr;
+//        pickedModelDepth = modelAndDepth.second;
+//        camera->GetRotation().transpose();
+//        xAtPress = x;
+//        yAtPress = y;
         // if (pickedModel)
         //     debug("found ", pickedModel->isPickable ? "pickable" : "non-pickable", " model at pos ", x, ", ", y, ": ",
         //           pickedModel->name, ", depth: ", pickedModelDepth);
         // else
         //     debug("found nothing at pos ", x, ", ", y);
 
-        if (pickedModel && !pickedModel->isPickable)
-            pickedModel = nullptr; // for non-pickable models we need only pickedModelDepth for mouse movement calculations later
-
-        if (pickedModel)
-            pickedToutAtPress = pickedModel->GetTout();
-        else
-            cameraToutAtPress = camera->GetTout();
-    }
+//        if (pickedModel && !pickedModel->isPickable)
+//            pickedModel = nullptr; // for non-pickable models we need only pickedModelDepth for mouse movement calculations later
+//
+//        if (pickedModel)
+//            pickedToutAtPress = pickedModel->GetTout();
+//        else
+//            cameraToutAtPress = camera->GetTout();
+//    }
 }
 
 void BasicScene::ScrollCallback(Viewport* viewport, int x, int y, int xoffset, int yoffset, bool dragging, int buttonState[])
@@ -325,7 +324,8 @@ void BasicScene::startMenu() {
             std::cout << "new game button pressed in start menu ." << endl;
             statistics->menu_flags[MainMenu_OP] = false;
             animate = true;
-
+            statistics->objectCollisionStopper->start(3);
+            statistics->selfCollisionStopper->start(3);
         }
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
@@ -657,6 +657,8 @@ void BasicScene::NextLevelMenu() {
         endWindow();
     }
 }
+
+
 void BasicScene::WinMenu() {
     if (statistics->menu_flags[WinMenu_OP]) {
         setWindow("You Won!");
@@ -680,59 +682,69 @@ void BasicScene::WinMenu() {
                 }
             }
         }
+        static bool saved = false;
         if(pos != -1){
             ImGui::Text("Please type your name to save in\nleader board: ");
-            char buffer[1024] = "";  // buffer to store the input string
-            ImGui::InputText("Input", buffer, sizeof(buffer));
+            static char name[256] = ""; // buffer to store the input string
+            ImGui::InputText("Input", name,IM_ARRAYSIZE(name));
             ImGui::Spacing();
             ImGui::Spacing();
-            if (ImGui::Button("Save", ImVec2(-1, 0)) && strlen(buffer) > 0) {
-                Score* scor = new Score ();
-                scor->name = buffer;
+            if (ImGui::Button("Save", ImVec2(-1, 0)) && !saved) {
+                Score *scor = new Score();
+                scor->name = name;
                 scor->score = statistics->score;
-                highScores->saveToHighScores(scor,pos);
+                highScores->saveToHighScores(scor, pos);
+                data->set_message("your score was saved!");
+                saved = true;
+            }
+            else if (saved){
+                data->set_message("your score was already saved");
             }
 
         }
-        for(int i = 0 ; i< 3 ; i++){
+        for (int i = 0; i < 3; i++) {
             ImGui::Spacing();
         }
         if (ImGui::Button("Back ", ImVec2(-1, 0))) {
             std::cout << "Back button pressed in win menu." << endl;
-            if(data->back_to_main.size() == 0 ){
-                statistics->menu_flags[SettingsMenu_OP] =false;
-                animate = true;
-            }
-            else{
-                statistics->menu_flags[SettingsMenu_OP] =false;
-                int ret = data->back_to_main.back();
-                data->back_to_main.pop_back();
-                statistics->menu_flags[ret] =true;
-            }
+                statistics->menu_flags[WinMenu_OP] =false;
+                statistics->menu_flags[MainMenu_OP] =true;
+                data->back_to_main.clear();
+                //TODO:reset game.
+
         }
-        ImGui::PopStyleColor(3);
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
         ImGui::PopFont();
+        ImGui::PushFont(messageFont);
+        ImGui::Text("%s", data->msg_c_str());
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
+        ImGui::PopFont();
+        ImGui::PopStyleColor(3);
         endWindow();
     }
 }
 void BasicScene::LoseMenu() {
-
     if (statistics->menu_flags[GameOverMenu_OP]) {
         setWindow("Game Over!");
         ImGui::PushFont(regularFont);
-        ImGui::Text("ohhh you died...");
-        for(int i = 0; i< 3 ; i++){
+        ImGui::Text("You lost..\nMaybe you will succeed next time.");
+        for (int i = 0; i < 8; i++) {
+            ImGui::Spacing();
+        }
+        ImGui::Text("Your total score until now is ");
+        ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
+        std::string tmp = std::to_string(statistics->score);
+        ImGui::Text("%s", tmp.c_str());
+        for (int i = 0; i < 3; i++) {
             ImGui::Spacing();
         }
         buttonStyle();
-        if (ImGui::Button("Back to main menu", ImVec2(-1, 0))) {
-            std::cout << "Back button pressed in loose menu." << endl;
-            statistics->menu_flags[GameOverMenu_OP] =false;
-            statistics->menu_flags[MainMenu_OP] =true;
-
-        }
         int pos = highScores->nextLeaderPos();
-        if( pos == -1) {
+        if (pos == -1) {
             std::vector<int> scores = this->highScores->extractScores();
             for (int i = 0; i < scores.size(); i++) {
                 if (statistics->score > scores[i]) {
@@ -740,27 +752,51 @@ void BasicScene::LoseMenu() {
                 }
             }
         }
-        if(pos != -1) {
-            ImGui::Text("Please type your name to save in\nleader board: ");
-            char buffer[1024] = "";  // buffer to store the input string
-            ImGui::InputText("Input", buffer, sizeof(buffer));
-            ImGui::Spacing();
-            ImGui::Spacing();
-            if (ImGui::Button("Save", ImVec2(-1, 0)) && strlen(buffer) > 0) {
-                Score* scor = new Score ();
-                scor->name = buffer;
-                scor->score = statistics->score;
-                highScores->saveToHighScores(scor,pos);
-            }
-
-            for(int i = 0 ; i< 3 ; i++){
-                ImGui::Spacing();
-            }
+        static bool saved = false;
+        if(pos != -1){
+        ImGui::Text("Please type your name to save in\nleader board: ");
+        static char name[256] = ""; // buffer to store the input string
+        ImGui::InputText("Input", name,IM_ARRAYSIZE(name));
+        ImGui::Spacing();
+        ImGui::Spacing();
+        if (ImGui::Button("Save", ImVec2(-1, 0)) && !saved) {
+            Score *scor = new Score();
+            scor->name = name;
+            scor->score = statistics->score;
+            highScores->saveToHighScores(scor, pos);
+            data->set_message("your score was saved!");
+            saved = true;
+        }
+        else if (saved){
+            data->set_message("your score was already saved");
         }
 
-        ImGui::PopStyleColor(3);
+         }
+        for (int i = 0; i < 3; i++) {
+            ImGui::Spacing();
+        }
+        if (ImGui::Button("Back ", ImVec2(-1, 0))) {
+            std::cout << "Back button pressed in win menu." << endl;
+            statistics->menu_flags[GameOverMenu_OP] = false;
+            statistics->menu_flags[MainMenu_OP] = true;
+            data->back_to_main.clear();
+            //TODO:reset game.
+            saved= false;
+        }
+
+        for (int i = 0; i < 3; i++) {
+            ImGui::Spacing();
+        }
         ImGui::PopFont();
+        ImGui::PushFont(messageFont);
+        ImGui::Text("%s", data->msg_c_str());
+        for (int i = 0; i < 3; i++) {
+            ImGui::Spacing();
+        }
+        ImGui::PopFont();
+        ImGui::PopStyleColor(3);
         endWindow();
+
     }
 }
 void BasicScene::StoreMenu() {
@@ -795,7 +831,7 @@ void BasicScene::StoreMenu() {
             std::cout << "Back button pressed in store menu." << endl;
             statistics->menu_flags[StoreMenu_OP] = false;
             if(data->back_to_main.size() == 0 ){
-                animate =true;
+                statistics->menu_flags[MainMenu_OP] = true;
             }
             else{
                 statistics->menu_flags[data->back_to_main.back()] = true;
@@ -811,8 +847,8 @@ void BasicScene::StoreMenu() {
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
-        ImGui::PopStyleColor(3);
         ImGui::PopFont();
+        ImGui::PopStyleColor(3);
         endWindow();
     }
 }
@@ -865,18 +901,6 @@ void BasicScene::PlayMenu()
         ImGui::SetWindowSize(ImVec2(0, 0), ImGuiCond_Always);
         ImGui::Text("Camera: ");
         //TODO: replace cameras.
-//        for (int i = 0; i < camList.size(); i++) {
-//            ImGui::SameLine(0);
-//            bool selectedCamera = camList[i] == camera;
-//            if (selectedCamera)
-//                ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive));
-//            if (ImGui::Button(std::to_string(i + 1).c_str()))
-//                SetCamera(i);
-//            if (selectedCamera)
-//                ImGui::PopStyleColor();
-//        }
-
-
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
@@ -908,6 +932,7 @@ void BasicScene::endWindow() {
     ImGui::PopFont();
     ImGui::PopStyleColor();
     ImGui::End();
+    data->set_message("");
 }
 void BasicScene::setWindow(const char* header) {
     ImGui::SetNextWindowPos(startPos);

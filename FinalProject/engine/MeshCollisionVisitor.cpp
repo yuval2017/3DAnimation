@@ -43,6 +43,8 @@ void MeshCollisionVisitor::handle_self_hit() {
     }
     else{
         basicScene->animate = false;
+        basicScene->getStatistics()->objectCollisionStopper->reset();
+        basicScene->getStatistics()->selfCollisionStopper->reset();
         basicScene->getStatistics()->menu_flags[GameOverMenu_OP] = true;
     }
 }
