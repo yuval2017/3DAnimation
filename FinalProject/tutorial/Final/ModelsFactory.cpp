@@ -40,7 +40,7 @@ ModelsFactory::ModelsFactory(){
     meshes[COIN] = ObjLoader::MeshFromObj("coin_mesh", {"data/coin.obj"});
     //meshes[TREE] = ObjLoader::MeshFromObj("tree_mesh",{"data/tree2.obj"} );
     meshes[FROG] = {IglLoader::MeshFromFiles("frog_mesh", "data/frog/Frog.obj")};
-    meshes[MOUSE] = {IglLoader::MeshFromFiles("mouse_mesh", "data/mouse/Frog.obj")};
+    meshes[MOUSE] = {IglLoader::MeshFromFiles("mouse_mesh", "data/mouse/Mouse.obj")};
     //need to implement but not in lines
     meshes[LINES] = NULL;
     meshes[SNAKE1] = ObjLoader::MeshFromObj("snake_mesh", {"data/snake1.obj"});

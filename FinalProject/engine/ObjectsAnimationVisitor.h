@@ -11,7 +11,7 @@
 #include <random>
 #include <algorithm>
 #include <cmath>
-#include "Calculates.h"
+#include "../tutorial/Final/Calculates.h"
 namespace cg3d {
     class ObjectsAnimationVisitor : public Visitor {
     public:
@@ -26,7 +26,6 @@ namespace cg3d {
         void CreateLevel1(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords);
         void CreateLevel2(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords);
         void CreateLevel3(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords);
-        void setRandomObjectLocations(int numFrogs, int numMice, double cubeSize, double domainX, double domainY, double domainZ, std::vector<Calculates::ObjectInfo>& locations);
 
 
     private:

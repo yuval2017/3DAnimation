@@ -53,6 +53,7 @@ public:
     bool doCubesIntersect(const Eigen::Vector3d& c1, const Eigen::Vector3d& c2, double cubeSize);
     void setRandomCubeLocations(double domainX, double domainY, double domainZ,
                                 int numCubes, double cubeSize, std::vector<ObjectInfo> &cubes);
+    void setRandomObjectLocations(int numFrogs, int numMice, double cubeSize, double domainX, double domainY, double domainZ, std::vector<Calculates::ObjectInfo>& locations);
     std::vector<TexCoord>
     getVertexTextureCoordinates(std::vector<Vertex> vertices, std::vector<Face> faces, std::string imagePath);
     std::vector<TexCoord> getVertexTextureCoordinates(Eigen::MatrixXd vertices, Eigen::MatrixXi faces, std::string imagePath);

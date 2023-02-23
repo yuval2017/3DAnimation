@@ -405,7 +405,7 @@ void Calculates::setRandomCubeLocations(double domainX, double domainY, double d
         // Check if cube intersects with any other cubes
         bool intersects = false;
         for (const auto& c : cubes) {
-            if (doCubesIntersect(p, c->position, cubeSize)) {
+            if (doCubesIntersect(p, c.position, cubeSize)) {
                 intersects = true;
                 break;
             }
@@ -415,9 +415,9 @@ void Calculates::setRandomCubeLocations(double domainX, double domainY, double d
         }
 
         // Add cube center to vector
-        ObjectInfo* object;
-        object->position = p;
-        object->type = 'c';
+        ObjectInfo object;
+        object.position = p;
+        object.type = 'c';
         cubes.push_back(object);
     }
 
@@ -446,15 +446,15 @@ void Calculates::setRandomObjectLocations( int numFrogs, int numMice, double cub
             newLoc = Vector3d::Random().normalized() * ((domainX + domainY + domainZ) / 6) * 0.9; // Spread evenly in the system
             validLocation = true;
             for (const auto& loc : locations) {
-                if ((loc->position - newLoc).norm() < minDist) {
+                if ((loc.position - newLoc).norm() < minDist) {
                     validLocation = false;
                     break;
                 }
             }
         }
-        ObjectInfo* object;
-        object->position = newLoc;
-        object->type = 'f';
+        ObjectInfo object;
+        object.position = newLoc;
+        object.type = 'f';
         locations.push_back(object);
     }
 
@@ -466,15 +466,15 @@ void Calculates::setRandomObjectLocations( int numFrogs, int numMice, double cub
             newLoc = Vector3d::Random().normalized() * ((domainX + domainY + domainZ) / 6) * 0.9; // Spread evenly in the system
             validLocation = true;
             for (const auto& loc : locations) {
-                if ((loc->position - newLoc).norm() < minDist) {
+                if ((loc.position - newLoc).norm() < minDist) {
                     validLocation = false;
                     break;
                 }
             }
         }
-        ObjectInfo* object;
-        object->position = newLoc;
-        object->type = 'm';
+        ObjectInfo object;
+        object.position = newLoc;
+        object.type = 'm';
         locations.push_back(object);
     }
 }

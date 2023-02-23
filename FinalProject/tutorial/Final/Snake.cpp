@@ -30,7 +30,7 @@ Snake::Snake(const std::shared_ptr<cg3d::Material>& material, const std::shared_
     ModelsFactory *factory = ModelsFactory::getInstance();
 
     auto frog =  factory->CreateModel(GREEN_MATERIAL , MOUSE , "collision_object");
-    frog->Scale(0.3f);
+    //frog->Scale(0.3f);
     root->AddChild(frog);
 
     //for check
