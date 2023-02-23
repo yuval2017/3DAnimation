@@ -29,7 +29,8 @@ Snake::Snake(){
 Snake::Snake(const std::shared_ptr<cg3d::Material>& material, const std::shared_ptr<cg3d::Movable>& root, std::shared_ptr<cg3d::Camera> _camera){
     ModelsFactory *factory = ModelsFactory::getInstance();
 
-    auto frog =  factory->CreateModel(GREEN_MATERIAL , FROG , "collision_object");
+    auto frog =  factory->CreateModel(GREEN_MATERIAL , MOUSE , "collision_object");
+    frog->Scale(0.3f);
     root->AddChild(frog);
 
     //for check

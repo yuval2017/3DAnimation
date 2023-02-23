@@ -118,7 +118,7 @@ void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, con
     Scene::Update(program, proj, view, model);
     if(program.name == "green"){
         program.SetUniform4f("lightColor", 0.7f, 0.7f, 0.7f, 0.7f);
-        program.SetUniform4f("Kai", 0.1333f, 0.5451f, 0.1333f, 1.0f);
+        program.SetUniform4f("Kai", 0.1333f, 0.5451f, 0.1333f, 0.0f);
         program.SetUniform4f("Kdi", 0.5f, 0.5f, 0.0f, 1.0f);
         program.SetUniform1f("specular_exponent", 5.0f);
         program.SetUniform4f("light_position", 0.0, 15.0f, 0.0, 1.0f);

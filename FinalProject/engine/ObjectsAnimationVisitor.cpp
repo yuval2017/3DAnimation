@@ -12,6 +12,7 @@
 #include "../tutorial/Final//ObjectsNames.h"
 #include "../tutorial/Final//ModelsFactory.h"
 
+
 void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
     basicScene = (BasicScene *)scene;
     if(!is_visitor_inited){
@@ -27,6 +28,7 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
         std::shared_ptr<Model> truck = generateObjectBezier(PHONG_MATERIAL,TRUCK, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
         generateObjectBezier(PHONG_MATERIAL,SPHERE, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
         generateObjectBezier(PHONG_MATERIAL,CUBE, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
+
 //        auto coin = ModelsFactory::getInstance()->CreateModel(BASIC_MATERIAL,COIN,"coin");
 //       auto program = std::make_shared<Program>("shaders/basicShader");
 //
@@ -61,6 +63,7 @@ void ObjectsAnimationVisitor::Visit(Model *model) {
         }
     }
 }
+
 std::shared_ptr<Model> ObjectsAnimationVisitor::generateObjectBezier(int material_id ,int model_id, std::string name, float scale){
     std::shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(material_id,model_id,name);
     basicScene->GetRoot()->AddChild(cube);
@@ -82,6 +85,7 @@ void ObjectsAnimationVisitor::setModelBezier(Eigen::Vector3f vectors,std::shared
 float ObjectsAnimationVisitor::generate_random_number(float min, float max) {
     return min + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(max-min)));
 }
+
 void ObjectsAnimationVisitor::moveAccordingToBeizerCurve(Model *model) {
     Eigen::RowVector4f Ti;
     Ti[0] = powf(model->t, 3);
@@ -145,13 +149,12 @@ void ObjectsAnimationVisitor::CreateLevel1(std::vector<shared_ptr<Model>> &model
     std::vector<double> objects_in_space_y = Calculates::getInstance()->linspace(5,y_length/2,n);
     std::vector<double> objects_in_space_x = Calculates::getInstance()->linspace(5,x_length/2,n);
     int scale = 3;
-    std::vector<Eigen::Vector3d> cubes;
+    std::vector<Calculates::ObjectInfo> cubes;
     Calculates::getInstance()->setRandomCubeLocations(x_length, y_length, z_length, n,  scale, cubes);
-
 
     for (int i = 0; i < n; i++) {
         //Eigen::Vector3f position = {objects_in_space_x[i],objects_in_space_y[i],objects_in_space_z[i]};
-        Eigen::Vector3f position = cubes[i].cast<float>();
+        Eigen::Vector3f position = cubes[i].position.cast<float>();
         coords.push_back(position);
         std::shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(BRICKS_MATERIAL,CUBE,"test");
         basicScene->GetRoot()->AddChild(cube);
@@ -160,6 +163,7 @@ void ObjectsAnimationVisitor::CreateLevel1(std::vector<shared_ptr<Model>> &model
     }
 
 }
+
 
 
 

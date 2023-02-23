@@ -11,14 +11,12 @@
 #include <random>
 #include <algorithm>
 #include <cmath>
+#include "Calculates.h"
 namespace cg3d {
     class ObjectsAnimationVisitor : public Visitor {
-
     public:
         void Run(Scene *scene, Camera *camera) override;
         void Visit(Model *model) override;
-        void GenerateCubeObject(const std::shared_ptr<Material>& _material, std::string prefix);
-        void GenerateSphereObject(const std::shared_ptr<Material>& _material, std::string prefix);
         void moveAccordingToBeizerCurve(Model *model);
         void setModelBezier(Eigen::Vector3f vectors, std::shared_ptr<Model> model);
         std::shared_ptr<Model> generateObjectBezier(int material_id, int model_id, std::string name, float scale);
@@ -26,9 +24,11 @@ namespace cg3d {
         Eigen::Vector3f calcForDraw(float ti, std::shared_ptr<Model> model);
         std::vector<double> linspace(float start_in, float end_in, int num_in);
         void CreateLevel1(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords);
-        bool doCubesIntersect(const Eigen::Vector3d& c1, const Eigen::Vector3d& c2, double cubeSize);
-        void setRandomCubeLocations(double domainX, double domainY, double domainZ,
-                                    int numCubes, double cubeSize, std::vector<Eigen::Vector3d> &cubes);
+        void CreateLevel2(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords);
+        void CreateLevel3(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords);
+        void setRandomObjectLocations(int numFrogs, int numMice, double cubeSize, double domainX, double domainY, double domainZ, std::vector<Calculates::ObjectInfo>& locations);
+
+
     private:
         std::shared_ptr<Material> material;
         std::shared_ptr<Program> program;
@@ -41,8 +41,6 @@ namespace cg3d {
         float minz = -5.0f;
         float maxz = 5.0f;
         float generate_random_number(float min, float max);
-
-
     };
 }
 

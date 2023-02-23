@@ -6,9 +6,14 @@
 #include <cmath>
 #include <random>
 #include <vector>
-#include <fstream>
+#include <iostream>
+#include <Eigen/Core>
+#include <Eigen/Geometry>
 
+using namespace Eigen;
 using namespace std;
+
+
 Calculates *Calculates::instancePtr = NULL;
 vector<TexCoord> Calculates::calculateTextureCoordinates(vector<Vertex> vertices, vector<Face> faces, const std::string& filename ) {
     vector<TexCoord> texCoords;
@@ -375,17 +380,15 @@ bool Calculates::isBoxesIntersect(Eigen::AlignedBox<double, 3>& boxA, Eigen::Ali
 }
 
 void Calculates::setRandomCubeLocations(double domainX, double domainY, double domainZ,
-                                                     int numCubes, double cubeSize, std::vector<Eigen::Vector3d> &cubes) {
+                                                     int numCubes, double cubeSize, std::vector<ObjectInfo> &cubes) {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> disX(-domainX/2 + cubeSize/2, domainX/2 - cubeSize/2);
     std::uniform_real_distribution<> disY(-domainY/2 + cubeSize/2, domainY/2 - cubeSize/2);
     std::uniform_real_distribution<> disZ(-domainZ/2 + cubeSize/2, domainZ/2 - cubeSize/2);
 
-    std::vector<Eigen::Vector3d> cubeCenters;
-    cubeCenters.reserve(numCubes);
 
-    while (cubeCenters.size() < numCubes) {
+    while (cubes.size() < numCubes) {
         // Generate random cube center
         double x = disX(gen);
         double y = disY(gen);
@@ -401,8 +404,8 @@ void Calculates::setRandomCubeLocations(double domainX, double domainY, double d
 
         // Check if cube intersects with any other cubes
         bool intersects = false;
-        for (const auto& c : cubeCenters) {
-            if (doCubesIntersect(p, c, cubeSize)) {
+        for (const auto& c : cubes) {
+            if (doCubesIntersect(p, c->position, cubeSize)) {
                 intersects = true;
                 break;
             }
@@ -412,9 +415,12 @@ void Calculates::setRandomCubeLocations(double domainX, double domainY, double d
         }
 
         // Add cube center to vector
-        cubeCenters.push_back(p);
+        ObjectInfo* object;
+        object->position = p;
+        object->type = 'c';
+        cubes.push_back(object);
     }
-    cubes = cubeCenters;
+
 
 }
 
@@ -424,53 +430,51 @@ bool Calculates::doCubesIntersect(const Eigen::Vector3d& c1, const Eigen::Vector
                          (c1.z() - c2.z()) * (c1.z() - c2.z()));
     return d < 2 * cubeSize;
 }
-void Calculates::setUniformCubeLocations(double domainX, double domainY, double domainZ,
-                                          int numCubes, double cubeSize, std::vector<Eigen::Vector3d> &cubes) {
-    std::random_device rd;
-    std::mt19937 gen(rd());
 
-    int cellsX = std::max(static_cast<int>(std::floor(domainX / cubeSize)), 1);
-    int cellsY = std::max(static_cast<int>(std::floor(domainY / cubeSize)), 1);
-    int cellsZ = std::max(static_cast<int>(std::floor(domainZ / cubeSize)), 1);
 
-    std::vector<Eigen::Vector3d> cubeCenters;
-    cubeCenters.reserve(numCubes);
 
-    for (int i = 0; i < cellsX; ++i) {
-        for (int j = 0; j < cellsY; ++j) {
-            for (int k = 0; k < cellsZ; ++k) {
-                double x = domainX / cellsX * (i + 0.5) - domainX / 2.0;
-                double y = domainY / cellsY * (j + 0.5) - domainY / 2.0;
-                double z = domainZ / cellsZ * (k + 0.5) - domainZ / 2.0;
-                Eigen::Vector3d p = {x, y, z};
-                double distFromOrigin = std::sqrt(x*x + y*y + z*z);
-                if (distFromOrigin < 10.0) {
-                    continue;
-                }
+void Calculates::setRandomObjectLocations( int numFrogs, int numMice, double cubeSize, double domainX, double domainY, double domainZ, std::vector<ObjectInfo> &locations) {
 
-                bool intersects = false;
-                for (const auto& c : cubeCenters) {
-                    if (doCubesIntersect(p, c, cubeSize)) {
-                        intersects = true;
-                        break;
-                    }
-                }
+    // Calculate minimum distance between objects
+    double minDist = cubeSize + 10;
 
-                if (!intersects) {
-                    cubeCenters.push_back(p);
-                }
-
-                if (cubeCenters.size() >= numCubes) {
+    // Add frogs
+    for (int i = 0; i < numFrogs; ++i) {
+        bool validLocation = false;
+        Vector3d newLoc;
+        while (!validLocation) {
+            newLoc = Vector3d::Random().normalized() * ((domainX + domainY + domainZ) / 6) * 0.9; // Spread evenly in the system
+            validLocation = true;
+            for (const auto& loc : locations) {
+                if ((loc->position - newLoc).norm() < minDist) {
+                    validLocation = false;
                     break;
                 }
             }
-            if (cubeCenters.size() >= numCubes) {
-                break;
+        }
+        ObjectInfo* object;
+        object->position = newLoc;
+        object->type = 'f';
+        locations.push_back(object);
+    }
+
+    // Add mice
+    for (int i = 0; i < numMice; ++i) {
+        bool validLocation = false;
+        Vector3d newLoc;
+        while (!validLocation) {
+            newLoc = Vector3d::Random().normalized() * ((domainX + domainY + domainZ) / 6) * 0.9; // Spread evenly in the system
+            validLocation = true;
+            for (const auto& loc : locations) {
+                if ((loc->position - newLoc).norm() < minDist) {
+                    validLocation = false;
+                    break;
+                }
             }
         }
-        if (cubeCenters.size() >= numCubes) {
-            break;
-        }
+        ObjectInfo* object;
+        object->position = newLoc;
+        object->type = 'm';
+        locations.push_back(object);
     }
-    cubes = cubeCenters;
 }

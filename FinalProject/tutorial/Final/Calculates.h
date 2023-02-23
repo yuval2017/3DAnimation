@@ -31,6 +31,11 @@ private:
     static Calculates* instancePtr;
     Calculates(){}
 public:
+    struct ObjectInfo {
+        Eigen::Vector3d position; // position of the object
+        char type; // distance from center to edge of the object
+    };
+
     Calculates(const Calculates& obj) = delete;
     static Calculates *getInstance(){
         if (instancePtr == NULL){
@@ -47,17 +52,11 @@ public:
     void generateRandomBeizierCurve(Eigen::Vector3f vector, Eigen::Matrix <float, 4, 3 > &MG_Result);
     bool doCubesIntersect(const Eigen::Vector3d& c1, const Eigen::Vector3d& c2, double cubeSize);
     void setRandomCubeLocations(double domainX, double domainY, double domainZ,
-                                int numCubes, double cubeSize, std::vector<Eigen::Vector3d> &cubes);
-    void setUniformCubeLocations(double domainX, double domainY, double domainZ,
-                                 int numCubes, double cubeSize, std::vector<Eigen::Vector3d> &cubes);
-
+                                int numCubes, double cubeSize, std::vector<ObjectInfo> &cubes);
     std::vector<TexCoord>
     getVertexTextureCoordinates(std::vector<Vertex> vertices, std::vector<Face> faces, std::string imagePath);
     std::vector<TexCoord> getVertexTextureCoordinates(Eigen::MatrixXd vertices, Eigen::MatrixXi faces, std::string imagePath);
 
-    bool
-    doCubesIntersect(const Eigen::Vector3d &c1, const Eigen::Vector3d &c2, double cubeSize,
-                     vector<Eigen::Vector3d> &cubes);
 };
 
 
