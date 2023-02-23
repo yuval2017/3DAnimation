@@ -15,6 +15,7 @@
 
 void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
     basicScene = (BasicScene *)scene;
+
     if(!is_visitor_inited){
         //don't need to init it anymore
         is_visitor_inited = true;
@@ -22,7 +23,6 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
         //material1
         material =  std::make_shared<Material>("material", program); // empty material
         material->AddTexture(0, "textures/box0.bmp", 2);
-
 
         generateObjectBezier(BRICKS_MATERIAL,SPHERE, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
         std::shared_ptr<Model> truck = generateObjectBezier(PHONG_MATERIAL,TRUCK, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
@@ -38,12 +38,47 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
 //        basicScene->GetRoot()->AddChild(coin);
 //        coin->Translate(Eigen::Vector3f(0.0f,0.0f,0.0f) - coin->GetPosition());
 //        coin->Scale(3.0f);
-        std::vector<std::shared_ptr<Model>> models;
-        std::vector<Eigen::Vector3f> coords;
-        //CreateLevel1(models, coords);
 
+        CreateLevel1(models, coords);
+    }
+    if(basicScene->getStatistics()->levelUp){
+        //TODO: if need to go to next level.
+        removeFormerlevel();
+        loadNextLevel(basicScene->getStatistics()->level+1);
+    }
+    if(basicScene->getStatistics()->restart){
+        removeFormerlevel();
+        loadNextLevel(1);
+        basicScene->getStatistics()->restart = false;
     }
     Visitor::Run(scene, camera);
+}
+
+void ObjectsAnimationVisitor::removeFormerlevel(){
+
+    for(shared_ptr<Model> model : models) {
+        if (model != nullptr) {
+            basicScene->GetRoot()->RemoveChild(model);
+        }
+    }
+
+}
+void ObjectsAnimationVisitor::loadNextLevel(int nextLevel){
+    switch (nextLevel) {
+        case 1:
+            CreateLevel1(models, coords);
+            break;
+        case 2:
+            CreateLevel2(models, coords);
+            break;
+        case 3:
+            CreateLevel3(models, coords);
+            break;
+        default:
+            //level 1;
+            CreateLevel1(models, coords);
+            break;
+    }
 }
 
 void ObjectsAnimationVisitor::Visit(Model *model) {
@@ -72,7 +107,6 @@ std::shared_ptr<Model> ObjectsAnimationVisitor::generateObjectBezier(int materia
     cube->Translate(location);
     cube->Scale(scale,Movable::Axis::XYZ);
     setModelBezier(location,cube);
-    cube->stopper.start();
     cube->GetTreeWithCube();
     return cube;
 }
@@ -133,18 +167,42 @@ void ObjectsAnimationVisitor::drawTheBeizerCurve(std::shared_ptr<Model> model) {
 
 }
 
-void ObjectsAnimationVisitor::CreateLevel1(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords) {
-    int n = 200;
+shared_ptr<Model> createFrog(){
+    ModelsFactory* factory = ModelsFactory::getInstance();
+    auto frog =  factory->CreateModel(GREEN_MATERIAL , FROG , std::string (COLLISION_OBJECT) + " PRICE "+ std::string(FROG_NAME));
+    frog->Scale(0.4f);
+    frog->Rotate(-M_PI/2, Movable::Axis::X);
+    frog->Rotate(M_PI, Movable::Axis::Z);
+    frog->Translate(Eigen::Vector3f{5,0,10});
+    frog->material->program->name = "green";
+    return frog;
+}
 
+
+shared_ptr<Model> createMouse(){
+
+    ModelsFactory* factory = ModelsFactory::getInstance();
+    auto mouse =  factory->CreateModel(GREY_MATERIAL , MOUSE ,std::string(COLLISION_OBJECT)+" price mouse");
+    mouse->Scale(0.6f);
+    mouse->Rotate(-M_PI/2, Movable::Axis::X);
+    mouse->Translate(Eigen::Vector3f{-10,0,10});
+    mouse->material->program->name = "grey";
+    return mouse;
+}
+
+
+
+
+
+void ObjectsAnimationVisitor::CreateLevel1(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords) {
+    int n = 20;
+    models.resize(0);
+    coords.resize(0);
     Eigen::Vector3d max = basicScene->level1->GetMeshList()[0]->data[0].vertices.colwise().maxCoeff();
     Eigen::Vector3d min = basicScene->level1->GetMeshList()[0]->data[0].vertices.colwise().minCoeff();
-
     double z_length = max[2]*basicScene->level1->scale_factor[2] - min[2]*basicScene->level1->scale_factor[2];
     double y_length = max[1]*basicScene->level1->scale_factor[1] - min[1]*basicScene->level1->scale_factor[1];
     double x_length = max[0]*basicScene->level1->scale_factor[0] - min[0]*basicScene->level1->scale_factor[0];
-    double dist_between_objects_z = z_length/n;
-    double dist_between_objects_y = y_length/n;
-    double dist_between_objects_x = x_length/n;
     std::vector<double> objects_in_space_z = Calculates::getInstance()->linspace(5,z_length/2,n);
     std::vector<double> objects_in_space_y = Calculates::getInstance()->linspace(5,y_length/2,n);
     std::vector<double> objects_in_space_x = Calculates::getInstance()->linspace(5,x_length/2,n);
@@ -164,10 +222,63 @@ void ObjectsAnimationVisitor::CreateLevel1(std::vector<shared_ptr<Model>> &model
 
 }
 
+void ObjectsAnimationVisitor::CreateLevel2(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords) {
+    int n = 30;
+    models.resize(0);
+    coords.resize(0);
+    Eigen::Vector3d max = basicScene->level1->GetMeshList()[0]->data[0].vertices.colwise().maxCoeff();
+    Eigen::Vector3d min = basicScene->level1->GetMeshList()[0]->data[0].vertices.colwise().minCoeff();
+    double z_length = max[2]*basicScene->level1->scale_factor[2] - min[2]*basicScene->level1->scale_factor[2];
+    double y_length = max[1]*basicScene->level1->scale_factor[1] - min[1]*basicScene->level1->scale_factor[1];
+    double x_length = max[0]*basicScene->level1->scale_factor[0] - min[0]*basicScene->level1->scale_factor[0];
+    std::vector<double> objects_in_space_z = Calculates::getInstance()->linspace(5,z_length/2,n);
+    std::vector<double> objects_in_space_y = Calculates::getInstance()->linspace(5,y_length/2,n);
+    std::vector<double> objects_in_space_x = Calculates::getInstance()->linspace(5,x_length/2,n);
+    int scale = 4;
+    std::vector<Calculates::ObjectInfo> cubes;
+    Calculates::getInstance()->setRandomCubeLocations(x_length, y_length, z_length, n,  scale, cubes);
+
+    for (int i = 0; i < n; i++) {
+        //Eigen::Vector3f position = {objects_in_space_x[i],objects_in_space_y[i],objects_in_space_z[i]};
+        Eigen::Vector3f position = cubes[i].position.cast<float>();
+        coords.push_back(position);
+        std::shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(BRICKS_MATERIAL,CUBE,"test");
+        basicScene->GetRoot()->AddChild(cube);
+        cube->Translate(position);
+        cube->Scale(scale);
+    }
+
+}
 
 
 
+void ObjectsAnimationVisitor::CreateLevel3(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords) {
+    int n = 40;
+    models.resize(0);
+    coords.resize(0);
+    Eigen::Vector3d max = basicScene->level1->GetMeshList()[0]->data[0].vertices.colwise().maxCoeff();
+    Eigen::Vector3d min = basicScene->level1->GetMeshList()[0]->data[0].vertices.colwise().minCoeff();
+    double z_length = max[2]*basicScene->level1->scale_factor[2] - min[2]*basicScene->level1->scale_factor[2];
+    double y_length = max[1]*basicScene->level1->scale_factor[1] - min[1]*basicScene->level1->scale_factor[1];
+    double x_length = max[0]*basicScene->level1->scale_factor[0] - min[0]*basicScene->level1->scale_factor[0];
+    std::vector<double> objects_in_space_z = Calculates::getInstance()->linspace(5,z_length/2,n);
+    std::vector<double> objects_in_space_y = Calculates::getInstance()->linspace(5,y_length/2,n);
+    std::vector<double> objects_in_space_x = Calculates::getInstance()->linspace(5,x_length/2,n);
+    int scale = 5;
+    std::vector<Calculates::ObjectInfo> cubes;
+    Calculates::getInstance()->setRandomCubeLocations(x_length, y_length, z_length, n,  scale, cubes);
 
+    for (int i = 0; i < n; i++) {
+        //Eigen::Vector3f position = {objects_in_space_x[i],objects_in_space_y[i],objects_in_space_z[i]};
+        Eigen::Vector3f position = cubes[i].position.cast<float>();
+        coords.push_back(position);
+        std::shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(BRICKS_MATERIAL,CUBE,"test");
+        basicScene->GetRoot()->AddChild(cube);
+        cube->Translate(position);
+        cube->Scale(scale);
+    }
+
+}
 
 
 

@@ -10,12 +10,9 @@
 #include <igl/deform_skeleton.h>
 #include <igl/dqs.h>
 #include <igl/per_vertex_normals.h>
-
-
+#include "Movable.h"
 #include <igl/opengl/glfw/imgui/ImGuiMenu.h>
-
 #include <imgui/imgui.h>
-
 #include <iostream>
 #include <vector>
 #include "ModelsFactory.h"

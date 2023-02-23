@@ -478,3 +478,40 @@ void Calculates::setRandomObjectLocations( int numFrogs, int numMice, double cub
         locations.push_back(object);
     }
 }
+
+Eigen::Vector3d Calculates::generatePointInSystem(const double x, const double y, const double z, const Eigen::Vector3d& center, const double n)
+{
+    // create random number generator
+    std::random_device rd;
+    std::mt19937 gen(rd());
+
+    // create uniform distribution for x, y, and z
+    std::uniform_real_distribution<> disX(-x/2.0, x/2.0);
+    std::uniform_real_distribution<> disY(-y/2.0, y/2.0);
+    std::uniform_real_distribution<> disZ(-z/2.0, z/2.0);
+
+    Eigen::Vector3d point;
+    bool validPoint = false;
+
+    // loop until a valid point is generated
+    while(!validPoint)
+    {
+        // generate random coordinates within the bounds of the system
+        const double newX = disX(gen);
+        const double newY = disY(gen);
+        const double newZ = disZ(gen);
+
+        // create a vector from the center point to the new point
+        const Eigen::Vector3d diff = Eigen::Vector3d(newX, newY, newZ) - center;
+
+        // check if the new point is at least n units away from the center point
+        if(diff.norm() >= n)
+        {
+            // if the point is valid, set it and exit the loop
+            point = Eigen::Vector3d(newX, newY, newZ);
+            validPoint = true;
+        }
+    }
+
+    return point;
+}

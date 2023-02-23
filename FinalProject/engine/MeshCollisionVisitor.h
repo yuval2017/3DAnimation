@@ -22,8 +22,9 @@ public:
             override;
 //            void Visit(Scene *scene)
 //            override;
-            void Visit(Model *model)
-            override;
+            void Visit(Model *model) override;
+            void handle_object_hit(Model *model);
+            void handle_self_hit();
 
 protected:
     BasicScene *basicScene;

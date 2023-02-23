@@ -17,7 +17,8 @@
 #define PlayMenu_OP                 8
 #define SPEED_COST                  50
 #define LIFE_COST                   30
-//#include "Stopper.h"
+
+#include "Stopper.h"
 
 using namespace std;
 
@@ -33,15 +34,16 @@ public:
     int level;
     int score ;
     int num_of_strikes;
-    bool object_collision;
-    bool self_collision;
+    int strikes_used;
     bool double_score;
     float speed ;
     void reset_level_data();
     float get_progress();
-
+    bool levelUp;
+    bool restart;
     void reset_game();
-
+    Stopper* selfCollisionStopper;
+    Stopper* objectCollisionStopper;
 private :
     static GameStatistics* instance;
     GameStatistics();

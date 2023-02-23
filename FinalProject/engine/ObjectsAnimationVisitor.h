@@ -26,9 +26,12 @@ namespace cg3d {
         void CreateLevel1(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords);
         void CreateLevel2(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords);
         void CreateLevel3(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords);
-
-
+        std::vector<std::shared_ptr<Model>> models;
+        std::vector<Eigen::Vector3f> coords;
+        void removeFormerlevel();
+        void loadNextLevel(int nextLevel);
     private:
+
         std::shared_ptr<Material> material;
         std::shared_ptr<Program> program;
         BasicScene *basicScene;

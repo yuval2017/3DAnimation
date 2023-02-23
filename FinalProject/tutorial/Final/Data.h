@@ -34,7 +34,7 @@ public:
     std::vector<int> get_back_to_main();
     int message_size();
     void restart_game();
-
+    void dec_life_bought();
 
     //game variables.
     bool gameMusic ;
@@ -54,6 +54,9 @@ private:
     int object_collision;
     int self_collision;
     int double_score;
+    int scoreLevel1;
+    int scoreLevel2 ;
+    int scoreLevel3 ;
     nlohmann::json json_data;
 
     Data();

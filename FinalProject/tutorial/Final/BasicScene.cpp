@@ -116,11 +116,22 @@ void BasicScene::BuildImGui(){
 void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, const Eigen::Matrix4f& view, const Eigen::Matrix4f& model)
 {
     Scene::Update(program, proj, view, model);
-    if(program.name == "green"){
-        program.SetUniform4f("lightColor", 0.7f, 0.7f, 0.7f, 0.7f);
-        program.SetUniform4f("Kai", 0.1333f, 0.5451f, 0.1333f, 0.0f);
-        program.SetUniform4f("Kdi", 0.5f, 0.5f, 0.0f, 1.0f);
-        program.SetUniform1f("specular_exponent", 5.0f);
+    char * green = "green";
+    char* grey = "grey";
+    int resgreen = (program.name).compare(green);
+    int resgrey = (program.name).compare(grey);
+    if( resgreen == 0 ){
+        program.SetUniform4f("lightColor", 0.8f, 0.9f, 0.6f, 1.0f);
+        program.SetUniform4f("Kai", 0.2f, 0.4f, 0.1f, 1.0f);
+        program.SetUniform4f("Kdi", 0.2f, 0.4f, 0.1f, 1.0f);
+        program.SetUniform1f("specular_exponent", 10.0f);
+        program.SetUniform4f("light_position", 0.0, 15.0f, 0.0, 1.0f);
+    }
+    else if(resgrey == 0){
+        program.SetUniform4f("lightColor", 0.7f, 0.7f, 0.7f, 1.0f);
+        program.SetUniform4f("Kai", 0.3f, 0.3f, 0.3f, 1.0f);
+        program.SetUniform4f("Kdi", 0.3f, 0.3f, 0.3f, 1.0f);
+        program.SetUniform1f("specular_exponent", 20.0f);
         program.SetUniform4f("light_position", 0.0, 15.0f, 0.0, 1.0f);
     }
     else{
@@ -330,6 +341,23 @@ void BasicScene::startMenu() {
 
         if (ImGui::Button("Store", ImVec2(-1, 0))) {
             std::cout << "store button pressed in start menu  ." << endl;
+            statistics->menu_flags[MainMenu_OP] = false;
+            data->back_to_main.push_back(MainMenu_OP);
+            statistics->menu_flags[StoreMenu_OP] = true;
+//            //add score check .
+//            Score* scor = generateRandomScore();
+//            int pos = highScores->nextLeaderPos();
+//            if( pos == -1) {
+//                std::vector<int> scores = this->highScores->extractScores();
+//                for (int i = 0; i < scores.size(); i++) {
+//                    if (scor->score > scores[i]) {
+//                        pos = i;
+//                    }
+//                }
+//            }
+//            if (pos != -1){
+//                highScores->saveToHighScores(scor,pos);
+//            }
 
             //start menu check .
             //TODO: replace.

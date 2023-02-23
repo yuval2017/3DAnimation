@@ -57,6 +57,8 @@ public:
     std::vector<TexCoord>
     getVertexTextureCoordinates(std::vector<Vertex> vertices, std::vector<Face> faces, std::string imagePath);
     std::vector<TexCoord> getVertexTextureCoordinates(Eigen::MatrixXd vertices, Eigen::MatrixXi faces, std::string imagePath);
+    Eigen::Vector3d generatePointInSystem(const double x, const double y, const double z, const Eigen::Vector3d& center, const double n);
+
 
 };
 

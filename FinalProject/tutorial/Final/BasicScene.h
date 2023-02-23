@@ -31,6 +31,9 @@ public:
     std::vector<std::shared_ptr<cg3d::Model>> game_models;
     void create_menu();
     bool done_inite = false;
+    GameStatistics* getStatistics();
+    Data* getData();
+
     ~BasicScene();
 private:
     Data* data;

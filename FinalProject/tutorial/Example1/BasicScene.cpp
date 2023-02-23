@@ -44,8 +44,6 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
     background->Scale(120, Axis::XYZ);
     background->SetPickable(false);
     background->SetStatic();
-
- 
     auto program = std::make_shared<Program>("shaders/phongShader");
     auto program1 = std::make_shared<Program>("shaders/pickingShader");
     
@@ -135,11 +133,14 @@ void BasicScene::Init(float fov, int width, int height, float near, float far)
 void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, const Eigen::Matrix4f& view, const Eigen::Matrix4f& model)
 {
     Scene::Update(program, proj, view, model);
-    program.SetUniform4f("lightColor", 0.8f, 0.3f, 0.0f, 0.5f);
-    program.SetUniform4f("Kai", 1.0f, 0.3f, 0.6f, 1.0f);
-    program.SetUniform4f("Kdi", 0.5f, 0.5f, 0.0f, 1.0f);
-    program.SetUniform1f("specular_exponent", 5.0f);
-    program.SetUniform4f("light_position", 0.0, 15.0f, 0.0, 1.0f);
+
+        program.SetUniform4f("lightColor", 0.8f, 0.3f, 0.0f, 0.5f);
+        program.SetUniform4f("Kai", 1.0f, 0.3f, 0.6f, 1.0f);
+        program.SetUniform4f("Kdi", 0.5f, 0.5f, 0.0f, 1.0f);
+        program.SetUniform1f("specular_exponent", 5.0f);
+        program.SetUniform4f("light_position", 0.0, 15.0f, 0.0, 1.0f);
+
+
 //    cyl->Rotate(0.001f, Axis::Y);
     cube->Rotate(0.1f, Axis::XYZ);
 }

@@ -18,29 +18,67 @@ void cg3d::MeshCollisionVisitor::Run(cg3d::Scene *scene, cg3d::Camera *camera) {
 void cg3d::MeshCollisionVisitor::Visit(Model *model) {
     int snake_head =basicScene->snake->bones.size()-1;
     Visitor::Visit(model);
-    if (basicScene->animate && model != nullptr && model->name != std::string(std::string(BONE_NAME) +" "+ std::to_string(snake_head)) && (model->name != std::string(std::string(BONE_NAME) + " " + std::to_string(snake_head- 1))) && (model->name.substr(0,
-                                                                                                                                                         strlen(COLLISION_OBJECT)) == COLLISION_OBJECT || model->name.substr(0,strlen(BONE_NAME)) == BONE_NAME)) {
-        //std::cout << "collision with " <<model->name <<" time elapse "<< std::to_string(model->stopper.getElapsedTime()) << " \n" << std::endl;
+    if (basicScene->animate && model != nullptr && model->name != std::string(std::string(BONE_NAME) +" "+
+    std::to_string(snake_head)) && (model->name != std::string(std::string(BONE_NAME) + " " +
+    std::to_string(snake_head- 1))) )
+    {
         std::shared_ptr<Model> snake = basicScene->snake->GetSnakeBones()[snake_head];
-        if (Calculates::getInstance()->isMeshCollision(snake, model, ((snake)->GetTreeWithOutCube()), model->GetTreeWithOutCube())) {
-            if(model->name.substr(0, strlen(BONE_NAME)) == BONE_NAME){
-                std::cout << "collision with " << model->name << " \n" << std::endl;
-
-                basicScene->animate = false;
-            }else if(model->name.substr(0, strlen(COLLISION_OBJECT)) == COLLISION_OBJECT){
-                std::string model_name = model->name.substr(15,model->name.size()-1);
-                //to make sure it was deleted
-                std::cout << "collision with " << model->name << " \n" << std::endl;
-                basicScene->GetRoot()->RemoveChild(model->bezier);
-                model->bezier = nullptr;
-                basicScene->GetRoot()->RemoveChild(model->shared_from_this());
-                //TODO for each collide change data in scene.
-            }
-            else{
-                std::cout << "should not collide with: " << model->name << " \n" << std::endl;
-            }
+        if(!(basicScene->getStatistics()->objectCollisionStopper->is_countdown_running()) & model->name.substr(0,strlen(COLLISION_OBJECT)) == COLLISION_OBJECT &&
+                Calculates::getInstance()->isMeshCollision(snake, model, ((snake)->GetTreeWithOutCube()), model->GetTreeWithOutCube())){
+            handle_object_hit(model);
+        }
+        else if (!(basicScene->getStatistics()->selfCollisionStopper->is_countdown_running())& model->name.substr(0,strlen(BONE_NAME)) == BONE_NAME &&
+                Calculates::getInstance()->isMeshCollision(snake, model, ((snake)->GetTreeWithOutCube()), model->GetTreeWithOutCube())){
+            std::cout << "collision with " << model->name << " \n" << std::endl;
+            handle_self_hit();
         }
     }
-    //for childs
+}
+
+
+void MeshCollisionVisitor::handle_self_hit() {
+    if(basicScene->getData()->get_life_bought() >0){
+        basicScene->getData()->dec_life_bought();
+        basicScene->getStatistics()->selfCollisionStopper->start(4);
+    }
+    else{
+        basicScene->animate = false;
+        basicScene->getStatistics()->menu_flags[GameOverMenu_OP] = true;
+    }
+}
+
+void MeshCollisionVisitor::handle_object_hit(Model *model){
+
+    if(model->name.find(CUBE_NAME) != std::string::npos){
+        if(basicScene->getStatistics()->num_of_strikes >0){
+            basicScene->getData()->dec_life_bought();
+            basicScene->getStatistics()->objectCollisionStopper->start(10);
+        }
+        else{
+            basicScene->animate = false;
+            basicScene->getStatistics()->menu_flags[GameOverMenu_OP] = true;
+        }
+    }
+    else if(model->name.find(FROG_NAME) != std::string::npos){
+        if(basicScene->getData()->get_life_bought() >0){
+            basicScene->getData()->dec_life_bought();
+            basicScene->getStatistics()->objectCollisionStopper->start(10);
+        }
+        else{
+            basicScene->animate = false;
+            basicScene->getStatistics()->menu_flags[GameOverMenu_OP] = true;
+        }
+    }
+    else if(model->name.find(MOUSE_NAME) != std::string::npos){
+        if(basicScene->getData()->get_life_bought() >0){
+            basicScene->getData()->dec_life_bought();
+            basicScene->getStatistics()->objectCollisionStopper->start(10);
+        }
+        else{
+            basicScene->animate = false;
+            basicScene->getStatistics()->menu_flags[GameOverMenu_OP] = true;
+        }
+    }
+
 }
 

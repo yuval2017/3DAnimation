@@ -17,6 +17,7 @@
 #define BRICKS_MATERIAL 2
 #define DAYLIGHT_MATERIAL 3
 #define GREEN_MATERIAL 4
+#define GREY_MATERIAL 5
 #define CUBE 0
 #define CYL 1
 #define SPHERE 2
@@ -28,7 +29,7 @@
 #define FROG 8
 #define MOUSE 9
 //increment every mesh or material
-#define NUMBER_OF_MATERIALS 5
+#define NUMBER_OF_MATERIALS 6
 #define NUMBER_OF_MESHES 10
 
 using namespace cg3d;
@@ -48,7 +49,9 @@ public:
     //2) phong
     //3) bricks
     //4) cube map shader
-    //5) frog material
+    //5) green material
+    //6) grey material
+
     //meshes
     std::shared_ptr<Mesh> meshes[NUMBER_OF_MESHES];
     //0) cube

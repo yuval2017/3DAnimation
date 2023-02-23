@@ -32,6 +32,10 @@ ModelsFactory::ModelsFactory(){
     //green material
     materials[GREEN_MATERIAL] = {std::make_shared<Material>("green_color", "shaders/phongShader")};
     materials[GREEN_MATERIAL]->program->name = "green";
+
+    //grey material
+    materials[GREY_MATERIAL] = {std::make_shared<Material>("grey_color", "shaders/phongShader")};
+    materials[GREY_MATERIAL]->program->name = "grey";
     //meshes
     meshes[CUBE] = Mesh::Cube();
     meshes[CYL] = ObjLoader::MeshFromObj("Cyl", {"data/zcylinder.obj"});

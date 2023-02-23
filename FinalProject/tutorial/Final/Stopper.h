@@ -1,30 +1,24 @@
-//
-// Created by יובל היטר on 18/02/2023.
-//
+#ifndef STOPPER_H
+#define STOPPER_H
 
-
-#pragma once
-#include <iostream>
 #include <chrono>
-#include <thread>
-#include <utility>
-using namespace std;
-using namespace std::chrono;
 
 class Stopper {
-private:
-    std::chrono::time_point<std::chrono::high_resolution_clock> start_time_;
-    std::chrono::time_point<std::chrono::high_resolution_clock> end_time_;
-    std::chrono::nanoseconds elapsed_time_{0};
-    bool is_running_{false};
 public:
     Stopper();
-    void start();
-    void stop();
+    Stopper(const Stopper&) = delete;
+    Stopper& operator=(const Stopper&) = delete;
+
+    void start(int seconds);
+    bool is_countdown_running() const;
     void reset();
-    void resume();
-    std::pair<int, int> ElapsedSecondsAndMilliseconds() const;
-    void CountDownFrom(int seconds);
+
+private:
+    bool countdown_running;
+    std::chrono::time_point<std::chrono::system_clock> start_time;
+    std::chrono::time_point<std::chrono::system_clock> end_time;
+
+    void update_countdown();
 };
 
-
+#endif // STOPPER_H

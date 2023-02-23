@@ -25,6 +25,7 @@ Data::Data()
     gameSound = true;
     musicVolume = 0.5f;
     soundVolume = 0.5f;
+    back_to_main.resize(0);
     load_data();
 }
 
@@ -34,13 +35,14 @@ void Data::load_data()
     if (file.is_open()) {
         json data;
         file >> data;
-
         total_money = data["total_money"];
         life_bought = data["life_bought"];
         object_collision = data["object_collision"];
         self_collision = data["self_collision"];
         double_score = data["double_score"];
-
+        scoreLevel1 = data["scoreLevel1"];
+        scoreLevel2 = data["scoreLevel2"];
+        scoreLevel3 = data["scoreLevel3"];
         file.close();
     }
     else {
@@ -61,7 +63,9 @@ void Data::save_data()
     data["object_collision"] = object_collision;
     data["self_collision"] = self_collision;
     data["double_score"] = double_score;
-
+    data["scoreLevel1"] = scoreLevel1;
+    data["scoreLevel2"] = scoreLevel2;
+    data["scoreLevel3"] = scoreLevel3 ;
     std::ofstream file("data.json");
     if (file.is_open()) {
         file << data;
@@ -69,6 +73,11 @@ void Data::save_data()
     }
 }
 
+void Data::dec_life_bought()
+{
+    life_bought--;
+    save_data();
+}
 void Data::set_total_money(int val)
 {
     total_money = val;

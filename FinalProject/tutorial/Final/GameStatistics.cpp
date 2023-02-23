@@ -19,17 +19,27 @@ GameStatistics* GameStatistics::getInstance()
 float GameStatistics::get_progress(){
     return level/num_of_levels;
 }
+
 GameStatistics::GameStatistics() {
 
     level = 1;
     speed = 1.0;
     score = 0;
     num_of_strikes = 0 ;
-    object_collision = true;
-    self_collision = true;
+    strikes_used = 0 ;
     double_score = false;
+    levelUp = false;
+    selfCollisionStopper = new Stopper();
+    objectCollisionStopper = new Stopper();
 }
 
 void GameStatistics::reset_game() {
-//TODO: IMPLEMENT.
+
+    level = 1;
+    speed = 1.0;
+    score = 0;
+    num_of_strikes = 0 ;
+    strikes_used = 0 ;
+    double_score = false;
+    levelUp = false;
 }

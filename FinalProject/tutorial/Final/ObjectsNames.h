@@ -6,8 +6,10 @@
 #define BEZIER_OBJECT_NAME "CollisionObject bezier"
 #define COLLISION_OBJECT "CollisionObject"
 #define BONE_NAME "bone"
-#define SNAKE "snake"
-#define SPHERE "sphere"
-#define CUBE "CUBE"
+#define SNAKE_NAME "snake"
+#define SPHERE_NAME "sphere"
+#define CUBE_NAME "CUBE"
+#define FROG_NAME "FROG"
+#define MOUSE_NAME "MOUSE"
 
 
