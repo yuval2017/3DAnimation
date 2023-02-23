@@ -28,10 +28,7 @@ Snake::Snake(){
 }
 Snake::Snake(const std::shared_ptr<cg3d::Material>& material, const std::shared_ptr<cg3d::Movable>& root, std::shared_ptr<cg3d::Camera> _camera){
     ModelsFactory *factory = ModelsFactory::getInstance();
-
-    auto frog =  factory->CreateModel(GREEN_MATERIAL , MOUSE , "collision_object");
-    //frog->Scale(0.3f);
-    root->AddChild(frog);
+    this->root = root;
 
     //for check
     auto program1 = std::make_shared<Program>("shaders/pickingShader");
@@ -50,56 +47,12 @@ Snake::Snake(const std::shared_ptr<cg3d::Material>& material, const std::shared_
 
 
 
-    sphere1 = ModelsFactory::getInstance()->CreateModel(PHONG_MATERIAL,SPHERE,"junk_sphere");
-    sphere1->showWireframe = true;
-    with_skinning = false;
-    number_of_joints = 16;
-
-    direction = {0, 0, 0.8f};
-    bones.push_back(factory->CreateModel(BRICKS_MATERIAL, CYL, "bone 0"));
-    bones[0]->Scale(scaleFactor,cg3d::Movable::Axis::Z);
-    bones[0]->SetCenter(Eigen::Vector3f(0,0,-0.8f*scaleFactor));
-    bones[0]->Translate(0.8f*scaleFactor,cg3d::Movable::Axis::Z);
-    bones[0]->Translate(-scaleFactor*(number_of_joints)*1.6,cg3d::Movable::Axis::Z);
-    root->AddChild(bones[0]);
-    for(int i = 1;i < number_of_joints; i++)
-    {
-        bones.push_back(factory->CreateModel(PHONG_MATERIAL, CYL, "bone " + std::to_string(i)));
-        bones[i]->Scale(scaleFactor,cg3d::Movable::Axis::Z);
-        bones[i]->Translate(-1.6f*scaleFactor*( number_of_joints - i- 1),cg3d::Movable::Axis::Z);
-        bones[i]->Translate(-0.8f*scaleFactor,cg3d::Movable::Axis::Z);
-
-        bones[i]->SetCenter(Eigen::Vector3f(0,0,-0.8f*scaleFactor));
-        //bones[i-1]->AddChild(bones[i]);
-        bones[i]->GetTreeWithOutCube();
-        root->AddChild(bones[i]);
-    }
-
-
-
-
-
-
-
 
 
     camera = std::move(_camera);
-    //bones[0]->AddChild(camera);
-    snake = factory->CreateModel(PHONG_MATERIAL,SNAKE1,"snake");
-    root->AddChild(snake);
-    snake->showWireframe = true;
 
-    joint_length = bones[0]->GetMeshList()[0]->data[0].vertices.colwise().maxCoeff()[2] - bones[0]->GetMeshList()[0]->data[0].vertices.colwise().minCoeff()[2];
-    float snake_length = joint_length * number_of_joints;
     std::cout<< joint_length << std::endl;
 
-    auto cubeMesh{IglLoader::MeshFromFiles("cube_igl","data/cube_old.obj")};
-    auto cube = Model::Create( "helpcube", cubeMesh, material);
-    //std::vector<TexCoord> Vts = Calculates::getInstance()->getVertexTextureCoordinates(cube->GetMeshList()[0]->data[0].vertices,cube->GetMeshList()[0]->data[0].faces,"../tutorial/textures/bricks.jpg");
-//    bones[0]->Rotate(M_PI,Model::Axis::X);
-   // bones[0]->Translate({0,0,0.8f*scaleFactor});
-    sphere1->Translate(-1.6f*scaleFactor*(number_of_joints - 0.5*number_of_joints),cg3d::Movable::Axis::Z);
-    root->AddChild(sphere1);
     initSnake();
 
 }
@@ -140,70 +93,8 @@ void Snake::MoveDone(){
 //        bones[1]->Rotate(0.1f, cg3d::Movable::Axis::X);
 //    }
 }
-void Snake::initJoints(){
-    int bones_size = number_of_joints;
-    vC.resize(bones_size + 1);
-    vT.resize(bones_size + 1);
-    vQ.resize(bones_size + 1,Eigen::Quaterniond::Identity());
-    Eigen::Vector3d min = snake->GetMeshList()[0]->data[0].vertices.colwise().minCoeff();
-    double min_z = min[2];
-    //set parents
-    BE.resize(16, 2);
-    Cp.resize(17, 3);
-    CT.resize(32, 3);
-    BE << 0, 1,
-            1, 2,
-            2, 3,
-            3, 4,
-            4, 5,
-            5, 6,
-            6, 7,
-            7, 8,
-            8, 9,
-            9,10,
-            10, 11,
-            11, 12,
-            12, 13,
-            13, 14,
-            14, 15,
-            15, 16;
 
 
-    restartSnake();
-    //viewer->data_list[0].add_points(points, Eigen::RowVector3d(0, 0, 1));
-    V = snake->GetMeshList()[0]->data[0].vertices;
-    calcWeight(V, min_z);
-    snakeJointBoxes.resize(bones_size);
-    //initBoundingBoxesForJoints();
-    //jointLength = 0.1;
-}
-void Snake::restartSnake(){
-    int bones_size = number_of_joints;
-    snake->setMeshData(snake->name,
-                       V_new,
-                       snake->GetMeshList()[0]->data[0].faces,
-                       snake->GetMeshList()[0]->data[0].vertexNormals,
-                       snake->GetMeshList()[0]->data[0].textureCoords);
-
-
-    Eigen::Vector3d min = snake->GetMeshList()[0]->data[0].vertices.colwise().minCoeff();
-    float min_z = min[2];
-    Eigen::Vector3d pos(0, 0, min_z);
-    Eigen::MatrixXd points(17, 3);
-    for (int i = 0; i < bones_size + 1; i++) {
-        vC[i] = pos;
-        vT[i] = pos;
-        points.row(i) = pos;
-        pos = pos + Eigen::Vector3d(0, 0, joint_length);
-    }
-
-    for (int i = 0; i < bones_size + 1; i++) {
-        Cp.row(i) = vC[i];
-    }
-    for (int i = 0; i < bones_size; i++) {
-        CT.row((i+1) * 2 - 1) = vC[i+1];
-    }
-}
 void Snake::calcWeight(Eigen::MatrixXd& V, double min_z){
     int bones_size = number_of_joints;
     int n = snake->GetMeshList()[0]->data[0].vertices.rows();
@@ -253,6 +144,10 @@ void Snake::skinning(Eigen::Vector3d t) {
 
 
 
+//    for (int i = 0; i < number_of_joints; i++)
+//        vT[i] = vT[i] + (vT[i + 1] - vT[i])/10;
+//    Eigen::Vector3d new_pos = bones[number_of_joints-1]->GetRotation().cast<double>()*t;
+    //vT[number_of_joints] = vT[number_of_joints] + new_pos;
 
     std::vector<Eigen::Vector3f> p;
 
@@ -262,41 +157,8 @@ void Snake::skinning(Eigen::Vector3d t) {
 
 
 
-
-
-//    for (int i = 0; i < number_of_joints; i++)
-//        vT[i] = vT[i] + (vT[i + 1] - vT[i])/10;
-//    Eigen::Vector3d new_pos = bones[number_of_joints-1]->GetRotation().cast<double>()*t;
-        //vT[number_of_joints] = vT[number_of_joints] + new_pos;
-
     std::cout<< bones[number_of_joints-1]->GetRotation().cast<double>() << "\n"<< std::endl;
 
-//    for (int i = 1; i < number_of_joints + 1; i++) {
-//        Eigen::Vector3d rd = vT[i] - vC[i - 1];
-//        Eigen::Vector3d re = vC[i] - vC[i - 1];
-////        Eigen::Quaternionf rot = Eigen::Quaternionf::FromTwoVectors(re.cast<float>(),rd.cast<float>());
-////        Eigen::Matrix3f system = bones[i-1]->GetRotation().transpose();
-////        Eigen::Quaternionf q = Eigen::Quaternionf(system);
-////        bones[i-1]->Rotate((q * rot.conjugate()) * q.conjugate());
-//
-//
-//        Eigen::Vector3f normal = re.normalized().cross(rd.normalized()).cast<float>();
-//
-//        float dot = rd.normalized().dot(re.normalized());//get dot
-//        std::cout<< "the dot of cyl id: "<< i-1 << " is " << dot << std::endl;
-//        if (dot > 1)
-//            dot = 1;
-//        if (dot < -1)
-//            dot = 1;
-//        float angle = acos(dot) ;
-//
-//        std::cout<< "the angle of cyl id: "<< i-1 << " is " << angle << std::endl;
-//
-//        Eigen::Vector3f rotationVec = (bones[i-1]->GetAggregatedTransform()).block<3, 3>(0, 0).inverse() * normal;
-//        Eigen::Matrix3f rot = (Eigen::AngleAxisf(angle,rotationVec.normalized())).toRotationMatrix();
-//
-//        bones[i-1]->Rotate(angle, rotationVec);
-//    }
 
     const int dim = Cp.cols();
     Eigen::MatrixXd T(BE.rows() * (dim + 1), dim);
@@ -340,19 +202,7 @@ void Snake::skinning(Eigen::Vector3d t) {
 }
 
 
-void Snake::SetTranslation(const Eigen::Vector3d& position, int id)
-{
-    Eigen::Vector3f oldPositionOfObject = (bones[id]->Tout * bones[id]->Tin).matrix().block(0, 3, 3, 1);
-    bones[id]->Tout.pretranslate(position.cast<float>() - oldPositionOfObject);
-}
-Eigen::Matrix4d Snake::getHeadMakeTransd()
-{
 
-    Eigen::Affine3d a = Eigen::Affine3d::Identity();
-    a.translate((Eigen::Vector3d)CT.row(31));
-    a.rotate(quat);
-    return a.matrix();
-}
 
 
 void Snake::moveSnake(Eigen::Vector3d t){
@@ -366,7 +216,58 @@ void Snake::moveSnake(Eigen::Vector3d t){
 //        bones[i]->Rotate(quat.cast<float>());
 //    }
 }
+void Snake::reset_bones(){
+
+
+
+    bones.resize(0);
+
+    bones.push_back(ModelsFactory::getInstance()->CreateModel(BRICKS_MATERIAL, CYL, "bone 0"));
+    //calculate joint length after scale
+    bones[0]->Scale(scaleFactor,cg3d::Movable::Axis::Z);
+    //calculate joint length
+    joint_length = bones[0]->GetMeshList()[0]->data[0].vertices.colwise().maxCoeff()[2] - bones[0]->GetMeshList()[0]->data[0].vertices.colwise().minCoeff()[2];
+    //length with scale
+    joint_length = joint_length * bones[0]->scale_factor[2];
+
+    bones[0]->SetCenter(Eigen::Vector3f(0,0,-(joint_length/2.0f)));
+    bones[0]->Translate((joint_length/2.0f),cg3d::Movable::Axis::Z);
+    bones[0]->Translate(-(number_of_joints)*joint_length,cg3d::Movable::Axis::Z);
+    root->AddChild(bones[0]);
+    for(int i = 1;i < number_of_joints; i++)
+    {
+        bones.push_back(ModelsFactory::getInstance()->CreateModel(PHONG_MATERIAL, CYL, "bone " + std::to_string(i)));
+        bones[i]->Scale(scaleFactor,cg3d::Movable::Axis::Z);
+        bones[i]->Translate(-joint_length*( number_of_joints - i- 1),cg3d::Movable::Axis::Z);
+        bones[i]->Translate(-(joint_length)/2.0f,cg3d::Movable::Axis::Z);
+
+        bones[i]->SetCenter(Eigen::Vector3f(0,0,-(joint_length)));
+        //bones[i-1]->AddChild(bones[i]);
+        bones[i]->GetTreeWithOutCube();
+        root->AddChild(bones[i]);
+    }
+}
+void Snake::reset_sake() {
+    //remove from scene
+    for(int i = 0;i < number_of_joints; i++)
+    {
+        root->RemoveChild(bones[i]);
+    }
+    reset_bones();
+    skinning({0.0f,0.0f,0.0f});
+}
 void Snake::initSnake(){
+    sphere1 = ModelsFactory::getInstance()->CreateModel(PHONG_MATERIAL,SPHERE,"junk_sphere");
+    sphere1->showWireframe = true;
+    with_skinning = false;
+    number_of_joints = 16;
+
+    reset_bones();
+
+    //create snake
+    snake = ModelsFactory::getInstance()->CreateModel(PHONG_MATERIAL,SNAKE1,"snake");
+    root->AddChild(snake);
+    snake->showWireframe = true;
     vC.resize(number_of_joints+1);
     BE.resize(number_of_joints, 2);
     Cp.resize(number_of_joints+1, 3);
@@ -375,30 +276,10 @@ void Snake::initSnake(){
     // vT - translation of joints
     vT.resize(number_of_joints + 1);
     vQ.resize(number_of_joints + 1, Eigen::Quaterniond::Identity());
-    rotationPropogation.resize(number_of_joints);
-    translatePropogation.resize(number_of_joints);
-    for (int i = 0; i < number_of_joints; i++) {
-        rotationPropogation[i] = Eigen::Vector3d::Identity();
-        translatePropogation[i] = Eigen::Vector3d(0, 0, -0.1f);
+
+    for (int i = 0; i < BE.rows()-1; i++) {
+        BE.row(i) << i, i+1;
     }
-    BE << 0, 1,
-            1, 2,
-            2, 3,
-            3, 4,
-            4, 5,
-            5, 6,
-            6, 7,
-            7, 8,
-            8, 9,
-            9,10,
-            10, 11,
-            11, 12,
-            12, 13,
-            13, 14,
-            14, 15,
-            15, 16;
-
-
 
     Eigen::MatrixXd vertices = snake->GetMeshList()[0]->data[0].vertices;
     Eigen::Vector3d translate = Eigen::Vector3d(0.0f,0.0f,-number_of_joints*(joint_length/2));
@@ -426,8 +307,6 @@ void Snake::initSnake(){
     Eigen::Vector3d min = snake->GetMeshList()[0]->data[0].vertices.colwise().minCoeff();
     Eigen::Vector3d maxi = snake->GetMeshList()[0]->data[0].vertices.colwise().maxCoeff();
     double min_z = min[2];
-    double max_z = maxi[2];
-
     Eigen::Vector3d pos(0, 0, min_z);
 
     // Init C
@@ -444,9 +323,6 @@ void Snake::initSnake(){
     Eigen::Vector3d min_vec = V_new.colwise().minCoeff();
     double minz = min_vec[2];
     calcWeight(V_new,minz);
-
-
-
 
 
 }
@@ -482,35 +358,15 @@ void Snake::ikRotateHelper(int id, const Eigen::Vector3f& t){
     Eigen::Vector3f rotationVec = (bones[id]->GetAggregatedTransform()).block<3, 3>(0, 0).inverse() * normal;
   //  std::cout << "the angel is: " << angle << std::endl;
     Eigen::Matrix3f rot = (Eigen::AngleAxisf(angle,rotationVec.normalized())).toRotationMatrix();
-    Eigen::Vector3d oi = rot.cast<double>().eulerAngles(2,0,2);
+    Eigen::Vector3d oi = rot.cast<double>().eulerAngles(1,0,1);
 
-//    bones[id]->Rotate(oi[0],Movable::Axis::Z);
+//    bones[id]->Rotate(oi[0],Movable::Axis::Y);
 //    bones[id]->Rotate(oi[1], Movable::Axis::X);
-//    bones[id]->Rotate(oi[2],Movable::Axis::Z);
+//    bones[id]->Rotate(oi[2],Movable::Axis::Y);
     bones[id]->Rotate(angle, rotationVec);
 }
-void Snake::moveSnake2(Eigen::Vector3d t){
-    //the rotation on the end -
-    //translatePropogation[0] = Eigen::Vector3d(0, 0, -0.1f);
-    //rotationPropogation[0] = direction;
-    for (int i = 0; i < number_of_joints; i++) {
-        //Eigen::Matrix3f system = bones[i]->GetRotation().transpose();
-        bones[i]->Translate( translatePropogation[i].cast<float>());
-        //bones[i]->Rotate(move,rotationPropogation[i].cast<float>());
-    }
 
-    //
-    for (int i = 1; i < number_of_joints; i++) {
-        rotationPropogation[i] = rotationPropogation[i-1];
-        translatePropogation[i-1] = translatePropogation[i];
-    }
 
-}
-void Snake::propTranslate(Eigen::Vector3d t ,int id){
-    for (int i = id+1; i < number_of_joints; i++) {
-        bones[i]->Translate(ikGetPosition(i-1,number_of_joints/2)-ikGetPosition(i,number_of_joints/2));
-    }
-}
 
 
 void Snake::Calc_Next_Position(std::vector<Eigen::Vector3f> &p, std::vector<double> &ris_Array, std::vector<double> &lambdaI_Array, Eigen::Vector3d t){

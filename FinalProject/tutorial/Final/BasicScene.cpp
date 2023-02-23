@@ -244,6 +244,11 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
             case GLFW_KEY_S:
                 camera->TranslateInSystem(system, {0, -0.1f, 0});
                 break;
+            case GLFW_KEY_R:
+                animate = false;
+                snake->reset_sake();
+                animate = true;
+                break;
             case GLFW_KEY_A:
                 camera->TranslateInSystem(system, {-0.1f, 0, 0});
                 break;

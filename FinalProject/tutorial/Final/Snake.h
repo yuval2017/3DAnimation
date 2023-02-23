@@ -75,8 +75,7 @@ public:
     bool with_skinning = false;
     float move = 0.5f;
 
-    std::vector<Eigen::Vector3d> rotationPropogation;
-    std::vector<Eigen::Vector3d> translatePropogation;
+    std::shared_ptr<Movable> root;
 
     void ikRotateHelper(int id, const Eigen::Vector3f& t);
     void IKFabric();
@@ -84,6 +83,8 @@ public:
     void moveSnake(Eigen::Vector3d t);
     void moveSnake2(Eigen::Vector3d t);
     void propTranslate(Eigen::Vector3d t ,int id);
+    void reset_bones();
+    void reset_sake();
 
 
 
