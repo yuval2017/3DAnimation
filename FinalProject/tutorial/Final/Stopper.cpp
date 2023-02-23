@@ -3,29 +3,52 @@
 //
 
 #include "Stopper.h"
+Stopper::Stopper() {}
+
 void Stopper::start() {
-    if (!isRunning) {
-        isRunning = true;
-        startTime = system_clock::now();
-    }
+    start_time_ = std::chrono::high_resolution_clock::now();
+    is_running_ = true;
 }
 
 void Stopper::stop() {
-    if (isRunning) {
-        isRunning = false;
-        elapsedTime += duration<double>(system_clock::now() - startTime).count();
+    end_time_ = std::chrono::high_resolution_clock::now();
+    is_running_ = false;
+}
+
+void Stopper::reset() {
+    elapsed_time_ = std::chrono::nanoseconds::zero();
+    start_time_ = std::chrono::time_point<std::chrono::high_resolution_clock>();
+    end_time_ = std::chrono::time_point<std::chrono::high_resolution_clock>();
+    is_running_ = false;
+}
+
+void Stopper::resume() {
+    if (is_running_) {
+        return;
     }
+
+    start_time_ = std::chrono::high_resolution_clock::now() - elapsed_time_;
+    is_running_ = true;
 }
 
-void Stopper::clear() {
-    isRunning = false;
-    elapsedTime = 0;
-}
-
-double Stopper::getElapsedTime() {
-    if (isRunning) {
-        return elapsedTime + duration<double>(system_clock::now() - startTime).count();
+std::pair<int, int> Stopper::ElapsedSecondsAndMilliseconds() const {
+    std::chrono::time_point<std::chrono::high_resolution_clock> end_time;
+    if (is_running_) {
+        end_time = std::chrono::high_resolution_clock::now();
     } else {
-        return elapsedTime;
+        end_time = end_time_;
+    }
+
+    auto elapsed_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time_).count();
+    auto seconds = static_cast<int>(elapsed_milliseconds / 1000);
+    auto milliseconds = static_cast<int>(elapsed_milliseconds % 1000);
+
+    return std::make_pair(seconds, milliseconds);
+}
+
+void Stopper::CountDownFrom(int seconds) {
+    for (int i = seconds; i >= 0; i--) {
+        std::cout << i << std::endl;
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 }

@@ -6,20 +6,25 @@
 
 #include <iostream>
 #include <chrono>
+#include <thread>
+#include <utility>
 using namespace std;
 using namespace std::chrono;
 
 class Stopper {
 private:
-    time_point<system_clock> startTime;
-    bool isRunning;
-    double elapsedTime;
+    std::chrono::time_point<std::chrono::high_resolution_clock> start_time_;
+    std::chrono::time_point<std::chrono::high_resolution_clock> end_time_;
+    std::chrono::nanoseconds elapsed_time_{0};
+    bool is_running_{false};
 public:
-    Stopper() : isRunning(false), elapsedTime(0) {}
+    Stopper();
     void start();
     void stop();
-    void clear();
-    double getElapsedTime();
+    void reset();
+    void resume();
+    std::pair<int, int> ElapsedSecondsAndMilliseconds() const;
+    void CountDownFrom(int seconds);
 };
 
 
