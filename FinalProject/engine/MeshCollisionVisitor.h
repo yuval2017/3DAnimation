@@ -25,6 +25,7 @@ public:
             void Visit(Model *model) override;
             void handle_object_hit(Model *model);
             void handle_self_hit();
+            void handle_eating(Model* model);
 
 protected:
     BasicScene *basicScene;

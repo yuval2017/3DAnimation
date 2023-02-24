@@ -61,14 +61,14 @@ void Snake::SetSpeed(float new_speed){
     speed = new_speed;
 }
 void Snake::MoveLeft(){
-    direction = Eigen::Vector3d(0.8f, 0, 0);
+    direction = Eigen::Vector3d(0.3f, 0, 0);
 //    if(!with_skinning) {
 //        bones[0]->Rotate(0.1f, cg3d::Movable::Axis::Y);
 //        bones[1]->Rotate(-0.1f, cg3d::Movable::Axis::Y);
 //    }
 }
 void Snake::MoveRight(){
-    direction = Eigen::Vector3d(-0.8f, 0, 0);
+    direction = Eigen::Vector3d(-0.3f, 0, 0);
 //    if(!with_skinning) {
 //
 //        bones[0]->Rotate(-0.1f, cg3d::Movable::Axis::Y);
@@ -76,7 +76,7 @@ void Snake::MoveRight(){
 //    }
 }
 void Snake::MoveUp(){
-    direction = Eigen::Vector3d(0, 0.8f, 0);
+    direction = Eigen::Vector3d(0, 0.3f, 0);
 //    if(!with_skinning) {
 //        bones[0]->Rotate(0.1f, cg3d::Movable::Axis::X);
 //        bones[1]->Rotate(-0.1f, cg3d::Movable::Axis::X);
@@ -84,7 +84,7 @@ void Snake::MoveUp(){
 }
 
 void Snake::MoveDone(){
-    direction = Eigen::Vector3d(0, -0.8f, 0);
+    direction = Eigen::Vector3d(0, -0.3f, 0);
 //    if(!with_skinning) {
 //        bones[0]->Rotate(-0.1f, cg3d::Movable::Axis::X);
 //        bones[1]->Rotate(0.1f, cg3d::Movable::Axis::X);

@@ -486,8 +486,8 @@ std::queue<Eigen::Vector3f> Calculates::generatePointsInSystem(float x_length, f
 //second try.
 
     // Define the minimum distance from the edges and the point
-    float min_edge_dist = 10.0;
-    float min_point_dist = 100.0;
+    float min_edge_dist = 5.0;
+    float min_point_dist = 70.0;
 
 
     // Create a queue to store the points
@@ -520,6 +520,7 @@ std::queue<Eigen::Vector3f> Calculates::generatePointsInSystem(float x_length, f
 
         // Add the new point to the queue
         pointQueue.push(newPoint);
+        std::cout << "point " << pointQueue.size() <<" added "<< endl;
     }
 
     return pointQueue;

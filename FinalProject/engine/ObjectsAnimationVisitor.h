@@ -57,14 +57,14 @@ namespace cg3d {
         std::vector<shared_ptr<Model>> mouses_available;
         std::vector<shared_ptr<Model>> coins_available;
         // Generate 3 points every sec1, sec2, sec3 seconds for len1, len2, len3 seconds
-        double sec1 = 2.0; // generate frog points every 2 seconds
-        double len1 = 4.0; // frog points should disappear after 10 seconds
-        double sec2 = 2.0; // generate mouse points every 3 seconds
-        double len2 = 5.0; // mouse points should disappear after 7 seconds
-        double sec3 = 2.0; // generate cube points every 5 seconds
-        double len3 = 4.0; // cube points should disappear after 5 seconds
-        int min_dist = 10;
-        int num_of_points = 70;
+        double sec1 = 5.0; // generate frog points every 2 seconds
+        double len1 = 20.0; // frog points should disappear after 10 seconds
+        double sec2 = 5.0; // generate mouse points every 3 seconds
+        double len2 = 20.0; // mouse points should disappear after 7 seconds
+        double sec3 = 5.0; // generate cube points every 5 seconds
+        double len3 = 20.0; // cube points should disappear after 5 seconds
+        int min_dist = 4;
+        int num_of_points = 45;
         int num_of_models = 15;
         Calculates* calculates ;
     };

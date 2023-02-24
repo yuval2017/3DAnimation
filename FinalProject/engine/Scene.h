@@ -42,7 +42,7 @@ public:
 
 
     // Camera list parameters
-    std::vector<std::shared_ptr<cg3d::Camera>> cameras{ 3 };
+    std::vector<std::shared_ptr<cg3d::Camera>> cameras{ 4};
     int camera_index = 0;
     int number_of_cameras = 0;
     std::shared_ptr<Camera> camera;

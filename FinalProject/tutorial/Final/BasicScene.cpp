@@ -37,34 +37,47 @@ void BasicScene::Init(float fov, int width, int height, float near, float far) {
 
 
 void BasicScene::init_cameras(float fov, int width, int height,float near, float far) {
-    //
-// Set camera list
+
+    //Set camera list
     cameras.resize(cameras.capacity());
     cameras[0] = Camera::Create("global view", fov, float(width) / height, near, far);
     cameras[1] = Camera::Create("snake front view", fov, float(width) / height, near, far);
     cameras[2] = Camera::Create("snake back view", fov, float(width) / height, near, far);
+    cameras[3] = Camera::Create("snake back view", fov, float(width) / height, near, far);
     number_of_cameras = int(cameras.size());
-    // Set global view
+
+
+    // x axis is for move step to left and right,
+    // y axis moves down and up, z axis is for front and back.
+
+
+    // Set front
     snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[0]);
-    Eigen::Vector3f camera_translation0 = Eigen::Vector3f(0.f, 10.f, 50.f);
-    cameras[0]->Translate(camera_translation0);
-    cameras[0]->RotateByDegree(-15.f, Movable::Axis::X);
+    cameras[0]->Translate(Eigen::Vector3f(1.f, 1.f, -6.f));
+    cameras[0]->Rotate(M_PI, Movable::Axis::Y);
+    cameras[0]->Rotate(-M_PI/18, Movable::Axis::X);
 
-    // Set snake front view
+
+    // Set mid snake view
     snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[1]);
-    Eigen::Vector3f camera_translation1 = cameras[1]->GetRotation() * Eigen::Vector3f(0.f, 0.6f, 0.6f);
-    cameras[1]->Translate(camera_translation1);
+    cameras[1]->Translate(Eigen::Vector3f(-3.f, 2.f, -15.f));
+    cameras[1]->Rotate(M_PI, Movable::Axis::Y);
+   // cameras[1]->Rotate(M_PI/8, Movable::Axis::X);
 
-    // Set snake back view
+    //Set over-view
     snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[2]);
-    Eigen::Vector3f camera_translation2 = cameras[2]->GetRotation() * Eigen::Vector3f(0.f, 0.6f, -4.f);
-    cameras[2]->Translate(camera_translation2);
-    cameras[2]->RotateByDegree(180, Movable::Axis::Y);
+    cameras[2]->Translate(Eigen::Vector3f(-5.f, 10.f, -20.f));
+    cameras[2]->Rotate(M_PI, Movable::Axis::Y);
+    cameras[2]->RotateByDegree(-15.f, Movable::Axis::X);
 
+    //Set over-view
+//    snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[3]);
+//    cameras[3]->Translate(Eigen::Vector3f(-5.f, 10.f, -50.f));
+//    cameras[3]->Rotate(M_PI, Movable::Axis::Y);
+//    cameras[3]->RotateByDegree(-15.f, Movable::Axis::X);
 
     camera = cameras[0];
-//    camera->Translate(50,Movable::Axis::Z);
-//    camera->Translate(5, Movable::Axis::Y);
+
 
 
 }
@@ -140,7 +153,7 @@ void BasicScene::BuildImGui(){
     StoreMenu();
     LeadersMenu();
     SettingsMenu();
-    //PlayMenu();
+    PlayMenu();
 }
 
 void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, const Eigen::Matrix4f& view, const Eigen::Matrix4f& model)
@@ -367,6 +380,7 @@ void BasicScene::init_helpers(){
 
 void BasicScene::loadingMenu() {
     if(statistics->menu_flags[LoadingMenu_OP]){
+        animate = false;
         setWindow("Loading");
         ImGui::PushFont(regularFont);
         ImGui::ProgressBar(progress, ImVec2(0.0f, 0.0f));
@@ -390,6 +404,7 @@ void BasicScene::loadingMenu() {
 void BasicScene::startMenu() {
 
     if(statistics->menu_flags[MainMenu_OP]) {
+        animate = false;
         setWindow("3D Snake");
         ImGui::PushFont(regularFont);
         buttonStyle();
@@ -397,8 +412,8 @@ void BasicScene::startMenu() {
             std::cout << "new game button pressed in start menu ." << endl;
             statistics->menu_flags[MainMenu_OP] = false;
             animate = true;
-            statistics->objectCollisionStopper->start(3);
-            statistics->selfCollisionStopper->start(3);
+            statistics->objectCollisionStopper->start(5);
+            statistics->selfCollisionStopper->start(5);
         }
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
@@ -489,6 +504,7 @@ void BasicScene::startMenu() {
 void BasicScene::PausedMenu()
 {
     if(statistics->menu_flags[PauseMenu_OP]) {
+        animate = false;
         setWindow("Pause");
         ImGui::PushFont(regularFont);
         ImGui::ProgressBar(statistics->get_progress(), ImVec2(0.0f, 0.0f));
@@ -571,6 +587,7 @@ void BasicScene::PausedMenu()
 void BasicScene::SettingsMenu()
 {
     if(statistics->menu_flags[SettingsMenu_OP]) {
+        animate = false;
         setWindow("Settings");
         ImGui::PushFont(regularFont);
         setBoxes();
@@ -688,6 +705,7 @@ void BasicScene::SettingsMenu()
 void BasicScene::NextLevelMenu() {
 
     if (statistics->menu_flags[LevelMenu_OP]) {
+        animate = false;
         setWindow("Level Up");
         ImGui::PushFont(regularFont);
         std::string tmp = std::to_string(statistics->level);
@@ -734,6 +752,7 @@ void BasicScene::NextLevelMenu() {
 
 void BasicScene::WinMenu() {
     if (statistics->menu_flags[WinMenu_OP]) {
+        animate = false;
         setWindow("You Won!");
         ImGui::PushFont(regularFont);
         ImGui::Text("Congratulations You finished the game!!");
@@ -802,6 +821,7 @@ void BasicScene::WinMenu() {
 }
 void BasicScene::LoseMenu() {
     if (statistics->menu_flags[GameOverMenu_OP]) {
+        animate = false;
         setWindow("Game Over!");
         ImGui::PushFont(regularFont);
         ImGui::Text("You lost..\nMaybe you will succeed next time.");
@@ -875,6 +895,7 @@ void BasicScene::LoseMenu() {
 void BasicScene::StoreMenu() {
 
     if (statistics->menu_flags[StoreMenu_OP]) {
+        animate = false;
         setWindow("Store");
         ImGui::PushFont(regularFont);
         ImGui::Text("You have total money of ");
@@ -929,6 +950,7 @@ void BasicScene::StoreMenu() {
 void BasicScene::LeadersMenu() {
 
     if (statistics->menu_flags[LeadersMenu_OP]) {
+        animate = false;
         setWindow("Leader Board");
         ImGui::PushFont(regularFont);
         this->highScores->loadHighScores();
@@ -970,18 +992,31 @@ void BasicScene::PlayMenu()
     if(animate) {
         int flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize;
         bool* pOpen = nullptr;
-        ImGui::Begin("Menu", pOpen, flags);
+        ImGui::Begin("Game Menu", pOpen, flags);
         ImGui::SetWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-        ImGui::SetWindowSize(ImVec2(0, 0), ImGuiCond_Always);
+        ImGui::SetWindowSize(ImVec2(screen_width, 100), ImGuiCond_Always);
         ImGui::Text("Camera: ");
-        //TODO: replace cameras.
-        for(int i = 0; i< 3 ; i++){
-            ImGui::Spacing();
+        for (int i = 0; i < cameras.size(); i++) {
+            ImGui::SameLine(0);
+            bool selectedCamera = cameras[i] == camera;
+            if (selectedCamera)
+                ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive));
+            if (ImGui::Button(std::to_string(i + 1).c_str()))
+                SetCamera(i);
+            if (selectedCamera)
+                ImGui::PopStyleColor();
         }
+        ImGui::SameLine();
+        if (ImGui::Button("Center"))
+            camera->SetTout(Eigen::Affine3f::Identity());
         ImGui::End();
     }
 }
-
+void BasicScene::SetCamera(int index)
+{
+    camera = cameras[index];
+    viewport->camera = camera;
+}
 
 
 void BasicScene::buttonStyle() {
@@ -1076,4 +1111,17 @@ Data* BasicScene::getData(){
     return this->data;
 }
 
+void BasicScene::ViewportSizeCallback(Viewport* _viewport)
+{
+    for (auto& cam: cameras)
+        cam->SetProjection(float(_viewport->width) / float(_viewport->height));
 
+    // note: we don't need to call Scene::ViewportSizeCallback since we are setting the projection of all the cameras
+}
+
+void BasicScene::AddViewportCallback(Viewport* _viewport)
+{
+    viewport = _viewport;
+
+    Scene::AddViewportCallback(viewport);
+}
