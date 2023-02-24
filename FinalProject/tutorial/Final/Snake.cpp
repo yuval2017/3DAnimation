@@ -331,7 +331,9 @@ Eigen::Vector3f Snake::ikGetPosition(int id, float length){
 }
 
 
-
+Eigen::Vector3f Snake::get_snake_head(){
+    return ikGetPosition(number_of_joints-1, joint_length/2);
+}
 
 
 

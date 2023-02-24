@@ -85,6 +85,7 @@ public:
     void propTranslate(Eigen::Vector3d t ,int id);
     void reset_bones();
     void reset_sake();
+    Eigen::Vector3f  get_snake_head();
 
 
 
