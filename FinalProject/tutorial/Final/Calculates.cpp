@@ -431,87 +431,96 @@ bool Calculates::doCubesIntersect(const Eigen::Vector3d& c1, const Eigen::Vector
     return d < 2 * cubeSize;
 }
 
+std::queue<Eigen::Vector3f> Calculates::generatePointsInSystem(float x_length, float y_length, float z_length, int n,float min_dist, Eigen::Vector3f point, std::vector<Eigen::Vector3f> points) {
+//first try.
+
+    //    // Define a random number generator
+//    std::queue<Eigen::Vector3f> result_points;
+//    float min_dist_sq = min_dist * min_dist;
+//
+//    // calculate grid size for n points
+//    int grid_size = std::ceil(std::cbrt(n));
+//
+//    // calculate spacing between grid points
+//    float x_spacing = x_length / grid_size;
+//    float y_spacing = y_length / grid_size;
+//    float z_spacing = z_length / grid_size;
+//    // generate grid points
+//    for (int i = 0; i < grid_size; ++i) {
+//        for (int j = 0; j < grid_size; ++j) {
+//            for (int k = 0; k < grid_size; ++k) {
+//                float x = (i + 0.5) * x_spacing - x_length / 2.0;
+//                float y = (j + 0.5) * y_spacing - y_length / 2.0;
+//                float z = (k + 0.5) * z_spacing - z_length / 2.0;
+//                Eigen::Vector3f grid_point(x, y, z);
+//
+//                // check distance to existing points
+//                bool valid = true;
+//                for (const auto& existing_point : points) {
+//                    if ((grid_point - existing_point).squaredNorm() < min_dist_sq) {
+//                        valid = false;
+//                        break;
+//                    }
+//                }
+//
+//                // check distance to target point
+//                if ((grid_point - point).squaredNorm() < min_dist_sq) {
+//                    valid = false;
+//                }
+//
+//                // add valid points to result
+//                if (valid) {
+//                    result_points.push(grid_point);
+//                }
+//
+//                // stop if we have enough points
+//                if (result_points.size() >= n) {
+//                    return result_points;
+//                }
+//            }
+//        }
+//    }
+//
+//    return result_points;
+
+//second try.
+
+    // Define the minimum distance from the edges and the point
+    float min_edge_dist = 10.0;
+    float min_point_dist = 100.0;
 
 
-void Calculates::setRandomObjectLocations( int numFrogs, int numMice, double cubeSize, double domainX, double domainY, double domainZ, std::vector<ObjectInfo> &locations) {
+    // Create a queue to store the points
+    std::queue<Vector3f> pointQueue;
 
-    // Calculate minimum distance between objects
-    double minDist = cubeSize + 10;
-
-    // Add frogs
-    for (int i = 0; i < numFrogs; ++i) {
-        bool validLocation = false;
-        Vector3d newLoc;
-        while (!validLocation) {
-            newLoc = Vector3d::Random().normalized() * ((domainX + domainY + domainZ) / 6) * 0.9; // Spread evenly in the system
-            validLocation = true;
-            for (const auto& loc : locations) {
-                if ((loc.position - newLoc).norm() < minDist) {
-                    validLocation = false;
-                    break;
+    // Generate new points until we have enough
+    while (pointQueue.size() < n) {
+        // Generate a random point within the system, subject to the constraints
+        Vector3f newPoint;
+        bool validPoint = false;
+        while (!validPoint) {
+            newPoint = Vector3f::Random();
+            newPoint.x() *= x_length / 2.0 - min_edge_dist;
+            newPoint.y() *= y_length / 2.0 - min_edge_dist;
+            newPoint.z() *= z_length / 2.0 - min_edge_dist;
+            newPoint += point;
+            if ((newPoint - point).norm() >= min_point_dist) {
+                bool tooClose = false;
+                for (const auto& existingPoint : points) {
+                    if ((newPoint - existingPoint).norm() < min_dist) {
+                        tooClose = true;
+                        break;
+                    }
+                }
+                if (!tooClose) {
+                    validPoint = true;
                 }
             }
         }
-        ObjectInfo object;
-        object.position = newLoc;
-        object.type = 'f';
-        locations.push_back(object);
+
+        // Add the new point to the queue
+        pointQueue.push(newPoint);
     }
 
-    // Add mice
-    for (int i = 0; i < numMice; ++i) {
-        bool validLocation = false;
-        Vector3d newLoc;
-        while (!validLocation) {
-            newLoc = Vector3d::Random().normalized() * ((domainX + domainY + domainZ) / 6) * 0.9; // Spread evenly in the system
-            validLocation = true;
-            for (const auto& loc : locations) {
-                if ((loc.position - newLoc).norm() < minDist) {
-                    validLocation = false;
-                    break;
-                }
-            }
-        }
-        ObjectInfo object;
-        object.position = newLoc;
-        object.type = 'm';
-        locations.push_back(object);
-    }
-}
-
-Eigen::Vector3d Calculates::generatePointInSystem(const double x, const double y, const double z, const Eigen::Vector3d& center, const double n)
-{
-    // create random number generator
-    std::random_device rd;
-    std::mt19937 gen(rd());
-
-    // create uniform distribution for x, y, and z
-    std::uniform_real_distribution<> disX(-x/2.0, x/2.0);
-    std::uniform_real_distribution<> disY(-y/2.0, y/2.0);
-    std::uniform_real_distribution<> disZ(-z/2.0, z/2.0);
-
-    Eigen::Vector3d point;
-    bool validPoint = false;
-
-    // loop until a valid point is generated
-    while(!validPoint)
-    {
-        // generate random coordinates within the bounds of the system
-        const double newX = disX(gen);
-        const double newY = disY(gen);
-        const double newZ = disZ(gen);
-
-        // create a vector from the center point to the new point
-        const Eigen::Vector3d diff = Eigen::Vector3d(newX, newY, newZ) - center;
-
-        // check if the new point is at least n units away from the center point
-        if(diff.norm() >= n)
-        {
-            // if the point is valid, set it and exit the loop
-            point = Eigen::Vector3d(newX, newY, newZ);
-            validPoint = true;
-        }
-    }
-
-    return point;
+    return pointQueue;
 }

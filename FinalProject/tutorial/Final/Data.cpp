@@ -40,9 +40,9 @@ void Data::load_data()
         object_collision = data["object_collision"];
         self_collision = data["self_collision"];
         double_score = data["double_score"];
-        scoreLevel1 = data["scoreLevel1"];
-        scoreLevel2 = data["scoreLevel2"];
-        scoreLevel3 = data["scoreLevel3"];
+        scores[1] = data["scoreLevel1"];
+        scores[2] = data["scoreLevel2"];
+        scores[3] = data["scoreLevel3"];
         file.close();
     }
     else {
@@ -63,9 +63,9 @@ void Data::save_data()
     data["object_collision"] = object_collision;
     data["self_collision"] = self_collision;
     data["double_score"] = double_score;
-    data["scoreLevel1"] = scoreLevel1;
-    data["scoreLevel2"] = scoreLevel2;
-    data["scoreLevel3"] = scoreLevel3 ;
+    data["scoreLevel1"] = scores[1];
+    data["scoreLevel2"] = scores[2];
+    data["scoreLevel3"] = scores[3];
     std::ofstream file("data.json");
     if (file.is_open()) {
         file << data;
@@ -191,5 +191,12 @@ std::vector<int> Data::get_back_to_main()
 int Data::message_size()
 {
     return this->msg.size();
+}
+
+bool Data::checkScore(int score, int level) {
+    if(score >= scores[level]){
+        return true;
+    }
+    return false;
 }
 

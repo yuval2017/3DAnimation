@@ -15,11 +15,15 @@
 #define GameOverMenu_OP             6
 #define WinMenu_OP                  7
 #define PlayMenu_OP                 8
+#define LoadingMenu_OP              9
 #define SPEED_COST                  50
 #define LIFE_COST                   30
+#define FROG_PRICE                  10
+#define MOUSE_PRICE                 50
+#define COIN_PRICE                  100
 
 #include "Stopper.h"
-
+#include "Data.h"
 using namespace std;
 
 class GameStatistics {
@@ -27,7 +31,7 @@ class GameStatistics {
 public:
     static GameStatistics* getInstance();
     char characterName[256] = "";
-    bool menu_flags[10] = {false, false,false, false,false, false,false, false,false, false};
+    bool menu_flags[11] = {false, false,false, false,false, false,false, false,false,false, false};
     bool back_to_main=false;
     //Stopper timer;
     const int num_of_levels =3;
@@ -44,7 +48,13 @@ public:
     void reset_game();
     Stopper* selfCollisionStopper;
     Stopper* objectCollisionStopper;
+
+    float loadingProgress();
+
+    void inc_Score(int i);
+
 private :
+    Data* data ;
     static GameStatistics* instance;
     GameStatistics();
     GameStatistics(GameStatistics const&);              // Don't Implement.

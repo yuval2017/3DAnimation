@@ -11,7 +11,6 @@ void Stopper::start(int sec) {
     if (!is_countdown_running()) {
         start_time = std::chrono::system_clock::now();
         seconds = sec;
-        std::cout << "count down of "<< seconds <<" seconds started."<< std::endl;
     }
 
 }
@@ -21,11 +20,9 @@ bool Stopper::is_countdown_running()  {
         return false;
     int val = seconds - std::chrono::duration_cast<std::chrono::seconds> (std::chrono::system_clock::now() - start_time).count() ;
     if(val <= 0){
-        std::cout << "count down of "<< seconds <<" seconds is over."<< std::endl;
         reset();
         return false;
     }
-    std::cout << "time remain: "<< val << std::endl;
     return true;
 }
 

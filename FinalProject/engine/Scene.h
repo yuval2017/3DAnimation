@@ -41,6 +41,10 @@ public:
 
 
 
+    // Camera list parameters
+    std::vector<std::shared_ptr<cg3d::Camera>> cameras{ 3 };
+    int camera_index = 0;
+    int number_of_cameras = 0;
     std::shared_ptr<Camera> camera;
     virtual void Draw_changes();
     virtual void MouseCallback(Viewport* viewport, int x, int y, int button, int action, int mods, int buttonState[]);

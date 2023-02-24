@@ -43,6 +43,8 @@ public:
     float soundVolume ;
     std::vector<int> back_to_main;
 
+    bool checkScore(int score, int level);
+
 private:
     void load_data();
     void save_data();
@@ -54,11 +56,8 @@ private:
     int object_collision;
     int self_collision;
     int double_score;
-    int scoreLevel1;
-    int scoreLevel2 ;
-    int scoreLevel3 ;
+    int scores[4];
     nlohmann::json json_data;
-
     Data();
     ~Data();
 };

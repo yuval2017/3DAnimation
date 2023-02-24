@@ -9,7 +9,7 @@
 #include "Camera.h"
 #include "igl/opengl/glfw/Viewer.h"
 #include "igl/opengl/ViewerData.h"
-
+#include "queue"
 
 
 struct Vertex {
@@ -53,13 +53,9 @@ public:
     bool doCubesIntersect(const Eigen::Vector3d& c1, const Eigen::Vector3d& c2, double cubeSize);
     void setRandomCubeLocations(double domainX, double domainY, double domainZ,
                                 int numCubes, double cubeSize, std::vector<ObjectInfo> &cubes);
-    void setRandomObjectLocations(int numFrogs, int numMice, double cubeSize, double domainX, double domainY, double domainZ, std::vector<Calculates::ObjectInfo>& locations);
     std::vector<TexCoord>
     getVertexTextureCoordinates(std::vector<Vertex> vertices, std::vector<Face> faces, std::string imagePath);
     std::vector<TexCoord> getVertexTextureCoordinates(Eigen::MatrixXd vertices, Eigen::MatrixXi faces, std::string imagePath);
-    Eigen::Vector3d generatePointInSystem(const double x, const double y, const double z, const Eigen::Vector3d& center, const double n);
-
+    std::queue<Eigen::Vector3f> generatePointsInSystem(float x_length, float y_length, float z_length, int n,float min_dist, Eigen::Vector3f point, std::vector<Eigen::Vector3f> points);
 
 };
-
-

@@ -7,6 +7,7 @@
 #include "Material.h"
 #include "Movable.h"
 #include "ViewerData.h"
+#include "../tutorial/Final/Stopper.h"
 namespace cg3d
 {
 
@@ -57,7 +58,7 @@ public:
     Eigen::Vector3f GetPosition();
     std::shared_ptr <Model> bezier;
     float bezier_speed = 1;
-
+    Stopper stopper;
 
 
     inline std::shared_ptr<Mesh> GetMesh(int index = 0) const { return meshList[index]; }

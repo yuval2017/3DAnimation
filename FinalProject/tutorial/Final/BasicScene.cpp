@@ -22,9 +22,12 @@ using namespace cg3d;
 
 void BasicScene::Init(float fov, int width, int height, float near, float far) {
 
-    camera = Camera::Create("camera", fov, float(width) / height, near, far);
     initProperties(width, height);
+    this->statistics->menu_flags[LoadingMenu_OP] = true;
+    progress=0;
+    done = 0;
     init_objects();
+    init_cameras(fov,width,height,near,far);
     init_helpers();
     setFonts();
     setStartPos();
@@ -32,6 +35,39 @@ void BasicScene::Init(float fov, int width, int height, float near, float far) {
 
 }
 
+
+void BasicScene::init_cameras(float fov, int width, int height,float near, float far) {
+    //
+// Set camera list
+    cameras.resize(cameras.capacity());
+    cameras[0] = Camera::Create("global view", fov, float(width) / height, near, far);
+    cameras[1] = Camera::Create("snake front view", fov, float(width) / height, near, far);
+    cameras[2] = Camera::Create("snake back view", fov, float(width) / height, near, far);
+    number_of_cameras = int(cameras.size());
+    // Set global view
+    snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[0]);
+    Eigen::Vector3f camera_translation0 = Eigen::Vector3f(0.f, 10.f, 50.f);
+    cameras[0]->Translate(camera_translation0);
+    cameras[0]->RotateByDegree(-15.f, Movable::Axis::X);
+
+    // Set snake front view
+    snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[1]);
+    Eigen::Vector3f camera_translation1 = cameras[1]->GetRotation() * Eigen::Vector3f(0.f, 0.6f, 0.6f);
+    cameras[1]->Translate(camera_translation1);
+
+    // Set snake back view
+    snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[2]);
+    Eigen::Vector3f camera_translation2 = cameras[2]->GetRotation() * Eigen::Vector3f(0.f, 0.6f, -4.f);
+    cameras[2]->Translate(camera_translation2);
+    cameras[2]->RotateByDegree(180, Movable::Axis::Y);
+
+
+    camera = cameras[0];
+//    camera->Translate(50,Movable::Axis::Z);
+//    camera->Translate(5, Movable::Axis::Y);
+
+
+}
 BasicScene::BasicScene(std::string name, Display* display) : SceneWithImGui(std::move(name), display)
 {
     ImGui::GetIO().IniFilename = nullptr;
@@ -52,15 +88,7 @@ void BasicScene::initProperties( int width, int height){
     windowSize = ImVec2(window_width, window_height);
 }
 
-void BasicScene::init_helpers(){
 
-    this->highScores = new HighScores();
-    this->statistics->menu_flags[MainMenu_OP] = true;
-    this->soundManager = SoundManager::getInstance();
-    soundManager->play_game_music();
-    this->animate = false;
-
-}
 
 void BasicScene::setImage(){
     backgroundImage = stbi_load("../tutorial/Final/images/7x7.jpg", &image_width , &image_height, &channels, STBI_rgb_alpha);
@@ -103,6 +131,7 @@ void BasicScene::setStartPos() {
 }
 
 void BasicScene::BuildImGui(){
+    loadingMenu();
     startMenu();
     PausedMenu();
     NextLevelMenu();
@@ -119,8 +148,10 @@ void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, con
     Scene::Update(program, proj, view, model);
     char * green = "green";
     char* grey = "grey";
+    char* gold = "gold";
     int resgreen = (program.name).compare(green);
     int resgrey = (program.name).compare(grey);
+    int resgold = (program.name).compare(gold);
     if( resgreen == 0 ){
         program.SetUniform4f("lightColor", 0.8f, 0.9f, 0.6f, 1.0f);
         program.SetUniform4f("Kai", 0.2f, 0.4f, 0.1f, 1.0f);
@@ -133,6 +164,13 @@ void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, con
         program.SetUniform4f("Kai", 0.3f, 0.3f, 0.3f, 1.0f);
         program.SetUniform4f("Kdi", 0.3f, 0.3f, 0.3f, 1.0f);
         program.SetUniform1f("specular_exponent", 20.0f);
+        program.SetUniform4f("light_position", 0.0, 15.0f, 0.0, 1.0f);
+    }
+    else if(resgold == 0){
+        program.SetUniform4f("lightColor", 1.0f, 0.8f, 0.1f, 1.0f);
+        program.SetUniform4f("Kai", 0.8f, 0.6f, 0.1f, 1.0f);
+        program.SetUniform4f("Kdi", 0.8f, 0.6f, 0.1f, 1.0f );
+        program.SetUniform1f("specular_exponent", 50.0f);
         program.SetUniform4f("light_position", 0.0, 15.0f, 0.0, 1.0f);
     }
     else{
@@ -310,10 +348,45 @@ void BasicScene::init_objects() {
     material =  std::make_shared<Material>("material", program); // empty material
     material->AddTexture(0, "textures/box0.bmp", 2);
     snake = new Snake(material,root,camera);
-    camera->Translate(50,Movable::Axis::Z);
-    camera->Translate(5, Movable::Axis::Y);
+    init_flags[0]= true;
+    done++;
+    progress = done/len;
+
+}
+void BasicScene::init_helpers(){
+
+    this->highScores = new HighScores();
+    this->soundManager = SoundManager::getInstance();
+    //soundManager->play_game_music();
+    this->animate = false;
+    init_flags[2]= true;
+    done++;
+    progress = done/len;
+
 }
 
+void BasicScene::loadingMenu() {
+    if(statistics->menu_flags[LoadingMenu_OP]){
+        setWindow("Loading");
+        ImGui::PushFont(regularFont);
+        ImGui::ProgressBar(progress, ImVec2(0.0f, 0.0f));
+        ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
+        ImGui::Text("Done");
+        for(int i = 0; i< 30 ; i++){
+            ImGui::Spacing();
+        }
+        if(progress == 1.0 ){
+            ImGui::Text("Loading is finished! Press the button to start play.");
+            if (ImGui::Button("Start Play", ImVec2(-1, 0))) {
+                std::cout << "start play button pressed in loading menu ." << endl;
+                statistics->menu_flags[LoadingMenu_OP] = false;
+                statistics->menu_flags[MainMenu_OP] = true;
+            }
+        }
+        ImGui::PopFont();
+        endWindow();
+    }
+}
 void BasicScene::startMenu() {
 
     if(statistics->menu_flags[MainMenu_OP]) {
@@ -707,9 +780,9 @@ void BasicScene::WinMenu() {
         }
         if (ImGui::Button("Back ", ImVec2(-1, 0))) {
             std::cout << "Back button pressed in win menu." << endl;
+            data->back_to_main.clear();
                 statistics->menu_flags[WinMenu_OP] =false;
                 statistics->menu_flags[MainMenu_OP] =true;
-                data->back_to_main.clear();
                 //TODO:reset game.
 
         }
@@ -777,9 +850,9 @@ void BasicScene::LoseMenu() {
         }
         if (ImGui::Button("Back ", ImVec2(-1, 0))) {
             std::cout << "Back button pressed in win menu." << endl;
+            data->back_to_main.clear();
             statistics->menu_flags[GameOverMenu_OP] = false;
             statistics->menu_flags[MainMenu_OP] = true;
-            data->back_to_main.clear();
             //TODO:reset game.
             saved= false;
         }
@@ -822,6 +895,7 @@ void BasicScene::StoreMenu() {
         if (ImGui::Button("refill health - 30 coins", ImVec2(-1, 0))) {
             data->inc_life_bought();
             data->set_message(std::to_string(data->get_life_bought()));
+            soundManager->play_sound(std::to_string(FAIL_SOUND));
         }
 
         for(int i = 0; i< 3 ; i++){
@@ -991,7 +1065,9 @@ Score* BasicScene::generateRandomScore() {
     return ret;
 }
 
-
+SoundManager* BasicScene::getSoundManager() {
+    return soundManager;
+}
 
 GameStatistics* BasicScene::getStatistics(){
     return this->statistics;
@@ -999,3 +1075,5 @@ GameStatistics* BasicScene::getStatistics(){
 Data* BasicScene::getData(){
     return this->data;
 }
+
+

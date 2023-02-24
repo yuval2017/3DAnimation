@@ -31,6 +31,7 @@ GameStatistics::GameStatistics() {
     levelUp = false;
     selfCollisionStopper = new Stopper();
     objectCollisionStopper = new Stopper();
+    data = Data::getInstance();
 }
 
 void GameStatistics::reset_game() {
@@ -42,4 +43,13 @@ void GameStatistics::reset_game() {
     strikes_used = 0 ;
     double_score = false;
     levelUp = false;
+}
+
+void GameStatistics::inc_Score(int i) {
+
+    score+=i;
+    if(data->checkScore(score,level)){
+        levelUp= true;
+        menu_flags[LevelMenu_OP] = true;
+    }
 }

@@ -41,7 +41,6 @@ private:
     MeshCollisionVisitor meshCollisionVisitor;
     AnimationVisitor animationVisitor;
     ObjectsAnimationVisitor objectsAnimationVisitor;
-
     Viewport* FindViewportAtPos(int x, int y);
     DrawVisitor defaultVisitor;
     std::vector<std::shared_ptr<Viewport>> viewports;

@@ -33,7 +33,11 @@ public:
     bool done_inite = false;
     GameStatistics* getStatistics();
     Data* getData();
-
+    SoundManager* getSoundManager();
+    bool init_flags[3] = {false, false,false};
+    float done;
+    float len = 3;
+    float progress;
     ~BasicScene();
 private:
     Data* data;
@@ -53,6 +57,7 @@ private:
     Eigen::VectorXi EQ;
     // If an edge were collapsed, we'd collapse it to these points:
     Eigen::MatrixXd V, C, N, T, points,edges,colors;
+    void loadingMenu();
     void init_objects();
     void startMenu();
     void PausedMenu();
@@ -78,6 +83,7 @@ private:
     int screen_width;
     int screen_height;
     int channels;
+
     void SettingsMenu();
     void setStartPos();
     void setWindow(const char* header);
@@ -89,4 +95,5 @@ private:
     GLuint backgroundImageTexture;
     ImVec2 startPos ;
     int windowFlags;
+    void init_cameras(float fov,int width, int height,float near,float far);
 };
