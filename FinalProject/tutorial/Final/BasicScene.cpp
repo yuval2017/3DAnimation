@@ -37,34 +37,32 @@ void BasicScene::Init(float fov, int width, int height, float near, float far) {
 
 
 void BasicScene::init_cameras(float fov, int width, int height,float near, float far) {
-    //
+
+// Set global view
 // Set camera list
     cameras.resize(cameras.capacity());
     cameras[0] = Camera::Create("global view", fov, float(width) / height, near, far);
     cameras[1] = Camera::Create("snake front view", fov, float(width) / height, near, far);
     cameras[2] = Camera::Create("snake back view", fov, float(width) / height, near, far);
+    camera = cameras[0];
     number_of_cameras = int(cameras.size());
-    // Set global view
-    snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[0]);
-    Eigen::Vector3f camera_translation0 = Eigen::Vector3f(0.f, 10.f, 50.f);
-    cameras[0]->Translate(camera_translation0);
-    cameras[0]->RotateByDegree(-15.f, Movable::Axis::X);
 
+    snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[0]);
+    cameras[0]->Translate( Eigen::Vector3f(0.f, 2.f, -15.f));
+    //cameras[0]->Rotate(-M_PI/6.f, Movable::Axis::X);
+    cameras[0]->Rotate(-M_PI , Axis::Y);
     // Set snake front view
     snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[1]);
     Eigen::Vector3f camera_translation1 = cameras[1]->GetRotation() * Eigen::Vector3f(0.f, 0.6f, 0.6f);
     cameras[1]->Translate(camera_translation1);
-
+    cameras[1]->Rotate(M_PI , Axis::Y);
     // Set snake back view
     snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[2]);
     Eigen::Vector3f camera_translation2 = cameras[2]->GetRotation() * Eigen::Vector3f(0.f, 0.6f, -4.f);
     cameras[2]->Translate(camera_translation2);
-    cameras[2]->RotateByDegree(180, Movable::Axis::Y);
-
-
+    cameras[2]->Rotate(M_PI, Movable::Axis::Y);
+    cameras[2]->Rotate(M_PI , Axis::Y);
     camera = cameras[0];
-//    camera->Translate(50,Movable::Axis::Z);
-//    camera->Translate(5, Movable::Axis::Y);
 
 
 }
@@ -140,7 +138,7 @@ void BasicScene::BuildImGui(){
     StoreMenu();
     LeadersMenu();
     SettingsMenu();
-    //PlayMenu();
+    PlayMenu();
 }
 
 void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, const Eigen::Matrix4f& view, const Eigen::Matrix4f& model)
@@ -247,12 +245,12 @@ void BasicScene::CursorPosCallback(Viewport* viewport, int x, int y, bool draggi
         } else {
             // camera->SetTout(cameraToutAtPress);
             if (buttonState[GLFW_MOUSE_BUTTON_RIGHT] != GLFW_RELEASE)
-                root->TranslateInSystem(system, {-float(xAtPress - x) / moveCoeff/10.0f, float( yAtPress - y) / moveCoeff/10.0f, 0});
+                camera->TranslateInSystem(system, {-float(xAtPress - x) / moveCoeff/10.0f, float( yAtPress - y) / moveCoeff/10.0f, 0});
             if (buttonState[GLFW_MOUSE_BUTTON_MIDDLE] != GLFW_RELEASE)
-                root->RotateInSystem(system, float(x - xAtPress) / 180.0f, Axis::Z);
+                camera->RotateInSystem(system, float(x - xAtPress) / 180.0f, Axis::Z);
             if (buttonState[GLFW_MOUSE_BUTTON_LEFT] != GLFW_RELEASE) {
-                root->RotateInSystem(system, float(x - xAtPress) / angleCoeff, Axis::Y);
-                root->RotateInSystem(system, float(y - yAtPress) / angleCoeff, Axis::X);
+                camera->RotateInSystem(system, float(x - xAtPress) / angleCoeff, Axis::Y);
+                camera->RotateInSystem(system, float(y - yAtPress) / angleCoeff, Axis::X);
             }
         }
         xAtPress =  x;
@@ -397,8 +395,8 @@ void BasicScene::startMenu() {
             std::cout << "new game button pressed in start menu ." << endl;
             statistics->menu_flags[MainMenu_OP] = false;
             animate = true;
-            statistics->objectCollisionStopper->start(3);
-            statistics->selfCollisionStopper->start(3);
+            statistics->objectCollisionStopper->start(5);
+            statistics->selfCollisionStopper->start(5);
         }
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
@@ -974,15 +972,25 @@ void BasicScene::PlayMenu()
         ImGui::SetWindowPos(ImVec2(0, 0), ImGuiCond_Always);
         ImGui::SetWindowSize(ImVec2(0, 0), ImGuiCond_Always);
         ImGui::Text("Camera: ");
-        //TODO: replace cameras.
-        for(int i = 0; i< 3 ; i++){
-            ImGui::Spacing();
+        for (int i = 0; i < cameras.size(); i++) {
+            ImGui::SameLine(0);
+            bool selectedCamera = cameras[i] == camera;
+            if (selectedCamera)
+                ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive));
+            if (ImGui::Button(std::to_string(i + 1).c_str()))
+                SetCamera(i);
+            if (selectedCamera)
+                ImGui::PopStyleColor();
         }
         ImGui::End();
     }
 }
 
-
+void BasicScene::SetCamera(int index)
+{
+    camera = cameras[index];
+    viewport->camera = camera;
+}
 
 void BasicScene::buttonStyle() {
     // Set button color to dark green
@@ -1077,3 +1085,17 @@ Data* BasicScene::getData(){
 }
 
 
+void BasicScene::ViewportSizeCallback(Viewport* _viewport)
+{
+    for (auto& cam: cameras)
+        cam->SetProjection(float(_viewport->width) / float(_viewport->height));
+
+    // note: we don't need to call Scene::ViewportSizeCallback since we are setting the projection of all the cameras
+}
+
+void BasicScene::AddViewportCallback(Viewport* _viewport)
+{
+    viewport = _viewport;
+
+    Scene::AddViewportCallback(viewport);
+}

@@ -30,6 +30,7 @@ public:
     //added for engine
     std::vector<std::shared_ptr<cg3d::Model>> game_models;
     void create_menu();
+    void SetCamera(int index);
     bool done_inite = false;
     GameStatistics* getStatistics();
     Data* getData();
@@ -38,6 +39,8 @@ public:
     float done;
     float len = 3;
     float progress;
+    void AddViewportCallback(Viewport* _viewport) override;
+    void ViewportSizeCallback(Viewport* _viewport) override;
     ~BasicScene();
 private:
     Data* data;
@@ -57,6 +60,7 @@ private:
     Eigen::VectorXi EQ;
     // If an edge were collapsed, we'd collapse it to these points:
     Eigen::MatrixXd V, C, N, T, points,edges,colors;
+    cg3d::Viewport* viewport = nullptr;
     void loadingMenu();
     void init_objects();
     void startMenu();
