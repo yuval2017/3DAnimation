@@ -180,7 +180,6 @@ void ObjectsAnimationVisitor::Visit(Model *model) {
 }
 
 std::shared_ptr<Model> ObjectsAnimationVisitor::generateObjectBezier(int material_id ,int model_id, std::string name, float scale){
-
     std::shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(material_id,model_id,name);
     basicScene->GetRoot()->AddChild(cube);
     cube->showWireframe = true;
@@ -260,8 +259,7 @@ void ObjectsAnimationVisitor::drawTheBeizerCurve(std::shared_ptr<Model> model) {
 shared_ptr<Model> ObjectsAnimationVisitor::createFrog(){
     ModelsFactory* factory = ModelsFactory::getInstance();
     shared_ptr<Model> frog =  factory->CreateModel(GREEN_MATERIAL , FROG , std::string (EATING_OBJECT) + std::string(TIMING)+ std::string(FROG_NAME));
-    //frog->material->program->name = "green";
-    basicScene->GetRoot()->AddChild(frog);
+    frog->material->program->name = "green";
     return frog;
 }
 
@@ -316,7 +314,6 @@ void ObjectsAnimationVisitor::CreateLevel1(std::vector<shared_ptr<Model>> &model
 
 
 }
-
 void ObjectsAnimationVisitor::CreateLevel2(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords) {
     int n = 30;
     models.resize(0);

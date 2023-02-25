@@ -99,10 +99,11 @@ void Model::SetMeshList(std::vector<std::shared_ptr<Mesh>> _meshList)
 //may do it in the game initiate
 igl::AABB<Eigen::MatrixXd, 3> *Model::GetTreeWithCube(){
     if(!is_tree_inited){
-        std::shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(BASIC_MATERIAL,CUBE,"help_box");
-         //AddChild(cube);
-         cube->AddChild(this->shared_from_this());
-        //cube->isHidden = true;
+        std::shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(PHONG_MATERIAL,CUBE,"help_box");
+         AddChild(cube);
+         //cube->AddChild(this->shared_from_this());
+        cube->isHidden = true;
+        cube->Scale(10);
         treeA1.init(cube->GetMeshList()[0]->data[0].vertices,cube->GetMeshList()[0]->data[0].faces);
         is_tree_inited = true;
     }

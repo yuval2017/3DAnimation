@@ -40,13 +40,23 @@ void cg3d::MeshCollisionVisitor::Visit(Model *model) {
           std::cout << "collision with " << model->name << " \n collision running = " <<
           (basicScene->getStatistics()->objectCollisionStopper->is_countdown_running())<<std::endl;
           handle_object_hit(model);
+      else if(!model->isHidden &&
+                model->name.find(COLLISION_OBJECT) != std::string::npos &&
+                !(basicScene->getStatistics()->objectCollisionStopper->is_countdown_running())){
+          std::cout << "collision with " << model->name << " \n" << std::endl;
+          if( (Calculates::getInstance()->
+                  isMeshCollision(snake, model, ((snake)->GetTreeWithCube()),
+                                  model->GetTreeWithOutCube()))) {
+              std::cout << "collision with " << model->name << " \n" << std::endl;
+              handle_object_hit(model);
+          }
       }
       else if( !model->isHidden &&
                 model->name.find(EATING_OBJECT) != std::string::npos ){
           if (Calculates::getInstance()->
                   isMeshCollision(snake, model, ((snake)->GetTreeWithCube()),
-                                  model->GetTreeWithCube())) {
-              std::cout << " eating " << model->name << " \n" << std::endl;
+                                  model->GetTreeWithOutCube())) {
+              std::cout << " eated " << model->name << " \n" << std::endl;
               handle_eating(model);
           }
       }
