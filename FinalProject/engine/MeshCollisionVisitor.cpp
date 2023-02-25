@@ -31,13 +31,14 @@ void cg3d::MeshCollisionVisitor::Visit(Model *model) {
           std::cout << "collision with " << model->name << " \n" << std::endl;
           handle_self_hit();
       }
-      else if(!model->isHidden &&
-                model->name.find(COLLISION_OBJECT) != std::string::npos &&
+      else if((!model->isHidden & model->name.find(COLLISION_OBJECT) != std::string::npos) &
                 !(basicScene->getStatistics()->objectCollisionStopper->is_countdown_running())&&
               (Calculates::getInstance()->
                       isMeshCollision(snake, model, ((snake)->GetTreeWithCube()),
                                       model->GetTreeWithCube()))){
-          std::cout << "collision with " << model->name << " \n" << std::endl;
+
+          std::cout << "collision with " << model->name << " \n collision running = " <<
+          (basicScene->getStatistics()->objectCollisionStopper->is_countdown_running())<<std::endl;
           handle_object_hit(model);
       }
       else if( !model->isHidden &&

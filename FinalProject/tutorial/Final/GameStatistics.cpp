@@ -17,7 +17,7 @@ GameStatistics* GameStatistics::getInstance()
 
 
 float GameStatistics::get_progress(){
-    return level/num_of_levels;
+    return score/data->scores[level];
 }
 
 GameStatistics::GameStatistics() {

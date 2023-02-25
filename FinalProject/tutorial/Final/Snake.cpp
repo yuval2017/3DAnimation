@@ -257,6 +257,7 @@ void Snake::reset_bones(){
     bones[0]->Translate((joint_length/2.0f),cg3d::Movable::Axis::Z);
     bones[0]->Translate(-(number_of_joints)*joint_length,cg3d::Movable::Axis::Z);
     root->AddChild(bones[0]);
+    bones[0]->Translate({0,0,0});
     for(int i = 1;i < number_of_joints; i++)
     {
         bones.push_back(ModelsFactory::getInstance()->CreateModel(PHONG_MATERIAL, CYL, "bone " + std::to_string(i)));
@@ -268,6 +269,7 @@ void Snake::reset_bones(){
         //bones[i-1]->AddChild(bones[i]);
         bones[i]->GetTreeWithOutCube();
         root->AddChild(bones[i]);
+        bones[i]->Translate({0,0,0});
     }
 }
 void Snake::reset_sake() {

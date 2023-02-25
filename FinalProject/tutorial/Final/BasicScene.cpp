@@ -24,7 +24,6 @@ void BasicScene::Init(float fov, int width, int height, float near, float far) {
 
     initProperties(width, height);
     this->statistics->menu_flags[LoadingMenu_OP] = true;
-    progress=0;
     done = 0;
     init_objects();
     init_cameras(fov,width,height,near,far);
@@ -363,7 +362,6 @@ void BasicScene::init_objects() {
     snake = new Snake(material,root,camera);
     init_flags[0]= true;
     done++;
-    progress = done/len;
 
 }
 void BasicScene::init_helpers(){
@@ -374,33 +372,43 @@ void BasicScene::init_helpers(){
     this->animate = false;
     init_flags[2]= true;
     done++;
-    progress = done/len;
 
 }
 
 void BasicScene::loadingMenu() {
+
+    if(start_time == 0.0 ) {
+        start_time = ImGui::GetTime();
+    }
     if(statistics->menu_flags[LoadingMenu_OP]){
         animate = false;
         setWindow("Loading");
         ImGui::PushFont(regularFont);
-        ImGui::ProgressBar(progress, ImVec2(0.0f, 0.0f));
-        ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
-        ImGui::Text("Done");
-        for(int i = 0; i< 30 ; i++){
-            ImGui::Spacing();
-        }
-        if(progress == 1.0 ){
-            ImGui::Text("Loading is finished! Press the button to start play.");
-            if (ImGui::Button("Start Play", ImVec2(-1, 0))) {
-                std::cout << "start play button pressed in loading menu ." << endl;
-                statistics->menu_flags[LoadingMenu_OP] = false;
-                statistics->menu_flags[MainMenu_OP] = true;
-            }
+        // Get the current time in seconds
+
+        // Get the current time in seconds
+        float current_time = ImGui::GetTime();
+
+        // Calculate the progress as a value between 0 and 1
+        float progress =  (done == 3) ? std::min((current_time - start_time) / 30.f, 1.0f) : start_time;
+
+        // Display the progress as a percentage
+        ImGui::Text("Percentage of Time Passed: %.2f%%", progress * 100.0f);
+
+        // Display the progress bar
+        ImGui::ProgressBar(progress, ImVec2(-1, 0), "");
+        // Call the callback function when progress reaches 100%
+        if (progress >= 1.0f) {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            statistics->menu_flags[LoadingMenu_OP] = false;
+            statistics->menu_flags[MainMenu_OP] =true;
         }
         ImGui::PopFont();
         endWindow();
     }
 }
+
+
 void BasicScene::startMenu() {
 
     if(statistics->menu_flags[MainMenu_OP]) {
@@ -412,8 +420,8 @@ void BasicScene::startMenu() {
             std::cout << "new game button pressed in start menu ." << endl;
             statistics->menu_flags[MainMenu_OP] = false;
             animate = true;
-            statistics->objectCollisionStopper->start(5);
-            statistics->selfCollisionStopper->start(5);
+            statistics->objectCollisionStopper->start(15);
+            statistics->selfCollisionStopper->start(30);
         }
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();

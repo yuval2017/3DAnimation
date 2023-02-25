@@ -29,16 +29,21 @@ ModelsFactory::ModelsFactory(){
     materials[DAYLIGHT_MATERIAL]->AddTexture(0, "textures/cubemaps/Daylight Box_", 3);
 
 
+    //frog material
+    //materials[FROG_MATERIAL] = {std::make_shared<Material>("green_color", "shaders/phongShader")};
+    //materials[FROG_MATERIAL]-> program->name = "green";
+
+
     //green material
     materials[GREEN_MATERIAL] = {std::make_shared<Material>("green_color", "shaders/phongShader")};
-    materials[GREEN_MATERIAL]->program->name = "green";
+    //materials[GREEN_MATERIAL]->program->name = "green";
 
     //grey material
     materials[GREY_MATERIAL] = {std::make_shared<Material>("grey_color", "shaders/phongShader")};
     materials[GREY_MATERIAL]->program->name = "grey";
 
     //gold material
-    materials[GOLD_MATERIAL] = {std::make_shared<Material>("ggold_color", "shaders/phongShader")};
+    materials[GOLD_MATERIAL] = {std::make_shared<Material>("gold_color", "shaders/phongShader")};
     materials[GOLD_MATERIAL]->program->name = "gold";
 
     //meshes
@@ -48,8 +53,9 @@ ModelsFactory::ModelsFactory(){
     meshes[TRUCK] = ObjLoader::MeshFromObj("sphere_mesh", {"data/truck.obj"});
     meshes[COIN] = ObjLoader::MeshFromObj("coin_mesh", {"data/coin.obj"});
     //meshes[TREE] = ObjLoader::MeshFromObj("tree_mesh",{"data/tree2.obj"} );
-    meshes[FROG] = {IglLoader::MeshFromFiles("frog_mesh", "data/frog/Frog.obj")};
+    //meshes[FROG] = {IglLoader::MeshFromFiles("frog_mesh", "data/frog/Frog.obj")};
     meshes[MOUSE] = {IglLoader::MeshFromFiles("mouse_mesh", "data/mouse/Mouse.obj")};
+    meshes[FROG] =  {IglLoader::MeshFromFiles("frog2_mesh", "data/frog2/Frog.obj")};
     //need to implement but not in lines
     meshes[LINES] = NULL;
     meshes[SNAKE1] = ObjLoader::MeshFromObj("snake_mesh", {"data/snake1.obj"});

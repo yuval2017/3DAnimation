@@ -61,7 +61,6 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
         CreateLevel1(models, coords);
         basicScene->init_flags[1]= true;
         basicScene->done++;
-        basicScene->progress = basicScene->done/basicScene->len;
 
     }
     else{
@@ -73,7 +72,7 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
                     frogPoints.pop();
                     frogPoints.push(pos);
                     frog->Translate(pos);
-                    std::cout<< "added frog model : "<<pos[0] <<", " << pos[1] <<", " << pos[2] <<std::endl;
+                    //std::cout<< "added frog model : "<<pos[0] <<", " << pos[1] <<", " << pos[2] <<std::endl;
                     stopperFrog->start(sec1);
                     frog->stopper.start(len1);
                     break;
@@ -88,7 +87,7 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
                     mousePoints.pop();
                     mousePoints.push(pos);
                     mouse->Translate(pos);
-                    std::cout<< "added mouse model : "<<pos[0] <<", " << pos[1] <<", " << pos[2] <<std::endl;
+                    //std::cout<< "added mouse model : "<<pos[0] <<", " << pos[1] <<", " << pos[2] <<std::endl;
                     stopperMouse->start(sec2);
                     mouse->stopper.start(len2);
                     break;
@@ -103,7 +102,7 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
                     coinPoints.pop();
                     coinPoints.push(pos);
                     coin->Translate(pos);
-                    std::cout<< "added coin model: "<<pos[0] <<", " << pos[1] <<", " << pos[2] <<std::endl;
+                    //std::cout<< "added coin model: "<<pos[0] <<", " << pos[1] <<", " << pos[2] <<std::endl;
                     stopperCoin->start(sec3);
                     coin->stopper.start(len3);
                     break;
@@ -158,7 +157,8 @@ void ObjectsAnimationVisitor::Visit(Model *model) {
         if(model->name.find(TIMING) != std::string::npos){
             if(!model->stopper.is_countdown_running()){
                 model->isHidden =true;
-                std::cout << "model becomes hidden: "<< model->name << std::endl;
+                model->stopper.reset();
+                //std::cout << "model becomes hidden: "<< model->name << std::endl;
             }
         }
         else if (model->name.substr(0, strlen(BEZIER_OBJECT_NAME)) == std::string(BEZIER_OBJECT_NAME)) {
@@ -180,10 +180,20 @@ void ObjectsAnimationVisitor::Visit(Model *model) {
 }
 
 std::shared_ptr<Model> ObjectsAnimationVisitor::generateObjectBezier(int material_id ,int model_id, std::string name, float scale){
+
     std::shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(material_id,model_id,name);
     basicScene->GetRoot()->AddChild(cube);
     cube->showWireframe = true;
-    Eigen::Vector3f location = Eigen::Vector3f (generate_random_number(minx,maxx),generate_random_number(miny,maxy),generate_random_number(minz,maxz));
+
+    Eigen::Vector3d max = basicScene->level1->GetMeshList()[0]->data[0].vertices.colwise().maxCoeff();
+    Eigen::Vector3d min = basicScene->level1->GetMeshList()[0]->data[0].vertices.colwise().minCoeff();
+    double z_length = max[2]*basicScene->level1->scale_factor[2] - min[2]*basicScene->level1->scale_factor[2];
+    double y_length = max[1]*basicScene->level1->scale_factor[1] - min[1]*basicScene->level1->scale_factor[1];
+    double x_length = max[0]*basicScene->level1->scale_factor[0] - min[0]*basicScene->level1->scale_factor[0];
+
+    Eigen::Vector3f location = calculates->generatePointsInSystem(
+            x_length/2,y_length/2,z_length/2,1,
+            min_dist,basicScene->snake->get_snake_head(),coords).front();
     cube->Translate(location);
     cube->Scale(scale,Movable::Axis::XYZ);
     setModelBezier(location,cube);
@@ -250,7 +260,8 @@ void ObjectsAnimationVisitor::drawTheBeizerCurve(std::shared_ptr<Model> model) {
 shared_ptr<Model> ObjectsAnimationVisitor::createFrog(){
     ModelsFactory* factory = ModelsFactory::getInstance();
     shared_ptr<Model> frog =  factory->CreateModel(GREEN_MATERIAL , FROG , std::string (EATING_OBJECT) + std::string(TIMING)+ std::string(FROG_NAME));
-    frog->material->program->name = "green";
+    //frog->material->program->name = "green";
+    basicScene->GetRoot()->AddChild(frog);
     return frog;
 }
 
@@ -261,6 +272,7 @@ shared_ptr<Model> ObjectsAnimationVisitor::createMouse(){
     shared_ptr<Model> mouse=  factory->CreateModel(GREY_MATERIAL , MOUSE ,std::string(EATING_OBJECT)+ std::string(TIMING)+ std::string(MOUSE_NAME));
     mouse->GetTreeWithCube();
     mouse->material->program->name = "grey";
+    basicScene->GetRoot()->AddChild(mouse);
     return mouse;
 }
 
@@ -269,6 +281,7 @@ shared_ptr<Model> ObjectsAnimationVisitor::createCoin(){
     ModelsFactory* factory = ModelsFactory::getInstance();
     shared_ptr<Model> coin =  factory->CreateModel(GOLD_MATERIAL , COIN ,std::string(EATING_OBJECT)+  std::string(TIMING)+ std::string(COIN_NAME));
     coin->material->program->name = "gold";
+    basicScene->GetRoot()->AddChild(coin);
     return coin;
 }
 
@@ -292,7 +305,7 @@ void ObjectsAnimationVisitor::CreateLevel1(std::vector<shared_ptr<Model>> &model
         //Eigen::Vector3f position = {objects_in_space_x[i],objects_in_space_y[i],objects_in_space_z[i]};
         Eigen::Vector3f position = cubes[i].position.cast<float>();
         coords.push_back(position);
-        shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(BRICKS_MATERIAL,CUBE,"test");
+        shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(BRICKS_MATERIAL,CUBE,std::string(COLLISION_OBJECT)+ std::string(CUBE_NAME));
         models.push_back(cube);
         basicScene->GetRoot()->AddChild(cube);
         cube->showWireframe = true;
@@ -324,7 +337,7 @@ void ObjectsAnimationVisitor::CreateLevel2(std::vector<shared_ptr<Model>> &model
         //Eigen::Vector3f position = {objects_in_space_x[i],objects_in_space_y[i],objects_in_space_z[i]};
         Eigen::Vector3f position = cubes[i].position.cast<float>();
         coords.push_back(position);
-        std::shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(BRICKS_MATERIAL,CUBE,"test");
+        std::shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(BRICKS_MATERIAL,CUBE,std::string(COLLISION_OBJECT)+ std::string(CUBE_NAME));
         basicScene->GetRoot()->AddChild(cube);
         cube->Translate(position);
         cube->Scale(scale);
@@ -351,10 +364,11 @@ void ObjectsAnimationVisitor::CreateLevel3(std::vector<shared_ptr<Model>> &model
 
     for (int i = 0; i < n; i++) {
         //Eigen::Vector3f position = {objects_in_space_x[i],objects_in_space_y[i],objects_in_space_z[i]};
+
+        std::shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(BRICKS_MATERIAL,CUBE,std::string(COLLISION_OBJECT)+ std::string(CUBE_NAME));
+        basicScene->GetRoot()->AddChild(cube);
         Eigen::Vector3f position = cubes[i].position.cast<float>();
         coords.push_back(position);
-        std::shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(BRICKS_MATERIAL,CUBE,"test");
-        basicScene->GetRoot()->AddChild(cube);
         cube->Translate(position);
         cube->Scale(scale);
     }
@@ -384,34 +398,31 @@ void ObjectsAnimationVisitor::init_point_givers(float x_length , float y_length,
         //add frogs.
         shared_ptr<Model> frog_model = createFrog();
         frog_model->isHidden = true;
+        frog_model->Translate({0,0,0});
         frogs_available.push_back(frog_model);
-        basicScene->GetRoot()->AddChild(frog_model);
         frog_model->Rotate(-M_PI/2.0f, Movable::Axis::X);
-        frog_model->Rotate(M_PI, Movable::Axis::Z);
-        //frog_model->Scale(2.0f);
-        frog_model->GetTreeWithCube();
+        //frog_model->Rotate(M_PI, Movable::Axis::Z);
+        frog_model->Scale(0.3f);
         //std::cout << "frog model created"<< std::endl;
 
 
         //add mouses
         shared_ptr<Model> mouse_model = createMouse();
         mouse_model->isHidden = true;
+        frog_model->Translate({0,0,0});
         mouses_available.push_back(mouse_model);
-        basicScene->GetRoot()->AddChild(mouse_model);
         mouse_model->Rotate(-M_PI/2.0f, Movable::Axis::X);
-        //mouse_model->Scale(2.0f);
-        mouse_model->GetTreeWithCube();
+        mouse_model->Scale(0.8f);
         //std::cout << "mouse model created"<< std::endl;
 
 
         //add coins
         shared_ptr<Model> coin_model = createCoin();
         coin_model->isHidden = true;
+        frog_model->Translate({0,0,0});
         coins_available.push_back(coin_model);
-        basicScene->GetRoot()->AddChild(coin_model);
         coin_model->Rotate(-M_PI/2.0f, Movable::Axis::X);
-        //coin_model->Scale(2.0f);
-        coin_model->GetTreeWithCube();
+        coin_model->Scale(0.5f);
         //std::cout << "coin model created"<< std::endl;
     }
 
