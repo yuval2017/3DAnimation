@@ -52,10 +52,10 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
         //initiating the system length for the objects positions.
 
         //generating the Bezier objects.
-        generateObjectBezier(BRICKS_MATERIAL,SPHERE, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
-        std::shared_ptr<Model> truck = generateObjectBezier(PHONG_MATERIAL,TRUCK, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
-        generateObjectBezier(PHONG_MATERIAL,SPHERE, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
-        generateObjectBezier(PHONG_MATERIAL,CUBE, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
+//        generateObjectBezier(BRICKS_MATERIAL,SPHERE, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
+//        std::shared_ptr<Model> truck = generateObjectBezier(PHONG_MATERIAL,TRUCK, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
+//        generateObjectBezier(PHONG_MATERIAL,SPHERE, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
+//        generateObjectBezier(PHONG_MATERIAL,CUBE, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
 
         //init the first level.
         CreateLevel1(models, coords);
@@ -292,7 +292,7 @@ void ObjectsAnimationVisitor::CreateLevel1(std::vector<shared_ptr<Model>> &model
         //Eigen::Vector3f position = {objects_in_space_x[i],objects_in_space_y[i],objects_in_space_z[i]};
         Eigen::Vector3f position = cubes[i].position.cast<float>();
         coords.push_back(position);
-        shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(BRICKS_MATERIAL,CUBE,"test");
+        shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(BRICKS_MATERIAL,CUBE,std::string(COLLISION_OBJECT) + "bricks");
         models.push_back(cube);
         basicScene->GetRoot()->AddChild(cube);
         cube->showWireframe = true;
@@ -303,7 +303,6 @@ void ObjectsAnimationVisitor::CreateLevel1(std::vector<shared_ptr<Model>> &model
 
 
 }
-
 void ObjectsAnimationVisitor::CreateLevel2(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords) {
     int n = 30;
     models.resize(0);
@@ -385,6 +384,7 @@ void ObjectsAnimationVisitor::init_point_givers(float x_length , float y_length,
         shared_ptr<Model> frog_model = createFrog();
         frog_model->isHidden = true;
         frogs_available.push_back(frog_model);
+        frog_model->GetTreeWithCube();
         basicScene->GetRoot()->AddChild(frog_model);
         frog_model->Rotate(-M_PI/2.0f, Movable::Axis::X);
         frog_model->Rotate(M_PI, Movable::Axis::Z);
@@ -396,22 +396,22 @@ void ObjectsAnimationVisitor::init_point_givers(float x_length , float y_length,
         //add mouses
         shared_ptr<Model> mouse_model = createMouse();
         mouse_model->isHidden = true;
+        frog_model->GetTreeWithCube();
         mouses_available.push_back(mouse_model);
         basicScene->GetRoot()->AddChild(mouse_model);
         mouse_model->Rotate(-M_PI/2.0f, Movable::Axis::X);
         //mouse_model->Scale(2.0f);
-        mouse_model->GetTreeWithCube();
         //std::cout << "mouse model created"<< std::endl;
 
 
         //add coins
         shared_ptr<Model> coin_model = createCoin();
+        frog_model->GetTreeWithCube();
         coin_model->isHidden = true;
         coins_available.push_back(coin_model);
         basicScene->GetRoot()->AddChild(coin_model);
         coin_model->Rotate(-M_PI/2.0f, Movable::Axis::X);
         //coin_model->Scale(2.0f);
-        coin_model->GetTreeWithCube();
         //std::cout << "coin model created"<< std::endl;
     }
 
