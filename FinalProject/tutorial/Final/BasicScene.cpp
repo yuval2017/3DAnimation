@@ -442,15 +442,22 @@ void BasicScene::startMenu() {
             ImGui::Spacing();
         }
 
+        static char* mass = "";
+
         if (ImGui::Button("Tutorial", ImVec2(-1, 0))) {
-            std::cout << "store button pressed in start menu  ." << endl;
-            data->set_message("Press the up,down,right,left,\n Keys to move around.\nBe aware of obstacles.\n"
+            if( std::strlen(mass)== 0) {
+                std::cout << "store button pressed in start menu  ." << endl;
+                mass = ("Press the up,down,right,left,\n Keys to move around.\nBe aware of obstacles.\n"
                         "Eat as much animals as you can.\nEach eat will gain you score points.\nGood Luck!");
+            }
+            else{
+                mass = "";
+            }
 
         }
+        ImGui::PopFont();
         ImGui::PushFont(messageFont);
-        ImGui::Text("%s", data->msg_c_str());
-
+        ImGui::Text( mass);
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
@@ -458,7 +465,7 @@ void BasicScene::startMenu() {
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
-
+        ImGui::PushFont(regularFont);
         if (ImGui::Button("Store", ImVec2(-1, 0))) {
             std::cout << "store button pressed in start menu  ." << endl;
             statistics->menu_flags[MainMenu_OP] = false;
