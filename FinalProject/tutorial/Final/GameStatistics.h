@@ -2,6 +2,7 @@
 // Created by Bar damri on 19/02/2023.
 //
 
+
 #ifndef ENGINEREWORK_GAMESTATISTICS_H
 #define ENGINEREWORK_GAMESTATISTICS_H
 #pragma once
@@ -24,7 +25,7 @@
 #define FROG_PRICE                  10
 #define MOUSE_PRICE                 50
 #define COIN_PRICE                  100
-
+#include "SoundManager.h"
 #include "Stopper.h"
 #include "Data.h"
 using namespace std;
@@ -59,6 +60,7 @@ public:
 
 private :
     Data* data ;
+    SoundManager* soundManager;
     static GameStatistics* instance;
     GameStatistics();
     GameStatistics(GameStatistics const&);              // Don't Implement.

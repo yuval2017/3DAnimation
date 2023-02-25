@@ -3,6 +3,7 @@
 //
 
 #include "GameStatistics.h"
+
 GameStatistics* GameStatistics::instance = 0;
 
 GameStatistics* GameStatistics::getInstance()
@@ -30,6 +31,7 @@ GameStatistics::GameStatistics() {
     double_score = false;
     levelUp = false;
     data = Data::getInstance();
+    soundManager = SoundManager::getInstance();
 }
 
 void GameStatistics::reset_game() {
@@ -57,6 +59,8 @@ void GameStatistics::inc_Score(int i) {
 
         } else {
             restart = true;
+            soundManager->play_sound(std::to_string(SUCCESS_SOUND));
+
         }
     }
 }

@@ -135,8 +135,7 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
         basicScene->snake->reset_sake();
         basicScene->resetCameras();
         basicScene->getStatistics()->restart = false;
-        basicScene->getStatistics()->menu_flags[WinMenu_OP] = true;
-        basicScene->getSoundManager()->play_sound(std::to_string(SUCCESS_SOUND));
+        basicScene->getStatistics()->menu_flags[MainMenu_OP] = true;
         basicScene->start_time = 0.0;
     }
 
