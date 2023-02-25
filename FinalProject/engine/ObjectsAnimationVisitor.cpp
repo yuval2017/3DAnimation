@@ -273,8 +273,6 @@ shared_ptr<Model> ObjectsAnimationVisitor::createCoin(){
 }
 
 
-
-
 void ObjectsAnimationVisitor::CreateLevel1(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords) {
     int n = 20;
     models.resize(0);
@@ -332,8 +330,6 @@ void ObjectsAnimationVisitor::CreateLevel2(std::vector<shared_ptr<Model>> &model
         cube->Translate(position);
         cube->Scale(scale);
     }
-
-
 }
 
 
@@ -364,6 +360,7 @@ void ObjectsAnimationVisitor::CreateLevel3(std::vector<shared_ptr<Model>> &model
         cube->Scale(scale);
     }
 }
+
 
 void ObjectsAnimationVisitor::GetCurrMapMaxLength(float &length_x, float &length_y, float &length_z){
     Eigen::Vector3d max = basicScene->level1->GetMeshList()[0]->data[0].vertices.colwise().maxCoeff();
