@@ -1012,11 +1012,6 @@ void BasicScene::PlayMenu()
         ImGui::End();
     }
 }
-void BasicScene::SetCamera(int index)
-{
-    camera = cameras[index];
-    viewport->camera = camera;
-}
 
 
 void BasicScene::SetCamera(int index)
@@ -1125,3 +1120,9 @@ void BasicScene::ViewportSizeCallback(Viewport* _viewport)
     // note: we don't need to call Scene::ViewportSizeCallback since we are setting the projection of all the cameras
 }
 
+void BasicScene::AddViewportCallback(Viewport* _viewport)
+{
+    viewport = _viewport;
+
+    Scene::AddViewportCallback(viewport);
+}
