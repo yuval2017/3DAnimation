@@ -272,7 +272,6 @@ shared_ptr<Model> ObjectsAnimationVisitor::createCoin(){
     return coin;
 }
 
-
 void ObjectsAnimationVisitor::CreateLevel1(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords) {
     int n = 20;
     models.resize(0);
