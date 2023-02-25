@@ -13,6 +13,9 @@
 #define HEALTH_SOUND 2
 #define HIT_SOUND 3
 #define PROGRESS_SOUND 4
+#define SUCCESS_SOUND 5
+#define KACHING_SOUND 6
+#define BOO_SOUND 7
 #define GAME_MUSIC q
 #define FIRST_MUSIC "@1"
 #define SECOND_MUSIC "@2"

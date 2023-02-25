@@ -16,8 +16,6 @@
 #include "../tutorial/Final//ModelsFactory.h"
 #include "iostream"
 
-// Keep track of elapsed time
-static float elapsed_time = 0.0f;
 
 void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
     basicScene = (BasicScene *)scene;
@@ -61,13 +59,9 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
 //        generateObjectBezier(PHONG_MATERIAL,CUBE, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
 
         //init the first level.
-        //CreateLevel1(models, coords);
+        CreateLevel1(models, coords);
         basicScene->init_flags[1]= true;
         basicScene->done++;
-        basicScene->progress = basicScene->done/basicScene->len;
-
-
-
 
     }
     else{
@@ -79,7 +73,7 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
                     frogPoints.pop();
                     frogPoints.push(pos);
                     frog->Translate(pos);
-                    std::cout<< "added frog model : "<<pos[0] <<", " << pos[1] <<", " << pos[2] <<std::endl;
+                    //std::cout<< "added frog model : "<<pos[0] <<", " << pos[1] <<", " << pos[2] <<std::endl;
                     stopperFrog->start(sec1);
                     frog->stopper.start(len1);
                     break;
@@ -94,7 +88,7 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
                     mousePoints.pop();
                     mousePoints.push(pos);
                     mouse->Translate(pos);
-                    std::cout<< "added mouse model : "<<pos[0] <<", " << pos[1] <<", " << pos[2] <<std::endl;
+                    //std::cout<< "added mouse model : "<<pos[0] <<", " << pos[1] <<", " << pos[2] <<std::endl;
                     stopperMouse->start(sec2);
                     mouse->stopper.start(len2);
                     break;
@@ -109,7 +103,7 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
                     coinPoints.pop();
                     coinPoints.push(pos);
                     coin->Translate(pos);
-                    std::cout<< "added coin model: "<<pos[0] <<", " << pos[1] <<", " << pos[2] <<std::endl;
+                    //std::cout<< "added coin model: "<<pos[0] <<", " << pos[1] <<", " << pos[2] <<std::endl;
                     stopperCoin->start(sec3);
                     coin->stopper.start(len3);
                     break;
@@ -117,16 +111,33 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
             }
         }
     }
+
+
+
+
     if(basicScene->getStatistics()->levelUp){
         basicScene->animate = false;
+        basicScene->start_time= 0.0f;
         removeFormerlevel();
         loadNextLevel(basicScene->getStatistics()->level+1);
+        basicScene->snake->reset_sake();
+        basicScene->resetCameras();
+        basicScene->getStatistics()->levelUp = false;
     }
+
+
+
+
     if(basicScene->getStatistics()->restart){
         basicScene->animate = false;
         removeFormerlevel();
         loadNextLevel(1);
+        basicScene->snake->reset_sake();
+        basicScene->resetCameras();
         basicScene->getStatistics()->restart = false;
+        basicScene->getStatistics()->menu_flags[WinMenu_OP] = true;
+        basicScene->getSoundManager()->play_sound(std::to_string(SUCCESS_SOUND));
+        basicScene->start_time = 0.0;
     }
 
     Visitor::Run(scene, camera);
@@ -139,6 +150,8 @@ void ObjectsAnimationVisitor::removeFormerlevel(){
             basicScene->GetRoot()->RemoveChild(model);
         }
     }
+    models.clear();
+    coords.clear();
 
 }
 void ObjectsAnimationVisitor::loadNextLevel(int nextLevel){
@@ -164,10 +177,11 @@ void ObjectsAnimationVisitor::Visit(Model *model) {
         if(model->name.find(TIMING) != std::string::npos){
             if(!model->stopper.is_countdown_running()){
                 model->isHidden =true;
-                std::cout << "model becomes hidden: "<< model->name << std::endl;
+                model->stopper.reset();
+                //std::cout << "model becomes hidden: "<< model->name << std::endl;
             }
         }
-         else if (model->name.substr(0, strlen(BEZIER_OBJECT_NAME)) == std::string(BEZIER_OBJECT_NAME)) {
+        else if (model->name.substr(0, strlen(BEZIER_OBJECT_NAME)) == std::string(BEZIER_OBJECT_NAME)) {
             if (model->t <= 1 && !model->moveBackwards) {
                 model->t += 0.04 * model->bezier_speed;
                 moveAccordingToBeizerCurve(model);
@@ -328,7 +342,6 @@ void ObjectsAnimationVisitor::CreateLevel2(std::vector<shared_ptr<Model>> &model
     Calculates::getInstance()->setRandomCubeLocations(x_length, y_length, z_length, n,  scale, cubes);
 
     for (int i = 0; i < n; i++) {
-        //Eigen::Vector3f position = {objects_in_space_x[i],objects_in_space_y[i],objects_in_space_z[i]};
         Eigen::Vector3f position = cubes[i].position.cast<float>();
         coords.push_back(position);
         std::shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(BRICKS_MATERIAL,CUBE,std::string(COLLISION_OBJECT) + "bricks");
@@ -358,7 +371,6 @@ void ObjectsAnimationVisitor::CreateLevel3(std::vector<shared_ptr<Model>> &model
     Calculates::getInstance()->setRandomCubeLocations(x_length, y_length, z_length, n,  scale, cubes);
 
     for (int i = 0; i < n; i++) {
-        //Eigen::Vector3f position = {objects_in_space_x[i],objects_in_space_y[i],objects_in_space_z[i]};
         Eigen::Vector3f position = cubes[i].position.cast<float>();
         coords.push_back(position);
         std::shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(BRICKS_MATERIAL,CUBE,std::string(COLLISION_OBJECT) + "bricks");

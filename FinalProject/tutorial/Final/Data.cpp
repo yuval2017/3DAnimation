@@ -3,7 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include "nlohmann/json.hpp"
-
+#include "GameStatistics.h"
 using json = nlohmann::json;
 
 Data* Data::instance = 0;
@@ -89,22 +89,16 @@ void Data::add_total_money(int val)
     total_money += val;
     save_data();
 }
-
-int Data::get_total_money() const
+void Data::sub_total_money(int val)
 {
-    return total_money;
-}
-
-void Data::set_life_bought(int val)
-{
-    life_bought = val;
+    total_money -= val;
     save_data();
 }
 
 void Data::inc_life_bought()
 {
     life_bought++;
-    save_data();
+    sub_total_money(LIFE_COST);
 }
 
 int Data::get_life_bought() const
@@ -112,50 +106,25 @@ int Data::get_life_bought() const
     return life_bought;
 }
 
-void Data::set_object_collision(int val)
-{
-    object_collision = val;
-    save_data();
-}
 
 void Data::inc_object_collision()
 {
     object_collision++;
-    save_data();
+    sub_total_money(OBJECT_COLLIDE_COST);
 }
 
-int Data::get_object_collision() const
-{
-    return object_collision;
-}
-
-void Data::set_self_collision(int val)
-{
-    self_collision = val;
-    save_data();
-}
 
 void Data::inc_self_collision()
 {
     self_collision++;
-    save_data();
+    sub_total_money(SELF_COLLIDE_COST);
 }
 
-int Data::get_self_collision() const
-{
-    return self_collision;
-}
-
-void Data::set_double_score(int val)
-{
-    double_score = val;
-    save_data();
-}
 
 void Data::inc_double_score()
 {
     double_score++;
-    save_data();
+    sub_total_money(DOUBLE_SCORE_COST);
 }
 
 int Data::get_double_score() const
@@ -173,19 +142,10 @@ void Data::restart_game()
     this->msg = "";
 }
 
-std::string Data::get_message() const
-{
-    return this->msg;
-}
 
 const char* Data::msg_c_str() const
 {
     return this->msg.c_str();
-}
-
-std::vector<int> Data::get_back_to_main()
-{
-    return this->back_to_main;
 }
 
 int Data::message_size()
@@ -198,5 +158,13 @@ bool Data::checkScore(int score, int level) {
         return true;
     }
     return false;
+}
+
+void Data::dec_double_score() {
+
+    if(double_score<0){
+        double_score--;
+        save_data();
+    }
 }
 

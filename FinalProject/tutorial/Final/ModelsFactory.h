@@ -21,6 +21,7 @@
 #define GREEN_MATERIAL 4
 #define GREY_MATERIAL 5
 #define GOLD_MATERIAL 6
+#define FROG_MATERIAL 7
 
 #define CUBE 0
 #define CYL 1
@@ -33,7 +34,7 @@
 #define FROG 8
 #define MOUSE 9
 //increment every mesh or material
-#define NUMBER_OF_MATERIALS 7
+#define NUMBER_OF_MATERIALS 8
 #define NUMBER_OF_MESHES 10
 
 using namespace cg3d;
@@ -59,6 +60,7 @@ public:
     //5) green material
     //6) grey material
     //7) gold material
+    //8) frog material
 
     //meshes
     std::shared_ptr<Mesh> meshes[NUMBER_OF_MESHES];

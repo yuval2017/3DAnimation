@@ -17,9 +17,9 @@ def play_music():
         "stats.mp3": 108,
     }
 
-    p = vlc.MediaPlayer('Game.mp3')
+    p = vlc.MediaPlayer('music1.mp3')
     p.play()
-    time.sleep(music_lengths['Game.mp3'])
+    time.sleep(music_lengths['music1.mp3'])
     p.stop()
 
 
