@@ -200,15 +200,15 @@ void Snake::skinning(Eigen::Vector3d t) {
     }
     ikRotateHelper(number_of_joints-1, p[number_of_joints]);
 
-    Eigen::MatrixXd VN;
-    igl::per_vertex_normals(U, snake->GetMesh()->data[0].faces, VN);
-    snake->setMeshData(snake->name,
-                    U,
-                    snake->GetMeshList()[0]->data[0].faces,
-                    VN,
-                    snake->GetMeshList()[0]->data[0].textureCoords);
-
-
+//    Eigen::MatrixXd VN;
+//    igl::per_vertex_normals(U, snake->GetMesh()->data[0].faces, VN);
+//    snake->setMeshData(snake->name,
+//                    U,
+//                    snake->GetMeshList()[0]->data[0].faces,
+//                    VN,
+//                    snake->GetMeshList()[0]->data[0].textureCoords);
+//
+//
 
 
     for (int i = 0; i < number_of_joints + 1; i++) {
@@ -253,21 +253,21 @@ void Snake::reset_bones(){
     //length with scale
     joint_length = joint_length * bones[0]->scale_factor[2];
 
+    root->AddChild(bones[0]);
     bones[0]->SetCenter(Eigen::Vector3f(0,0,-(joint_length/2.0f)));
     bones[0]->Translate((joint_length/2.0f),cg3d::Movable::Axis::Z);
     bones[0]->Translate(-(number_of_joints)*joint_length,cg3d::Movable::Axis::Z);
-    root->AddChild(bones[0]);
     for(int i = 1;i < number_of_joints; i++)
     {
         bones.push_back(ModelsFactory::getInstance()->CreateModel(PHONG_MATERIAL, CYL, "bone " + std::to_string(i)));
+        root->AddChild(bones[i]);
         bones[i]->Scale(scaleFactor,cg3d::Movable::Axis::Z);
         bones[i]->Translate(-joint_length*( number_of_joints - i- 1),cg3d::Movable::Axis::Z);
         bones[i]->Translate(-(joint_length)/2.0f,cg3d::Movable::Axis::Z);
 
         bones[i]->SetCenter(Eigen::Vector3f(0,0,-(joint_length)));
         //bones[i-1]->AddChild(bones[i]);
-        bones[i]->GetTreeWithOutCube();
-        root->AddChild(bones[i]);
+        bones[i]->GetTree();
     }
 }
 void Snake::reset_sake() {
@@ -320,11 +320,12 @@ void Snake::initSnake(){
         V_new.row(i) = Eigen::Vector3d(V_new_i[0], V_new_i[1], V_new_i[2]);
     }
     U = V_new;
-
+    Eigen::MatrixXd VN;
+    igl::per_vertex_normals(V_new, snake->GetMesh()->data[0].faces, VN);
     snake->setMeshData(snake->name,
                        V_new,
                        snake->GetMeshList()[0]->data[0].faces,
-                       snake->GetMeshList()[0]->data[0].vertexNormals,
+                       VN,
                        snake->GetMeshList()[0]->data[0].textureCoords);
 
     Eigen::Vector3d min = snake->GetMeshList()[0]->data[0].vertices.colwise().minCoeff();

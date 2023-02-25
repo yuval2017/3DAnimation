@@ -23,31 +23,33 @@ void cg3d::MeshCollisionVisitor::Visit(Model *model) {
     (model->name != std::string(std::string(BONE_NAME) +" "+ std::to_string(snake_head)))&&
     (model->name != std::string(std::string(BONE_NAME) + " " + std::to_string(snake_head- 1)))
     ){
+        std::shared_ptr<Movable> shrd = model->shared_from_this();
         std::shared_ptr<Model> snake = basicScene->snake->GetSnakeBones()[snake_head];
       if(model->name.find(BONE_NAME) != std::string::npos &&
         !(basicScene->getStatistics()->selfCollisionStopper->is_countdown_running()) &&
-         (Calculates::getInstance()-> isMeshCollision(snake, model, ((snake)->GetTreeWithOutCube()),
-                                        model->GetTreeWithOutCube()))){
+         (Calculates::getInstance()-> isMeshCollision(snake, model->shared_from_this(), ((snake)->GetTree()),
+                                        model->GetTree()))){
           std::cout << "collision with " << model->name << " \n" << std::endl;
           handle_self_hit();
       }
       else if(!model->isHidden &&
                 model->name.find(COLLISION_OBJECT) != std::string::npos &&
                 !(basicScene->getStatistics()->objectCollisionStopper->is_countdown_running())){
-          std::cout << "collision with " << model->name << " \n" << std::endl;
           if( (Calculates::getInstance()->
-                  isMeshCollision(snake, model, ((snake)->GetTreeWithCube()),
-                                  model->GetTreeWithOutCube()))) {
+                  isMeshCollision(snake, model->shared_from_this(), ((snake)->GetTree()),
+                                  model->GetTree()))) {
               std::cout << "collision with " << model->name << " \n" << std::endl;
               handle_object_hit(model);
           }
       }
+
       else if( !model->isHidden &&
                 model->name.find(EATING_OBJECT) != std::string::npos ){
+          std::cout << " check collision with " << model->name << " \n" << std::endl;
           if (Calculates::getInstance()->
-                  isMeshCollision(snake, model, ((snake)->GetTreeWithCube()),
-                                  model->GetTreeWithOutCube())) {
-              std::cout << " eated " << model->name << " \n" << std::endl;
+                  isMeshCollision(snake, model->shared_from_this(), ((snake)->GetTree()),
+                                  model->GetTree())) {
+              std::cout << " mouse!! " << model->name << " \n" << std::endl;
               handle_eating(model);
           }
       }

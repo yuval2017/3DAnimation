@@ -4,10 +4,13 @@
 
 #include "ObjectsAnimationVisitor.h"
 #include "../tutorial/Final/IglMeshLoader.h"
+#include "../tutorial/Final/ModelsFactory.h"
 #include <igl/per_vertex_normals.h>
 #include <iostream>
 #include <random>
 #include <utility>
+#include <igl/per_vertex_normals.h>
+
 //#include "../tutorial/Final/Calculates.h"
 #include "../tutorial/Final//ObjectsNames.h"
 #include "../tutorial/Final//ModelsFactory.h"
@@ -58,10 +61,13 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
 //        generateObjectBezier(PHONG_MATERIAL,CUBE, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
 
         //init the first level.
-        CreateLevel1(models, coords);
+        //CreateLevel1(models, coords);
         basicScene->init_flags[1]= true;
         basicScene->done++;
         basicScene->progress = basicScene->done/basicScene->len;
+
+
+
 
     }
     else{
@@ -161,7 +167,7 @@ void ObjectsAnimationVisitor::Visit(Model *model) {
                 std::cout << "model becomes hidden: "<< model->name << std::endl;
             }
         }
-        else if (model->name.substr(0, strlen(BEZIER_OBJECT_NAME)) == std::string(BEZIER_OBJECT_NAME)) {
+         else if (model->name.substr(0, strlen(BEZIER_OBJECT_NAME)) == std::string(BEZIER_OBJECT_NAME)) {
             if (model->t <= 1 && !model->moveBackwards) {
                 model->t += 0.04 * model->bezier_speed;
                 moveAccordingToBeizerCurve(model);
@@ -187,7 +193,7 @@ std::shared_ptr<Model> ObjectsAnimationVisitor::generateObjectBezier(int materia
     cube->Translate(location);
     cube->Scale(scale,Movable::Axis::XYZ);
     setModelBezier(location,cube);
-    cube->GetTreeWithCube();
+    cube->GetTree();
     return cube;
 }
 
@@ -251,16 +257,17 @@ shared_ptr<Model> ObjectsAnimationVisitor::createFrog(){
     ModelsFactory* factory = ModelsFactory::getInstance();
     shared_ptr<Model> frog =  factory->CreateModel(GREEN_MATERIAL , FROG , std::string (EATING_OBJECT) + std::string(TIMING)+ std::string(FROG_NAME));
     frog->material->program->name = "green";
+    frog->SetTreeAndCube(ModelsFactory::getInstance()->bounding_boxes[FROG],ModelsFactory::getInstance()->trees[FROG]);
     return frog;
 }
 
 
 shared_ptr<Model> ObjectsAnimationVisitor::createMouse(){
-
     ModelsFactory* factory = ModelsFactory::getInstance();
-    shared_ptr<Model> mouse=  factory->CreateModel(GREY_MATERIAL , MOUSE ,std::string(EATING_OBJECT)+ std::string(TIMING)+ std::string(MOUSE_NAME));
-    mouse->GetTreeWithCube();
+    shared_ptr<Model> mouse = factory->CreateModel(GREY_MATERIAL , MOUSE ,std::string(EATING_OBJECT)+ std::string(TIMING)+ std::string(MOUSE_NAME));
     mouse->material->program->name = "grey";
+    mouse->Rotate(-M_PI/2.0f,Movable::Axis::X);
+    mouse->SetTreeAndCube(ModelsFactory::getInstance()->bounding_boxes[MOUSE],ModelsFactory::getInstance()->trees[MOUSE]);
     return mouse;
 }
 
@@ -269,6 +276,7 @@ shared_ptr<Model> ObjectsAnimationVisitor::createCoin(){
     ModelsFactory* factory = ModelsFactory::getInstance();
     shared_ptr<Model> coin =  factory->CreateModel(GOLD_MATERIAL , COIN ,std::string(EATING_OBJECT)+  std::string(TIMING)+ std::string(COIN_NAME));
     coin->material->program->name = "gold";
+    coin->SetTreeAndCube(ModelsFactory::getInstance()->bounding_boxes[COIN],ModelsFactory::getInstance()->trees[COIN]);
     return coin;
 }
 
@@ -294,11 +302,11 @@ void ObjectsAnimationVisitor::CreateLevel1(std::vector<shared_ptr<Model>> &model
         coords.push_back(position);
         shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(BRICKS_MATERIAL,CUBE,std::string(COLLISION_OBJECT) + "bricks");
         models.push_back(cube);
+        cube->SetTreeAndCube(ModelsFactory::getInstance()->bounding_boxes[CUBE],ModelsFactory::getInstance()->trees[CUBE]);
         basicScene->GetRoot()->AddChild(cube);
         cube->showWireframe = true;
         cube->Translate(position);
         cube->Scale(scale);
-        cube->GetTreeWithCube();
     }
 
 
@@ -323,7 +331,8 @@ void ObjectsAnimationVisitor::CreateLevel2(std::vector<shared_ptr<Model>> &model
         //Eigen::Vector3f position = {objects_in_space_x[i],objects_in_space_y[i],objects_in_space_z[i]};
         Eigen::Vector3f position = cubes[i].position.cast<float>();
         coords.push_back(position);
-        std::shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(BRICKS_MATERIAL,CUBE,"test");
+        std::shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(BRICKS_MATERIAL,CUBE,std::string(COLLISION_OBJECT) + "bricks");
+        cube->SetTreeAndCube(ModelsFactory::getInstance()->bounding_boxes[CUBE],ModelsFactory::getInstance()->trees[CUBE]);
         basicScene->GetRoot()->AddChild(cube);
         cube->Translate(position);
         cube->Scale(scale);
@@ -352,7 +361,8 @@ void ObjectsAnimationVisitor::CreateLevel3(std::vector<shared_ptr<Model>> &model
         //Eigen::Vector3f position = {objects_in_space_x[i],objects_in_space_y[i],objects_in_space_z[i]};
         Eigen::Vector3f position = cubes[i].position.cast<float>();
         coords.push_back(position);
-        std::shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(BRICKS_MATERIAL,CUBE,"test");
+        std::shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(BRICKS_MATERIAL,CUBE,std::string(COLLISION_OBJECT) + "bricks");
+        cube->SetTreeAndCube(ModelsFactory::getInstance()->bounding_boxes[CUBE],ModelsFactory::getInstance()->trees[CUBE]);
         basicScene->GetRoot()->AddChild(cube);
         cube->Translate(position);
         cube->Scale(scale);
@@ -384,19 +394,14 @@ void ObjectsAnimationVisitor::init_point_givers(float x_length , float y_length,
         shared_ptr<Model> frog_model = createFrog();
         frog_model->isHidden = true;
         frogs_available.push_back(frog_model);
-        frog_model->GetTreeWithCube();
         basicScene->GetRoot()->AddChild(frog_model);
         frog_model->Rotate(-M_PI/2.0f, Movable::Axis::X);
         frog_model->Rotate(M_PI, Movable::Axis::Z);
-        //frog_model->Scale(2.0f);
-        frog_model->GetTreeWithCube();
-        //std::cout << "frog model created"<< std::endl;
 
 
         //add mouses
         shared_ptr<Model> mouse_model = createMouse();
         mouse_model->isHidden = true;
-        frog_model->GetTreeWithCube();
         mouses_available.push_back(mouse_model);
         basicScene->GetRoot()->AddChild(mouse_model);
         mouse_model->Rotate(-M_PI/2.0f, Movable::Axis::X);
@@ -406,7 +411,6 @@ void ObjectsAnimationVisitor::init_point_givers(float x_length , float y_length,
 
         //add coins
         shared_ptr<Model> coin_model = createCoin();
-        frog_model->GetTreeWithCube();
         coin_model->isHidden = true;
         coins_available.push_back(coin_model);
         basicScene->GetRoot()->AddChild(coin_model);

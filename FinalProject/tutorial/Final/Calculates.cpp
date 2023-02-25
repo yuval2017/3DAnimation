@@ -9,7 +9,8 @@
 #include <iostream>
 #include <Eigen/Core>
 #include <Eigen/Geometry>
-
+#include <igl/per_vertex_normals.h>
+#include "ModelsFactory.h"
 using namespace Eigen;
 using namespace std;
 
@@ -203,7 +204,7 @@ std::vector<TexCoord> Calculates::calculateTextureCoordinates(Eigen::MatrixXd ve
     }
     return calculateTextureCoordinates(_vertices,_faces,filename);
 }
-bool Calculates::isMeshCollision(std::shared_ptr<cg3d::Model> mesh1, Model* mesh2, igl::AABB<Eigen::MatrixXd, 3>* treeA, igl::AABB<Eigen::MatrixXd, 3>* treeB){
+bool Calculates::isMeshCollision(const std::shared_ptr<cg3d::Movable>& mesh1, const std::shared_ptr<cg3d::Movable>&  mesh2, igl::AABB<Eigen::MatrixXd, 3>* treeA, igl::AABB<Eigen::MatrixXd, 3>* treeB){
     //base cases
 
     if (treeA == nullptr || treeB == nullptr){
@@ -237,7 +238,7 @@ bool Calculates::isMeshCollision(std::shared_ptr<cg3d::Model> mesh1, Model* mesh
            isMeshCollision(mesh1, mesh2, treeA->m_right, treeB->m_left) |
            isMeshCollision(mesh1, mesh2, treeA->m_right, treeB->m_right);
 }
-bool Calculates::isBoxesIntersect(Eigen::AlignedBox<double, 3>& boxA, Eigen::AlignedBox<double, 3>& boxB, const std::shared_ptr<cg3d::Model>& mesh1,Model* mesh2){
+bool Calculates::isBoxesIntersect(Eigen::AlignedBox<double, 3>& boxA, Eigen::AlignedBox<double, 3>& boxB, const std::shared_ptr<cg3d::Movable>& mesh1,const std::shared_ptr<cg3d::Movable>& mesh2){
     // matrix A
     Eigen::Matrix3d A = mesh1->GetRotation().cast<double>();
     Eigen::Vector3d A0 = A.col(0);
@@ -524,4 +525,60 @@ std::queue<Eigen::Vector3f> Calculates::generatePointsInSystem(float x_length, f
     }
 
     return pointQueue;
+}
+
+MeshData Calculates::createDataFromBox(Eigen::AlignedBox<double, 3>& box){
+    Eigen::MatrixXd V, NV, T;
+    Eigen::MatrixXi F;
+
+    V.resize(8,3);
+    F.resize(12,3);
+
+    Eigen::RowVector3d BottomRightCeil = box.corner(box.BottomRightCeil);
+    Eigen::RowVector3d BottomRightFloor = box.corner(box.BottomRightFloor);
+    Eigen::RowVector3d BottomLeftCeil = box.corner(box.BottomLeftCeil);
+    Eigen::RowVector3d BottomLeftFloor = box.corner(box.BottomLeftFloor);
+    Eigen::RowVector3d TopRightCeil = box.corner(box.TopRightCeil);
+    Eigen::RowVector3d TopRightFloor = box.corner(box.TopRightFloor);
+    Eigen::RowVector3d TopLeftCeil = box.corner(box.TopLeftCeil);
+    Eigen::RowVector3d TopLeftFloor = box.corner(box.TopLeftFloor);
+
+
+    V.row(0) = BottomLeftFloor;
+    V.row(1) = BottomRightFloor;
+    V.row(2) = TopLeftFloor;
+    V.row(3) = TopRightFloor;
+    V.row(4) = BottomLeftCeil;
+    V.row(5) = BottomRightCeil;
+    V.row(6) = TopLeftCeil;
+    V.row(7) = TopRightCeil;
+
+    F.row(0) = Eigen::Vector3i(0,1,3);
+    F.row(1) = Eigen::Vector3i(3,2,0);
+    F.row(2) = Eigen::Vector3i(4,5,7);
+    F.row(3) = Eigen::Vector3i(7,6,4);
+    F.row(4) = Eigen::Vector3i(0,4,6);
+    F.row(5) = Eigen::Vector3i(6,2,0);
+    F.row(6) = Eigen::Vector3i(5,7,3);
+    F.row(7) = Eigen::Vector3i(7,3,1);
+    F.row(8) = Eigen::Vector3i(2,6,7);
+    F.row(9) = Eigen::Vector3i(7,3,2);
+    F.row(10) = Eigen::Vector3i(4,5,1);
+    F.row(11) = Eigen::Vector3i(1,0,4);
+
+
+    igl::per_vertex_normals(V,F,NV);
+    T = Eigen::MatrixXd::Zero(V.rows(),2);
+
+    return {V,F,NV,T};
+}
+std::shared_ptr<Model> Calculates::createBox(Eigen::AlignedBox<double, 3>& box){
+    std::vector<std::shared_ptr<Mesh>> meshList;
+    std::vector<MeshData> new_data;
+    std::shared_ptr<Material> material = {std::make_shared<Material>("green_color", "shaders/phongShader")};
+    material->program->name = "green";
+    new_data.push_back(createDataFromBox(box));
+    auto m = std::make_shared<Mesh>("cube",new_data);
+    meshList.push_back(m);
+    return Model::Create( "cube",meshList,material);
 }

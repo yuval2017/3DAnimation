@@ -11,6 +11,8 @@
 #include "Camera.h"
 #include "igl/opengl/glfw/Viewer.h"
 #include "igl/opengl/ViewerData.h"
+#include <igl/AABB.h>
+
 
 #define BASIC_MATERIAL 0
 #define PHONG_MATERIAL 1
@@ -37,8 +39,11 @@
 using namespace cg3d;
 class ModelsFactory {
     private:
+    MeshData createDataFromBox(Eigen::AlignedBox<double, 3>& box);
+    std::shared_ptr<Model> createBox(Eigen::AlignedBox<double, 3>& box);
     static ModelsFactory* instancePtr;
     ModelsFactory();
+    void create_bounding_box(int mesh_id);
 
 public:
     //programs
@@ -67,6 +72,9 @@ public:
     //7) tree
     //8) frog
     //9) mouse
+
+    std::shared_ptr<Model> bounding_boxes[NUMBER_OF_MESHES];
+    igl::AABB<Eigen::MatrixXd, 3> trees[NUMBER_OF_MESHES];
 
     std::shared_ptr<Model> CreateModel(int material_id, int mesh_id, std::string name);
     std::shared_ptr<Model> CreateBricksCubeModel();

@@ -25,9 +25,7 @@ protected:
     Model(Model&&) = default; // important: doesn't add itself to the parent's children (object isn't constructed yet)
     Model& operator=(const Model& other) = default;
 
-    //add to eigen
-    igl::AABB<Eigen::MatrixXd, 3> treeA1;
-    bool is_tree_inited = false;
+
 
 public:
     void setMaterial(std::shared_ptr<Material> _material){material = std::move(_material);};
@@ -36,9 +34,8 @@ public:
         return std::shared_ptr<Model>{new Model{std::forward<Args>(args)...}}; // NOLINT(modernize-make-shared)
     }
     //add to eigen
-    igl::AABB<Eigen::MatrixXd, 3> *GetTreeWithCube();
-    igl::AABB<Eigen::MatrixXd, 3> *GetTreeWithOutCube();
-
+    void SetTreeAndCube(std::shared_ptr<Model> cube, igl::AABB<Eigen::MatrixXd, 3> tree);
+    igl::AABB<Eigen::MatrixXd, 3> *GetTree();
     ~Model() override = default;
 
     void Accept(Visitor* visitor) override { visitor->Visit(this); };
@@ -59,14 +56,17 @@ public:
     std::shared_ptr <Model> bezier;
     float bezier_speed = 1;
     Stopper stopper;
-
+    //add to eigen
+    std::shared_ptr<Model> cube;
+    igl::AABB<Eigen::MatrixXd, 3> treeA1;
+    bool is_tree_inited = false;
 
     inline std::shared_ptr<Mesh> GetMesh(int index = 0) const { return meshList[index]; }
     inline std::vector<std::shared_ptr<Mesh>> GetMeshList() const { return meshList; }
     void SetMeshList(std::vector<std::shared_ptr<Mesh>> _meshList);
     void UpdateDataAndDrawMeshes(const Program& program, bool _showFaces, bool bindTextures); // helper function
     void AddOverlay(const OverlayData& data, bool drawPoints);
-    void setMeshData(std::string name,  Eigen::MatrixXd _V,  Eigen::MatrixXi _F,Eigen::MatrixXd _VN, Eigen::MatrixXd textureCoords);
+    void setMeshData(const std::string& name,  Eigen::MatrixXd _V,  Eigen::MatrixXi _F,Eigen::MatrixXd _VN, Eigen::MatrixXd textureCoords);
 private:
     static void UpdateDataAndBindMesh(igl::opengl::ViewerData& viewerData, const Program& program); // helper function
 

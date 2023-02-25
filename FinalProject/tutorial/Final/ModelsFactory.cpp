@@ -5,6 +5,7 @@
 #include "ModelsFactory.h"
 #include "IglMeshLoader.h"
 #include "ObjLoader.h"
+#include "Calculates.h"
 
 
 ModelsFactory* ModelsFactory::instancePtr = NULL;
@@ -43,6 +44,8 @@ ModelsFactory::ModelsFactory(){
 
     //meshes
     meshes[CUBE] = Mesh::Cube();
+
+
     meshes[CYL] = ObjLoader::MeshFromObj("Cyl", {"data/zcylinder.obj"});
     meshes[SPHERE] = ObjLoader::MeshFromObj("sphere_mesh", {"data/sphere.obj"});
     meshes[TRUCK] = ObjLoader::MeshFromObj("sphere_mesh", {"data/truck.obj"});
@@ -54,6 +57,11 @@ ModelsFactory::ModelsFactory(){
     meshes[LINES] = NULL;
     meshes[SNAKE1] = ObjLoader::MeshFromObj("snake_mesh", {"data/snake1.obj"});
 
+    for (int i = 0; i < NUMBER_OF_MESHES; i++) {
+        if(i != 3 && i != 7){
+            create_bounding_box(i);
+        }
+    }
 }
 ModelsFactory *ModelsFactory::getInstance(){
     if (instancePtr == NULL){
@@ -62,9 +70,16 @@ ModelsFactory *ModelsFactory::getInstance(){
     return instancePtr;
 }
 std::shared_ptr<Model> ModelsFactory::CreateModel(int material_id, int mesh_id, std::string name){
-    return Model::Create(name, meshes[mesh_id], materials[material_id]);
+    std::shared_ptr<Model> model = Model::Create(name, meshes[mesh_id], materials[material_id]);
+    return model;
 }
 std::shared_ptr<Model> ModelsFactory::CreateBricksCubeModel(){
     return nullptr;
 }
-
+void ModelsFactory::create_bounding_box(int mesh_id){
+    igl::AABB<Eigen::MatrixXd, 3> tree;
+    tree.init(meshes[mesh_id]->data[0].vertices, meshes[mesh_id]->data[0].faces);
+    trees[mesh_id] = tree;
+    bounding_boxes[mesh_id] = Calculates::getInstance()->createBox(trees[mesh_id].m_box);
+    bounding_boxes[mesh_id]->isHidden = true;
+}

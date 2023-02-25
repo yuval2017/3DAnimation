@@ -43,8 +43,10 @@ public:
         }
         return instancePtr;
     }
-    bool isMeshCollision(std::shared_ptr<cg3d::Model> mesh1, Model* mesh2, igl::AABB<Eigen::MatrixXd, 3>* treeA, igl::AABB<Eigen::MatrixXd, 3>* treeB);
-    bool isBoxesIntersect(Eigen::AlignedBox<double, 3>& boxA, Eigen::AlignedBox<double, 3>& boxB, const std::shared_ptr<cg3d::Model>& mesh1,Model* mesh2);
+    bool isMeshCollision(const std::shared_ptr<cg3d::Movable>& mesh1, const std::shared_ptr<cg3d::Movable>& mesh2, igl::AABB<Eigen::MatrixXd, 3>* treeA, igl::AABB<Eigen::MatrixXd, 3>* treeB);
+    bool isBoxesIntersect(Eigen::AlignedBox<double, 3>& boxA, Eigen::AlignedBox<double, 3>& boxB, const std::shared_ptr<cg3d::Movable>& mesh1,const std::shared_ptr<cg3d::Movable>& mesh2);
+    MeshData createDataFromBox(Eigen::AlignedBox<double, 3>& box);
+    std::shared_ptr<Model> createBox(Eigen::AlignedBox<double, 3>& box);
     std::vector<TexCoord> calculateTextureCoordinates(std::vector<Vertex> vertices, std::vector<Face> faces, const std::string& filename);
     std::vector<TexCoord> calculateTextureCoordinates(Eigen::MatrixXd vertices, Eigen::MatrixXi faces, const std::string& filename);
     void write_obj_file(const std::vector<Vertex>& vertices,std::vector<Face> faces,std::vector<TexCoord> VT, const std::string& filename);
