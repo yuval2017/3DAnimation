@@ -100,8 +100,9 @@ void Model::SetMeshList(std::vector<std::shared_ptr<Mesh>> _meshList)
 igl::AABB<Eigen::MatrixXd, 3> *Model::GetTreeWithCube(){
     if(!is_tree_inited){
         std::shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(BASIC_MATERIAL,CUBE,"help_box");
-        AddChild(cube);
-        cube->isHidden = true;
+         //AddChild(cube);
+         cube->AddChild(this->shared_from_this());
+        //cube->isHidden = true;
         treeA1.init(cube->GetMeshList()[0]->data[0].vertices,cube->GetMeshList()[0]->data[0].faces);
         is_tree_inited = true;
     }

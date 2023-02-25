@@ -29,7 +29,7 @@ void cg3d::MeshCollisionVisitor::Visit(Model *model) {
          (Calculates::getInstance()-> isMeshCollision(snake, model, ((snake)->GetTreeWithOutCube()),
                                         model->GetTreeWithOutCube()))){
           std::cout << "collision with " << model->name << " \n" << std::endl;
-          //handle_self_hit();
+          handle_self_hit();
       }
       else if(!model->isHidden &&
                 model->name.find(COLLISION_OBJECT) != std::string::npos &&
@@ -42,7 +42,6 @@ void cg3d::MeshCollisionVisitor::Visit(Model *model) {
       }
       else if( !model->isHidden &&
                 model->name.find(EATING_OBJECT) != std::string::npos ){
-
           if (Calculates::getInstance()->
                   isMeshCollision(snake, model, ((snake)->GetTreeWithCube()),
                                   model->GetTreeWithCube())) {
