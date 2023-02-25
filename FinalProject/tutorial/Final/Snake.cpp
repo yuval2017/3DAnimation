@@ -9,12 +9,14 @@
 #include "IglMeshLoader.h"
 #include <igl/deform_skeleton.h>
 #include <igl/dqs.h>
+#include <igl/directed_edge_parents.h>
 #include <igl/per_vertex_normals.h>
 #include "Movable.h"
 #include <igl/opengl/glfw/imgui/ImGuiMenu.h>
 #include <imgui/imgui.h>
 #include <iostream>
 #include <vector>
+#include <forward_kinematics.h>
 #include "ModelsFactory.h"
 #include "Calculates.h"
 #include "ObjLoader.h"
@@ -61,14 +63,18 @@ void Snake::SetSpeed(float new_speed){
     speed = new_speed;
 }
 void Snake::MoveLeft(){
-    direction = Eigen::Vector3d(0.3f, 0, 0);
+    direction = Eigen::Vector3d(0.8f, 0, 0.7f);
+//    float angle_radians = -20.0f * M_PI / 180.0f;
+//    bones[bones.size() - 1]->Rotate(Eigen::Quaternionf(cos(angle_radians / 2.0), 0.0, sin(angle_radians / 2.0), 0.0).toRotationMatrix());
 //    if(!with_skinning) {
 //        bones[0]->Rotate(0.1f, cg3d::Movable::Axis::Y);
 //        bones[1]->Rotate(-0.1f, cg3d::Movable::Axis::Y);
 //    }
 }
 void Snake::MoveRight(){
-    direction = Eigen::Vector3d(-0.3f, 0, 0);
+    direction = Eigen::Vector3d(-0.8f, 0, 0.7f);
+//    float angle_radians = 20.0f * M_PI / 180.0f;
+//    bones[bones.size() - 1]->Rotate(Eigen::Quaternionf(cos(angle_radians / 2.0), 0.0, sin(angle_radians / 2.0), 0.0).toRotationMatrix());
 //    if(!with_skinning) {
 //
 //        bones[0]->Rotate(-0.1f, cg3d::Movable::Axis::Y);
@@ -76,7 +82,10 @@ void Snake::MoveRight(){
 //    }
 }
 void Snake::MoveUp(){
-    direction = Eigen::Vector3d(0, 0.3f, 0);
+    direction = Eigen::Vector3d(0, 0.8f, 0.7f);
+//    float angle_radians = 20.0f * M_PI / 180.0f;
+//    bones[bones.size() - 1]->Rotate(Eigen::Quaternionf(cos(angle_radians / 2.0), sin(angle_radians / 2.0), 0.0, 0.0).toRotationMatrix());
+    //direction = Eigen::Vector3d(0, 0.8f, 0);
 //    if(!with_skinning) {
 //        bones[0]->Rotate(0.1f, cg3d::Movable::Axis::X);
 //        bones[1]->Rotate(-0.1f, cg3d::Movable::Axis::X);
@@ -84,7 +93,9 @@ void Snake::MoveUp(){
 }
 
 void Snake::MoveDone(){
-    direction = Eigen::Vector3d(0, -0.3f, 0);
+    direction = Eigen::Vector3d(0, -0.8f, 0.7f);
+//    float angle_radians = -20.0f * M_PI / 180.0f;
+//    bones[bones.size() - 1]->Rotate(Eigen::Quaternionf(cos(angle_radians / 2.0), sin(angle_radians / 2.0), 0.0, 0.0).toRotationMatrix());
 //    if(!with_skinning) {
 //        bones[0]->Rotate(-0.1f, cg3d::Movable::Axis::X);
 //        bones[1]->Rotate(0.1f, cg3d::Movable::Axis::X);
@@ -125,7 +136,19 @@ void Snake::calcWeight(Eigen::MatrixXd& V, double min_z){
 //
 //    }
 
-}
+
+//    W = Eigen::MatrixXd::Zero(V.rows(), Cp.rows() - 1);
+//    for (size_t i = 0; i < V.rows(); i++)
+//    {
+//        Eigen::Vector3f v = V.row(i).cast<float>().eval();
+//        auto res = getDistanceFromColsestJoints(v, Cp);
+//        auto weights = CalculateWeightByDistances(res[0], res[2], res[1], res[3]);
+//        W.row(i)[(int)res[0]] = weights[0];
+//        W.row(i)[(int)res[1]] = weights[1];
+        }
+
+
+
 
 void Snake::skinning(Eigen::Vector3d t) {
     if (with_skinning) {
@@ -172,17 +195,21 @@ void Snake::skinning(Eigen::Vector3d t) {
     igl::deform_skeleton(Cp, BE, T, CT, BET);
 
 
-    snake->setMeshData(snake->name,
-                    U,
-                    snake->GetMeshList()[0]->data[0].faces,
-                    snake->GetMeshList()[0]->data[0].vertexNormals,
-                    snake->GetMeshList()[0]->data[0].textureCoords);
-
-
     for (int i = 1; i < number_of_joints; i++) {
         ikRotateHelper(i-1,p[i]);
     }
     ikRotateHelper(number_of_joints-1, p[number_of_joints]);
+
+    Eigen::MatrixXd VN;
+    igl::per_vertex_normals(U, snake->GetMesh()->data[0].faces, VN);
+    snake->setMeshData(snake->name,
+                    U,
+                    snake->GetMeshList()[0]->data[0].faces,
+                    VN,
+                    snake->GetMeshList()[0]->data[0].textureCoords);
+
+
+
 
     for (int i = 0; i < number_of_joints + 1; i++) {
         vC[i] = vT[i].cast<double>();
@@ -194,8 +221,7 @@ void Snake::skinning(Eigen::Vector3d t) {
         Eigen::Matrix3f system = bones[i-1]->GetRotation().transpose();
         bones[i-1]->Translate( newPositionOfObject.cast<float>() - ikGetPosition(i-1,joint_length/2));
     }
-    direction = {0.0,0.0,0.8f};
-
+    direction = {0.0f,0.0f,0.7f};
 }
 
 
@@ -274,7 +300,7 @@ void Snake::initSnake(){
     vT.resize(number_of_joints + 1);
     vQ.resize(number_of_joints + 1, Eigen::Quaterniond::Identity());
 
-    for (int i = 0; i < BE.rows()-1; i++) {
+    for (int i = 0; i < BE.rows(); i++) {
         BE.row(i) << i, i+1;
     }
 
@@ -316,6 +342,7 @@ void Snake::initSnake(){
         vC[i] = pos;
         pos = pos + Eigen::Vector3d(0, 0, joint_length);
     }
+    igl::directed_edge_parents(BE, P);
 
     Eigen::Vector3d min_vec = V_new.colwise().minCoeff();
     double minz = min_vec[2];
@@ -411,3 +438,4 @@ void Snake::Calc_Next_Position(std::vector<Eigen::Vector3f> &p, std::vector<doub
     p = _p;
     ris_Array = _ris_Array;
 }
+

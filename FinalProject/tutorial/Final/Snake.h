@@ -3,6 +3,7 @@
 //
 
 #pragma once
+
 #include "iostream"
 #include "Model.h"
 #include "Camera.h"
@@ -48,7 +49,7 @@ private:
     Eigen::MatrixXd V_new;
     void load_snake(std::string& path);
     void Calc_Next_Position(std::vector<Eigen::Vector3f> &p, std::vector<double> &ris_Array, std::vector<double> &lambdaI_Array, Eigen::Vector3d t);
-
+    void initSnake2();
 
 
 public:
@@ -86,10 +87,13 @@ public:
     void reset_bones();
     void reset_sake();
     Eigen::Vector3f  get_snake_head();
+    void skinningV2();
 
-
-
+    Eigen::Vector4f getDistanceFromColsestJoints(Eigen::Vector3f posV, Eigen::MatrixXd C);
+    Eigen::Vector2f CalculateWeightByDistances(int joint1Index, float distance1, int joint2Index, float distance2);
+    float WeightFunction(float distance);
     void SetTranslation(const Eigen::Vector3d& position, int id);
+
 };
 
 
