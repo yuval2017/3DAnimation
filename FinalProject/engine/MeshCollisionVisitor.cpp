@@ -26,7 +26,7 @@ void cg3d::MeshCollisionVisitor::Visit(Model *model) {
         std::shared_ptr<Movable> shrd = model->shared_from_this();
         std::shared_ptr<Model> snake = basicScene->snake->GetSnakeBones()[snake_head];
       if(model->name.find(BONE_NAME) != std::string::npos &&
-        !(basicScene->getStatistics()->selfCollisionStopper->is_countdown_running()) &&
+        !(basicScene->getStatistics()->selfCollisionStopper.is_countdown_running()) &&
          (Calculates::getInstance()-> isMeshCollision(snake, model->shared_from_this(), ((snake)->GetTree()),
                                         model->GetTree()))){
           std::cout << "collision with " << model->name << " \n" << std::endl;
@@ -34,7 +34,7 @@ void cg3d::MeshCollisionVisitor::Visit(Model *model) {
       }
       else if(!model->isHidden &&
                 model->name.find(COLLISION_OBJECT) != std::string::npos &&
-                !(basicScene->getStatistics()->objectCollisionStopper->is_countdown_running())){
+                !(basicScene->getStatistics()->objectCollisionStopper.is_countdown_running())){
           if( (Calculates::getInstance()->
                   isMeshCollision(snake, model->shared_from_this(), ((snake)->GetTree()),
                                   model->GetTree()))) {
@@ -58,14 +58,14 @@ void cg3d::MeshCollisionVisitor::Visit(Model *model) {
 
 
 void MeshCollisionVisitor::handle_self_hit() {
-    if(basicScene->getData()->get_life_bought() >0){
+    if(basicScene->getData()->life_bought >0){
         basicScene->getData()->dec_life_bought();
-        basicScene->getStatistics()->selfCollisionStopper->start(4);
+        basicScene->getStatistics()->selfCollisionStopper.start(10);
     }
     else{
         basicScene->animate = false;
-        basicScene->getStatistics()->objectCollisionStopper->reset();
-        basicScene->getStatistics()->selfCollisionStopper->reset();
+        basicScene->getStatistics()->objectCollisionStopper.reset();
+        basicScene->getStatistics()->selfCollisionStopper.reset();
         basicScene->getSoundManager()->play_sound(std::to_string(FAIL_SOUND));
         basicScene->getStatistics()->menu_flags[GameOverMenu_OP] = true;
     }
@@ -75,28 +75,30 @@ void MeshCollisionVisitor::handle_object_hit(Model *model){
 
      if(model->name.find(CUBE_NAME) != std::string::npos) {
         std::cout<< "hitting cube" << std::endl;
-        if(basicScene->getData()->get_life_bought() >0){
+        if(basicScene->getData()->life_bought >0){
             basicScene->getData()->dec_life_bought();
-            basicScene->getStatistics()->selfCollisionStopper->start(4);
+            basicScene->getStatistics()->objectCollisionStopper.start(10);
+            basicScene->animate = true;
         }
         else{
             basicScene->animate = false;
-            basicScene->getStatistics()->objectCollisionStopper->reset();
-            basicScene->getStatistics()->selfCollisionStopper->reset();
+            basicScene->getStatistics()->objectCollisionStopper.reset();
+            basicScene->getStatistics()->selfCollisionStopper.reset();
             basicScene->getStatistics()->menu_flags[GameOverMenu_OP] = true;
             basicScene->getSoundManager()->play_sound(std::to_string(FAIL_SOUND));
         }
     }
     else {
         std::cout<< "hitting something else" << std::endl;
-        if(basicScene->getData()->get_life_bought() >0){
+        if(basicScene->getData()->life_bought>0){
             basicScene->getData()->dec_life_bought();
-            basicScene->getStatistics()->selfCollisionStopper->start(4);
+            basicScene->getStatistics()->objectCollisionStopper.start(10);
+            basicScene->animate = true;
         }
         else{
             basicScene->animate = false;
-            basicScene->getStatistics()->objectCollisionStopper->reset();
-            basicScene->getStatistics()->selfCollisionStopper->reset();
+            basicScene->getStatistics()->objectCollisionStopper.reset();
+            basicScene->getStatistics()->selfCollisionStopper.reset();
             basicScene->getStatistics()->menu_flags[GameOverMenu_OP] = true;
             basicScene->getSoundManager()->play_sound(std::to_string(FAIL_SOUND));
         }
@@ -110,6 +112,7 @@ void MeshCollisionVisitor::handle_eating(Model *model) {
         std::cout<< "eating coin" << std::endl;
         model->isHidden = true;
         model->stopper.reset();
+        basicScene->getSoundManager()->play_sound(std::to_string(HIT_SOUND));
         basicScene->getStatistics()->inc_Score(COIN_PRICE);
 
 

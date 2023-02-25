@@ -101,10 +101,6 @@ void Data::inc_life_bought()
     sub_total_money(LIFE_COST);
 }
 
-int Data::get_life_bought() const
-{
-    return life_bought;
-}
 
 
 void Data::inc_object_collision()
@@ -127,10 +123,6 @@ void Data::inc_double_score()
     sub_total_money(DOUBLE_SCORE_COST);
 }
 
-int Data::get_double_score() const
-{
-    return double_score;
-}
 
 void Data::set_message(std::string other)
 {

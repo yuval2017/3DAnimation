@@ -29,8 +29,6 @@ GameStatistics::GameStatistics() {
     strikes_used = 0 ;
     double_score = false;
     levelUp = false;
-    selfCollisionStopper = new Stopper();
-    objectCollisionStopper = new Stopper();
     data = Data::getInstance();
 }
 
@@ -42,8 +40,8 @@ void GameStatistics::reset_game() {
     strikes_used = 0 ;
     double_score = false;
     levelUp = false;
-    selfCollisionStopper->reset();
-    objectCollisionStopper->reset();
+    selfCollisionStopper.reset();
+    objectCollisionStopper.reset();
 }
 
 void GameStatistics::inc_Score(int i) {

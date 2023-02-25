@@ -49,8 +49,8 @@ public:
     bool levelUp;
     bool restart;
     void reset_game();
-    Stopper* selfCollisionStopper;
-    Stopper* objectCollisionStopper;
+    Stopper selfCollisionStopper;
+    Stopper objectCollisionStopper;
 
     bool resetSnake;
     void inc_Score(int i);

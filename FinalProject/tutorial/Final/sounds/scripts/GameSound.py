@@ -57,6 +57,7 @@ def main():
     global sound6
     global sound7
     global sound8
+    global sound9
     global sounds
     global game_musics
     global sound_number

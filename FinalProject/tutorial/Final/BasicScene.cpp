@@ -401,7 +401,7 @@ void BasicScene::loadingMenu() {
         float current_time = ImGui::GetTime();
 
         // Calculate the progress as a value between 0 and 1
-        float progress =  (done == 3) ? std::min((current_time - start_time) / 10.f, 1.0f) : start_time;
+        float progress =  (done == 3) ? std::min((current_time - start_time) / 30.f, 1.0f) : start_time;
 
         // Display the progress as a percentage
         ImGui::Text("Percentage of Time Passed: %.2f%%", progress * 100.0f);
@@ -431,9 +431,9 @@ void BasicScene::startMenu() {
             std::cout << "new game button pressed in start menu ." << endl;
             statistics->menu_flags[MainMenu_OP] = false;
             animate = true;
-            statistics->objectCollisionStopper->start(15);
-            statistics->selfCollisionStopper->start(30);
-            if(data->get_double_score()>0){
+            statistics->objectCollisionStopper.start(15);
+            statistics->selfCollisionStopper.start(30);
+            if(data->double_score >0){
                 data->dec_double_score();
                 statistics->double_score=true;
             }
@@ -532,7 +532,7 @@ void BasicScene::PausedMenu()
         ImGui::Spacing();
         ImGui::Text("Life remain: ");
         ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
-        std::string tmp11 = std::to_string(data->get_life_bought());
+        std::string tmp11 = std::to_string(data->life_bought);
         ImGui::Text("%s", tmp11.c_str());
         ImGui::Spacing();
         ImGui::Text("Level: ");
@@ -754,10 +754,10 @@ void BasicScene::NextLevelMenu() {
                 std::cout << "Next level button pressed in next level menu." << endl;
                 statistics->menu_flags[LevelMenu_OP] = false;
                 statistics->level++;
-                statistics->objectCollisionStopper->reset();
-                statistics->selfCollisionStopper->reset();
-                statistics->objectCollisionStopper->start(5);
-                statistics->selfCollisionStopper->start(5);
+                statistics->objectCollisionStopper.reset();
+                statistics->selfCollisionStopper.reset();
+                statistics->objectCollisionStopper.start(5);
+                statistics->selfCollisionStopper.start(5);
                 animate = true;
             }
         }
@@ -878,6 +878,8 @@ void BasicScene::WinMenu() {
         endWindow();
     }
 }
+
+
 void BasicScene::LoseMenu() {
 
     if (statistics->menu_flags[GameOverMenu_OP]) {
@@ -991,7 +993,7 @@ void BasicScene::StoreMenu() {
         ImGui::Spacing();
         ImGui::Text("Life remain: ");
         ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
-        std::string tmp11 = std::to_string(data->get_life_bought());
+        std::string tmp11 = std::to_string(data->life_bought);
         ImGui::Text("%s", tmp11.c_str());
         ImGui::Spacing();
         ImGui::Text("Level: ");
@@ -1003,40 +1005,62 @@ void BasicScene::StoreMenu() {
         std::string tmp33 = std::to_string(statistics->speed);
         ImGui::Text("%s", tmp33.c_str());
 
-        if (ImGui::Button("Buy speed - 50 coins", ImVec2(-1, 0))) {
-            statistics->inc_speed();
-            soundManager->play_sound(std::to_string(KACHING_SOUND));
+        if (ImGui::Button("Buy speed - 50 coins", ImVec2(-1, 0)) ) {
+            if(data->total_money >=SPEED_COST) {
+                statistics->inc_speed();
+                soundManager->play_sound(std::to_string(KACHING_SOUND));
+            }
+            else{
+                data->set_message("You have not enough money for that.");
+            }
         }
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
 
         if (ImGui::Button("Buy extra life - 30 coins", ImVec2(-1, 0))) {
+            if(data->total_money >=LIFE_COST) {
             data->inc_life_bought();
             soundManager->play_sound(std::to_string(KACHING_SOUND));
+        }
+        else{
+            data->set_message("You have not enough money for that.");
+        }
         }
 
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
         if (ImGui::Button("Buy self collision invisibility - 10 coins", ImVec2(-1, 0))) {
-            data->inc_self_collision();
-            soundManager->play_sound(std::to_string(KACHING_SOUND));
+            if (data->total_money >= SELF_COLLIDE_COST) {
+                data->inc_self_collision();
+                soundManager->play_sound(std::to_string(KACHING_SOUND));
+            } else {
+                data->set_message("You have not enough money for that.");
+            }
         }
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
 
         if (ImGui::Button("Buy obstacles collision invisibility - 20 coins", ImVec2(-1, 0))) {
-            data->inc_object_collision();
-            soundManager->play_sound(std::to_string(KACHING_SOUND));
+            if (data->total_money >= OBJECT_COLLIDE_COST) {
+                data->inc_object_collision();
+                soundManager->play_sound(std::to_string(KACHING_SOUND));
+            } else {
+                data->set_message("You have not enough money for that.");
+            }
         }
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
         if (ImGui::Button("Buy double score in game- 60 coins", ImVec2(-1, 0))) {
-            data->inc_object_collision();
+            if (data->total_money>= OBJECT_COLLIDE_COST) {
+            data->inc_double_score();
             soundManager->play_sound(std::to_string(KACHING_SOUND));
+            } else {
+                data->set_message("You have not enough money for that.");
+            }
         }
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
