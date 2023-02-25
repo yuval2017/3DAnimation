@@ -72,7 +72,7 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
                     Eigen::Vector3f pos = frogPoints.front();
                     frogPoints.pop();
                     frogPoints.push(pos);
-                    frog->Translate(pos);
+                    frog->Translate(pos - frog->GetPosition());
                     //std::cout<< "added frog model : "<<pos[0] <<", " << pos[1] <<", " << pos[2] <<std::endl;
                     stopperFrog->start(sec1);
                     frog->stopper.start(len1);
@@ -87,7 +87,7 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
                     Eigen::Vector3f pos = mousePoints.front();
                     mousePoints.pop();
                     mousePoints.push(pos);
-                    mouse->Translate(pos);
+                    mouse->Translate(pos - mouse->GetPosition());
                     //std::cout<< "added mouse model : "<<pos[0] <<", " << pos[1] <<", " << pos[2] <<std::endl;
                     stopperMouse->start(sec2);
                     mouse->stopper.start(len2);
@@ -102,7 +102,7 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
                     Eigen::Vector3f pos = coinPoints.front();
                     coinPoints.pop();
                     coinPoints.push(pos);
-                    coin->Translate(pos);
+                    coin->Translate(pos - coin->GetPosition());
                     //std::cout<< "added coin model: "<<pos[0] <<", " << pos[1] <<", " << pos[2] <<std::endl;
                     stopperCoin->start(sec3);
                     coin->stopper.start(len3);
