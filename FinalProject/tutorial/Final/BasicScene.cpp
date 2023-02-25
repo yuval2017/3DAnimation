@@ -70,16 +70,27 @@ void BasicScene::init_cameras(float fov, int width, int height,float near, float
     cameras[2]->RotateByDegree(-15.f, Movable::Axis::X);
 
     //Set over-view
-//    snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[3]);
-//    cameras[3]->Translate(Eigen::Vector3f(-5.f, 10.f, -50.f));
-//    cameras[3]->Rotate(M_PI, Movable::Axis::Y);
-//    cameras[3]->RotateByDegree(-15.f, Movable::Axis::X);
+    snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[3]);
+    cameras[3]->Translate(Eigen::Vector3f(-5.f, 10.f, -50.f));
+    cameras[3]->Rotate(M_PI, Movable::Axis::Y);
+    cameras[3]->RotateByDegree(-15.f, Movable::Axis::X);
 
     camera = cameras[0];
 
-
-
 }
+
+void BasicScene::resetCameras(){
+    //set the cameras on the new snake after level up.
+    snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[0]);
+
+    snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[1]);
+
+    snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[2]);
+
+    snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[3]);
+}
+
+
 BasicScene::BasicScene(std::string name, Display* display) : SceneWithImGui(std::move(name), display)
 {
     ImGui::GetIO().IniFilename = nullptr;
@@ -320,7 +331,7 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
                 camera->TranslateInSystem(system, {0, 0, 0.1f});
                 break;
             case GLFW_KEY_C:
-                statistics->score += 10;
+                statistics->inc_Score(500);
                 break;
             case GLFW_KEY_F:
                 camera->TranslateInSystem(system, {0, 0, -0.1f});
@@ -390,7 +401,7 @@ void BasicScene::loadingMenu() {
         float current_time = ImGui::GetTime();
 
         // Calculate the progress as a value between 0 and 1
-        float progress =  (done == 3) ? std::min((current_time - start_time) / 30.f, 1.0f) : start_time;
+        float progress =  (done == 3) ? std::min((current_time - start_time) / 10.f, 1.0f) : start_time;
 
         // Display the progress as a percentage
         ImGui::Text("Percentage of Time Passed: %.2f%%", progress * 100.0f);
@@ -422,6 +433,10 @@ void BasicScene::startMenu() {
             animate = true;
             statistics->objectCollisionStopper->start(15);
             statistics->selfCollisionStopper->start(30);
+            if(data->get_double_score()>0){
+                data->dec_double_score();
+                statistics->double_score=true;
+            }
         }
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
@@ -444,20 +459,6 @@ void BasicScene::startMenu() {
             statistics->menu_flags[MainMenu_OP] = false;
             data->back_to_main.push_back(MainMenu_OP);
             statistics->menu_flags[StoreMenu_OP] = true;
-//            //add score check .
-//            Score* scor = generateRandomScore();
-//            int pos = highScores->nextLeaderPos();
-//            if( pos == -1) {
-//                std::vector<int> scores = this->highScores->extractScores();
-//                for (int i = 0; i < scores.size(); i++) {
-//                    if (scor->score > scores[i]) {
-//                        pos = i;
-//                    }
-//                }
-//            }
-//            if (pos != -1){
-//                highScores->saveToHighScores(scor,pos);
-//            }
 
         }
         for(int i = 0; i< 3 ; i++){
@@ -515,7 +516,9 @@ void BasicScene::PausedMenu()
         animate = false;
         setWindow("Pause");
         ImGui::PushFont(regularFont);
-        ImGui::ProgressBar(statistics->get_progress(), ImVec2(0.0f, 0.0f));
+        float progress = statistics->score;
+        progress= progress/data->scores[statistics->level];
+        ImGui::ProgressBar(progress, ImVec2(0.0f, 0.0f));
         ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
         ImGui::Text("Progress Bar");
         for(int i = 0; i< 3 ; i++){
@@ -579,6 +582,9 @@ void BasicScene::PausedMenu()
             statistics->menu_flags[PauseMenu_OP] = false;
             statistics->menu_flags[MainMenu_OP] = true;
             data->back_to_main.clear();
+            data->add_total_money(statistics->score/10);
+            soundManager->play_sound(std::to_string(BOO_SOUND));
+            statistics->restart =true;
             statistics->reset_game();
 
 
@@ -714,26 +720,49 @@ void BasicScene::NextLevelMenu() {
 
     if (statistics->menu_flags[LevelMenu_OP]) {
         animate = false;
+        if(start_time == 0.0 ) {
+            start_time = ImGui::GetTime();
+        }
         setWindow("Level Up");
         ImGui::PushFont(regularFont);
         std::string tmp = std::to_string(statistics->level);
-        ImGui::Text("%s", tmp.c_str());
+        ImGui::Text(" Current level: %s", tmp.c_str());
         ImGui::Spacing();
         ImGui::Text("Your total score until now is ");
         ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
         tmp = std::to_string(statistics->score);
         ImGui::Text("%s", tmp.c_str());
-        for(int i = 0; i< 3 ; i++){
+        for (int i = 0; i < 3; i++) {
             ImGui::Spacing();
         }
+
         buttonStyle();
-        if (ImGui::Button("Next level", ImVec2(-1, 0))) {
-            //TODO: START NEXT LEVEL.
-            //CHECK INIT SNAKE.
-            std::cout << "Next level button pressed in next level menu." << endl;
-            statistics->levelUp = true;
-            statistics->level = statistics->level +1;
+        // Get the current time in seconds
+        float current_time = ImGui::GetTime();
+
+        // Calculate the progress as a value between 0 and 1
+        float progress =  (done == 3) ? std::min((current_time - start_time) / 10.f, 1.0f) : start_time;
+
+        // Display the progress as a percentage
+        ImGui::Text("Percentage of Time Passed: %.2f%%", progress * 100.0f);
+
+        // Display the progress bar
+        ImGui::ProgressBar(progress, ImVec2(-1, 0), "");
+        // Call the callback function when progress reaches 100%
+        if (progress >= 1.0f) {
+            if (ImGui::Button("Next level", ImVec2(-1, 0))) {
+                std::cout << "Next level button pressed in next level menu." << endl;
+                statistics->menu_flags[LevelMenu_OP] = false;
+                statistics->level++;
+                statistics->objectCollisionStopper->reset();
+                statistics->selfCollisionStopper->reset();
+                statistics->objectCollisionStopper->start(5);
+                statistics->selfCollisionStopper->start(5);
+                animate = true;
+            }
         }
+
+
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
@@ -759,8 +788,12 @@ void BasicScene::NextLevelMenu() {
 
 
 void BasicScene::WinMenu() {
+
     if (statistics->menu_flags[WinMenu_OP]) {
         animate = false;
+        if(start_time == 0.0 ) {
+            start_time = ImGui::GetTime();
+        }
         setWindow("You Won!");
         ImGui::PushFont(regularFont);
         ImGui::Text("Congratulations You finished the game!!");
@@ -782,7 +815,7 @@ void BasicScene::WinMenu() {
                 }
             }
         }
-        static bool saved = false;
+       static  bool saved = false;
         if(pos != -1){
             ImGui::Text("Please type your name to save in\nleader board: ");
             static char name[256] = ""; // buffer to store the input string
@@ -796,23 +829,41 @@ void BasicScene::WinMenu() {
                 highScores->saveToHighScores(scor, pos);
                 data->set_message("your score was saved!");
                 saved = true;
+
             }
             else if (saved){
                 data->set_message("your score was already saved");
             }
 
         }
+
         for (int i = 0; i < 3; i++) {
             ImGui::Spacing();
         }
-        if (ImGui::Button("Back ", ImVec2(-1, 0))) {
-            std::cout << "Back button pressed in win menu." << endl;
-            data->back_to_main.clear();
+        // Get the current time in seconds
+        float current_time = ImGui::GetTime();
+
+        // Calculate the progress as a value between 0 and 1
+        float progress =  (done == 3) ? std::min((current_time - start_time) / 30.f, 1.0f) : start_time;
+
+        // Display the progress as a percentage
+        ImGui::Text("Percentage of Time Passed: %.2f%%", progress * 100.0f);
+
+        // Display the progress bar
+        ImGui::ProgressBar(progress, ImVec2(-1, 0), "");
+        // Call the callback function when progress reaches 100%
+        if (progress >= 1.0f) {
+            if (ImGui::Button("Back ", ImVec2(-1, 0))) {
+                std::cout << "Back button pressed in win menu." << endl;
+                data->back_to_main.clear();
                 statistics->menu_flags[WinMenu_OP] =false;
                 statistics->menu_flags[MainMenu_OP] =true;
-                //TODO:reset game.
+                data->add_total_money(statistics->score/10);
+                statistics->reset_game();
 
+            }
         }
+
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
@@ -828,8 +879,12 @@ void BasicScene::WinMenu() {
     }
 }
 void BasicScene::LoseMenu() {
+
     if (statistics->menu_flags[GameOverMenu_OP]) {
         animate = false;
+        if(start_time == 0.0 ) {
+            start_time = ImGui::GetTime();
+        }
         setWindow("Game Over!");
         ImGui::PushFont(regularFont);
         ImGui::Text("You lost..\nMaybe you will succeed next time.");
@@ -876,13 +931,28 @@ void BasicScene::LoseMenu() {
         for (int i = 0; i < 3; i++) {
             ImGui::Spacing();
         }
-        if (ImGui::Button("Back ", ImVec2(-1, 0))) {
-            std::cout << "Back button pressed in win menu." << endl;
-            data->back_to_main.clear();
-            statistics->menu_flags[GameOverMenu_OP] = false;
-            statistics->menu_flags[MainMenu_OP] = true;
-            //TODO:reset game.
-            saved= false;
+        // Get the current time in seconds
+        float current_time = ImGui::GetTime();
+
+        // Calculate the progress as a value between 0 and 1
+        float progress =  (done == 3) ? std::min((current_time - start_time) / 10.f, 1.0f) : start_time;
+
+        // Display the progress as a percentage
+        ImGui::Text("Percentage of Time Passed: %.2f%%", progress * 100.0f);
+
+        // Display the progress bar
+        ImGui::ProgressBar(progress, ImVec2(-1, 0), "");
+        // Call the callback function when progress reaches 100%
+        if (progress >= 1.0f) {
+            if (ImGui::Button("Back ", ImVec2(-1, 0))) {
+                std::cout << "Back button pressed in lose menu." << endl;
+                data->back_to_main.clear();
+                statistics->menu_flags[GameOverMenu_OP] = false;
+                statistics->menu_flags[MainMenu_OP] = true;
+                data->add_total_money(statistics->score/10);
+                statistics->reset_game();
+
+            }
         }
 
         for (int i = 0; i < 3; i++) {
@@ -906,27 +976,68 @@ void BasicScene::StoreMenu() {
         animate = false;
         setWindow("Store");
         ImGui::PushFont(regularFont);
+        buttonStyle();
         ImGui::Text("You have total money of ");
         ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
-        std::string tmp = std::to_string(data->get_total_money());
+        std::string tmp = std::to_string(data->total_money);
         ImGui::Text("%s", tmp.c_str());
-        for(int i = 0; i< 3 ; i++){
+        for(int i = 0; i< 5 ; i++){
             ImGui::Spacing();
         }
-        if (ImGui::Button("extra speed - 50 coins", ImVec2(-1, 0))) {
-            statistics->speed += 1;
+        ImGui::Text("Total score: ");
+        ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
+        std::string tmp2 = std::to_string(statistics->score);
+        ImGui::Text("%s", tmp2.c_str());
+        ImGui::Spacing();
+        ImGui::Text("Life remain: ");
+        ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
+        std::string tmp11 = std::to_string(data->get_life_bought());
+        ImGui::Text("%s", tmp11.c_str());
+        ImGui::Spacing();
+        ImGui::Text("Level: ");
+        ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
+        std::string tmp22 = std::to_string(statistics->level);
+        ImGui::Text("%s", tmp22.c_str());
+        ImGui::Text("Snake speed: ");
+        ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
+        std::string tmp33 = std::to_string(statistics->speed);
+        ImGui::Text("%s", tmp33.c_str());
 
+        if (ImGui::Button("Buy speed - 50 coins", ImVec2(-1, 0))) {
+            statistics->inc_speed();
+            soundManager->play_sound(std::to_string(KACHING_SOUND));
         }
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
-        buttonStyle();
-        if (ImGui::Button("refill health - 30 coins", ImVec2(-1, 0))) {
+
+        if (ImGui::Button("Buy extra life - 30 coins", ImVec2(-1, 0))) {
             data->inc_life_bought();
-            data->set_message(std::to_string(data->get_life_bought()));
-            soundManager->play_sound(std::to_string(FAIL_SOUND));
+            soundManager->play_sound(std::to_string(KACHING_SOUND));
         }
 
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
+        if (ImGui::Button("Buy self collision invisibility - 10 coins", ImVec2(-1, 0))) {
+            data->inc_self_collision();
+            soundManager->play_sound(std::to_string(KACHING_SOUND));
+        }
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
+
+        if (ImGui::Button("Buy obstacles collision invisibility - 20 coins", ImVec2(-1, 0))) {
+            data->inc_object_collision();
+            soundManager->play_sound(std::to_string(KACHING_SOUND));
+        }
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
+        if (ImGui::Button("Buy double score in game- 60 coins", ImVec2(-1, 0))) {
+            data->inc_object_collision();
+            soundManager->play_sound(std::to_string(KACHING_SOUND));
+        }
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
@@ -1017,6 +1128,18 @@ void BasicScene::PlayMenu()
         ImGui::SameLine();
         if (ImGui::Button("Center"))
             camera->SetTout(Eigen::Affine3f::Identity());
+        ImGui::Spacing();
+        ImGui::Spacing();
+        ImGui::Text("Total score: ");
+        ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
+        std::string tmp = std::to_string(statistics->score);
+        ImGui::Text("%s", tmp.c_str());
+        ImGui::Spacing();
+        ImGui::Text("Level: ");
+        ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
+        std::string tmp2 = std::to_string(statistics->level);
+        ImGui::Text("%s", tmp2.c_str());
+        ImGui::Spacing();
         ImGui::End();
     }
 }

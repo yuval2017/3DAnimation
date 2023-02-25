@@ -11,27 +11,31 @@ sound_volume_changes = True
 game_play_volume_changed = True
 sound_number: float = 0.5
 game_music_number: float = 0.5
-audio_file = "../tutorial/Final/sounds/scripts/music/Game.mp3"
+audio_file0 = "../tutorial/Final/sounds/scripts/music/music1.mp3"
 audio_file1 = "../tutorial/Final/sounds/scripts/music/fail.mp3"
 audio_file2 = "../tutorial/Final/sounds/scripts/music/Health.mp3"
 audio_file3 = "../tutorial/Final/sounds/scripts/music/hit.mp3"
 audio_file4 = "../tutorial/Final/sounds/scripts/music/progress.mp3"
 audio_file5 = "../tutorial/Final/sounds/scripts/music/success.mp3"
-audio_file6 = "../tutorial/Final/sounds/scripts/music/menuMusic.mp3"
-audio_file7 = "../tutorial/Final/sounds/scripts/music/gameMusic.mp3"
+audio_file6 = "../tutorial/Final/sounds/scripts/music/kaching.mp3"
+audio_file7 = "../tutorial/Final/sounds/scripts/music/music2.mp3"
+audio_file8 = "../tutorial/Final/sounds/scripts/music/music3.mp3"
+audio_file9 = "../tutorial/Final/sounds/scripts/music/boo.mp3"
 pygame.init()
-sound1 = pygame.mixer.Sound(audio_file)
-sound2 = pygame.mixer.Sound(audio_file1)
-sound3 = pygame.mixer.Sound(audio_file2)
-sound4 = pygame.mixer.Sound(audio_file3)
-sound5 = pygame.mixer.Sound(audio_file4)
-sound6 = pygame.mixer.Sound(audio_file5)
-sound7 = pygame.mixer.Sound(audio_file6)
-sound8 = pygame.mixer.Sound(audio_file7)
-curr_sound = sound2
-curr_background = sound1
-sounds = {sound2, sound3, sound4, sound5, sound6}
-game_musics = {sound1,sound7, sound8}
+sound0 = pygame.mixer.Sound(audio_file0)
+sound1 = pygame.mixer.Sound(audio_file1)
+sound2 = pygame.mixer.Sound(audio_file2)
+sound3 = pygame.mixer.Sound(audio_file3)
+sound4 = pygame.mixer.Sound(audio_file4)
+sound5 = pygame.mixer.Sound(audio_file5)
+sound6 = pygame.mixer.Sound(audio_file6)
+sound7 = pygame.mixer.Sound(audio_file7)
+sound8 = pygame.mixer.Sound(audio_file8)
+sound9 = pygame.mixer.Sound(audio_file9)
+curr_sound = sound1
+curr_background = sound0
+sounds = {sound1, sound2, sound3, sound4, sound5,sound6,sound9}
+game_musics = {sound0, sound7, sound8}
 one_time_stop_music = True
 one_time_play = True
 
@@ -44,6 +48,7 @@ def main():
     global curr_background
     global play_sound
     global is_sound_mute
+    global sound0
     global sound1
     global sound2
     global sound3
@@ -60,8 +65,8 @@ def main():
     global game_play_volume_changed
     global one_time_stop_music
     global one_time_play
-    curr_sound = sound2
-    curr_background = sound1
+    curr_sound = sound1
+    curr_background = sound0
     thread1 = Thread(target=game_music)
     thread1.start()
     thread2 = Thread(target=game_sound)
@@ -88,25 +93,33 @@ def main():
             is_sound_mute = False
         elif pip_input == 'b':
             is_sound_mute = True
-            # this is all sounds
+
+        # this is all sounds
         elif pip_input == '1':
-            curr_sound = sound2
+            curr_sound = sound1
             play_sound = True
         elif pip_input == '2':
-            curr_sound = sound3
+            curr_sound = sound2
             play_sound = True
         elif pip_input == '3':
-            curr_sound = sound4
+            curr_sound = sound3
             play_sound = True
         elif pip_input == '4':
-            curr_sound = sound5
+            curr_sound = sound4
             play_sound = True
         elif pip_input == '5':
+            curr_sound = sound5
+            play_sound = True
+        elif pip_input == '6':
             curr_sound = sound6
             play_sound = True
+        elif pip_input == '9':
+            curr_sound = sound9
+            play_sound = True
+        # the game music
         elif pip_input == '@1':
             curr_background.stop()
-            curr_background = sound1
+            curr_background = sound8
             one_time_play = True
         elif pip_input == '@2':
             curr_background.stop()
@@ -114,11 +127,11 @@ def main():
             one_time_play = True
         elif pip_input == '@3':
             curr_background.stop()
-            curr_background = sound8
+            curr_background = sound0
             one_time_play = True
         # here is to change the game sound
         elif pip_input == 'q':
-            play_sound = sound1
+            play_sound = sound0
         elif pip_input[0:1] == 'n':
             sound_number = float(pip_input[1:6])
             sound_volume_changes = True

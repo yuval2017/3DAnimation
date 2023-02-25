@@ -63,7 +63,7 @@ void Snake::SetSpeed(float new_speed){
     speed = new_speed;
 }
 void Snake::MoveLeft(){
-    direction = Eigen::Vector3d(0.8f, 0, 0.7f);
+    direction = Eigen::Vector3d(0.8f, 0, 1.5f);
 //    float angle_radians = -20.0f * M_PI / 180.0f;
 //    bones[bones.size() - 1]->Rotate(Eigen::Quaternionf(cos(angle_radians / 2.0), 0.0, sin(angle_radians / 2.0), 0.0).toRotationMatrix());
 //    if(!with_skinning) {
@@ -72,7 +72,7 @@ void Snake::MoveLeft(){
 //    }
 }
 void Snake::MoveRight(){
-    direction = Eigen::Vector3d(-0.8f, 0, 0.7f);
+    direction = Eigen::Vector3d(-0.8f, 0, 1.5f);
 //    float angle_radians = 20.0f * M_PI / 180.0f;
 //    bones[bones.size() - 1]->Rotate(Eigen::Quaternionf(cos(angle_radians / 2.0), 0.0, sin(angle_radians / 2.0), 0.0).toRotationMatrix());
 //    if(!with_skinning) {
@@ -82,7 +82,7 @@ void Snake::MoveRight(){
 //    }
 }
 void Snake::MoveUp(){
-    direction = Eigen::Vector3d(0, 0.8f, 0.7f);
+    direction = Eigen::Vector3d(0, 0.8f, 1.5f);
 //    float angle_radians = 20.0f * M_PI / 180.0f;
 //    bones[bones.size() - 1]->Rotate(Eigen::Quaternionf(cos(angle_radians / 2.0), sin(angle_radians / 2.0), 0.0, 0.0).toRotationMatrix());
     //direction = Eigen::Vector3d(0, 0.8f, 0);
@@ -93,7 +93,7 @@ void Snake::MoveUp(){
 }
 
 void Snake::MoveDone(){
-    direction = Eigen::Vector3d(0, -0.8f, 0.7f);
+    direction = Eigen::Vector3d(0, -0.8f, 1.5f);
 //    float angle_radians = -20.0f * M_PI / 180.0f;
 //    bones[bones.size() - 1]->Rotate(Eigen::Quaternionf(cos(angle_radians / 2.0), sin(angle_radians / 2.0), 0.0, 0.0).toRotationMatrix());
 //    if(!with_skinning) {

@@ -28,26 +28,27 @@ void cg3d::MeshCollisionVisitor::Visit(Model *model) {
         !(basicScene->getStatistics()->selfCollisionStopper->is_countdown_running()) &&
          (Calculates::getInstance()-> isMeshCollision(snake, model, ((snake)->GetTreeWithOutCube()),
                                         model->GetTreeWithOutCube()))){
-          std::cout << "collision with " << model->name << " \n" << std::endl;
+          //std::cout << "collision with " << model->name << " \n" << std::endl;
           handle_self_hit();
       }
-      else if((!model->isHidden & model->name.find(COLLISION_OBJECT) != std::string::npos) &
+      else if(((!model->isHidden & model->name.find(COLLISION_OBJECT)) != std::string::npos) &
                 !(basicScene->getStatistics()->objectCollisionStopper->is_countdown_running())&&
               (Calculates::getInstance()->
                       isMeshCollision(snake, model, ((snake)->GetTreeWithCube()),
                                       model->GetTreeWithCube()))){
 
-          std::cout << "collision with " << model->name << " \n collision running = " <<
-          (basicScene->getStatistics()->objectCollisionStopper->is_countdown_running())<<std::endl;
+          //std::cout << "collision with " << model->name << " \n collision running = " <<
+        // (basicScene->getStatistics()->objectCollisionStopper->is_countdown_running())<<std::endl;
           handle_object_hit(model);
+      }
       else if(!model->isHidden &&
                 model->name.find(COLLISION_OBJECT) != std::string::npos &&
                 !(basicScene->getStatistics()->objectCollisionStopper->is_countdown_running())){
-          std::cout << "collision with " << model->name << " \n" << std::endl;
+          //std::cout << "collision with " << model->name << " \n" << std::endl;
           if( (Calculates::getInstance()->
                   isMeshCollision(snake, model, ((snake)->GetTreeWithCube()),
                                   model->GetTreeWithOutCube()))) {
-              std::cout << "collision with " << model->name << " \n" << std::endl;
+            //  std::cout << "collision with " << model->name << " \n" << std::endl;
               handle_object_hit(model);
           }
       }
@@ -56,7 +57,7 @@ void cg3d::MeshCollisionVisitor::Visit(Model *model) {
           if (Calculates::getInstance()->
                   isMeshCollision(snake, model, ((snake)->GetTreeWithCube()),
                                   model->GetTreeWithOutCube())) {
-              std::cout << " eated " << model->name << " \n" << std::endl;
+            //  std::cout << " eated " << model->name << " \n" << std::endl;
               handle_eating(model);
           }
       }
@@ -81,10 +82,11 @@ void MeshCollisionVisitor::handle_self_hit() {
 void MeshCollisionVisitor::handle_object_hit(Model *model){
 
      if(model->name.find(CUBE_NAME) != std::string::npos) {
-        std::cout<< "hitting cube" << std::endl;
+        //std::cout<< "hitting cube" << std::endl;
         if(basicScene->getData()->get_life_bought() >0){
             basicScene->getData()->dec_life_bought();
             basicScene->getStatistics()->selfCollisionStopper->start(4);
+            basicScene->getSoundManager()->play_sound(std::to_string(HEALTH_SOUND));
         }
         else{
             basicScene->animate = false;
@@ -95,10 +97,11 @@ void MeshCollisionVisitor::handle_object_hit(Model *model){
         }
     }
     else {
-        std::cout<< "hitting something else" << std::endl;
+    //    std::cout<< "hitting something else" << std::endl;
         if(basicScene->getData()->get_life_bought() >0){
             basicScene->getData()->dec_life_bought();
             basicScene->getStatistics()->selfCollisionStopper->start(4);
+            basicScene->getSoundManager()->play_sound(std::to_string(HEALTH_SOUND));
         }
         else{
             basicScene->animate = false;
@@ -114,15 +117,16 @@ void MeshCollisionVisitor::handle_object_hit(Model *model){
 void MeshCollisionVisitor::handle_eating(Model *model) {
 
     if(model->name.find(COIN_NAME) != std::string::npos){
-        std::cout<< "eating coin" << std::endl;
+      //  std::cout<< "eating coin" << std::endl;
         model->isHidden = true;
         model->stopper.reset();
+        basicScene->getSoundManager()->play_sound(std::to_string(HIT_SOUND));
         basicScene->getStatistics()->inc_Score(COIN_PRICE);
 
 
     }
     else if(model->name.find(FROG_NAME) != std::string::npos){
-        std::cout<< "eating frog" << std::endl;
+       // std::cout<< "eating frog" << std::endl;
         model->isHidden = true;
         model->stopper.reset();
         basicScene->getSoundManager()->play_sound(std::to_string(HIT_SOUND));
@@ -130,7 +134,7 @@ void MeshCollisionVisitor::handle_eating(Model *model) {
 
     }
     else if(model->name.find(MOUSE_NAME) != std::string::npos){
-        std::cout<< "eating mouse" << std::endl;
+       // std::cout<< "eating mouse" << std::endl;
         model->isHidden = true;
         model->stopper.reset();
         basicScene->getSoundManager()->play_sound(std::to_string(HIT_SOUND));

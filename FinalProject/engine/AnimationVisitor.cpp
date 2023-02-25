@@ -19,6 +19,7 @@ namespace cg3d
 
     void AnimationVisitor::Visit(Model* model)
     {
+
         if(basicScene->animate && model->name == std::string("snake")){
             basicScene->snake->skinning(basicScene->snake->direction);
         }

@@ -13,8 +13,6 @@
 #include "../tutorial/Final//ModelsFactory.h"
 #include "iostream"
 
-// Keep track of elapsed time
-static float elapsed_time = 0.0f;
 
 void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
     basicScene = (BasicScene *)scene;
@@ -110,16 +108,33 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
             }
         }
     }
+
+
+
+
     if(basicScene->getStatistics()->levelUp){
         basicScene->animate = false;
+        basicScene->start_time= 0.0f;
         removeFormerlevel();
         loadNextLevel(basicScene->getStatistics()->level+1);
+        basicScene->snake->reset_sake();
+        basicScene->resetCameras();
+        basicScene->getStatistics()->levelUp = false;
     }
+
+
+
+
     if(basicScene->getStatistics()->restart){
         basicScene->animate = false;
         removeFormerlevel();
         loadNextLevel(1);
+        basicScene->snake->reset_sake();
+        basicScene->resetCameras();
         basicScene->getStatistics()->restart = false;
+        basicScene->getStatistics()->menu_flags[WinMenu_OP] = true;
+        basicScene->getSoundManager()->play_sound(std::to_string(SUCCESS_SOUND));
+        basicScene->start_time = 0.0;
     }
 
     Visitor::Run(scene, camera);
@@ -132,6 +147,8 @@ void ObjectsAnimationVisitor::removeFormerlevel(){
             basicScene->GetRoot()->RemoveChild(model);
         }
     }
+    models.clear();
+    coords.clear();
 
 }
 void ObjectsAnimationVisitor::loadNextLevel(int nextLevel){
@@ -331,13 +348,15 @@ void ObjectsAnimationVisitor::CreateLevel2(std::vector<shared_ptr<Model>> &model
     Calculates::getInstance()->setRandomCubeLocations(x_length, y_length, z_length, n,  scale, cubes);
 
     for (int i = 0; i < n; i++) {
-        //Eigen::Vector3f position = {objects_in_space_x[i],objects_in_space_y[i],objects_in_space_z[i]};
         Eigen::Vector3f position = cubes[i].position.cast<float>();
         coords.push_back(position);
-        std::shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(BRICKS_MATERIAL,CUBE,std::string(COLLISION_OBJECT)+ std::string(CUBE_NAME));
+        shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(BRICKS_MATERIAL,CUBE,std::string(COLLISION_OBJECT)+ std::string(CUBE_NAME));
+        models.push_back(cube);
         basicScene->GetRoot()->AddChild(cube);
+        cube->showWireframe = true;
         cube->Translate(position);
         cube->Scale(scale);
+        cube->GetTreeWithCube();
     }
 }
 
@@ -360,14 +379,15 @@ void ObjectsAnimationVisitor::CreateLevel3(std::vector<shared_ptr<Model>> &model
     Calculates::getInstance()->setRandomCubeLocations(x_length, y_length, z_length, n,  scale, cubes);
 
     for (int i = 0; i < n; i++) {
-        //Eigen::Vector3f position = {objects_in_space_x[i],objects_in_space_y[i],objects_in_space_z[i]};
-
-        std::shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(BRICKS_MATERIAL,CUBE,std::string(COLLISION_OBJECT)+ std::string(CUBE_NAME));
-        basicScene->GetRoot()->AddChild(cube);
         Eigen::Vector3f position = cubes[i].position.cast<float>();
         coords.push_back(position);
+        shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(BRICKS_MATERIAL,CUBE,std::string(COLLISION_OBJECT)+ std::string(CUBE_NAME));
+        models.push_back(cube);
+        basicScene->GetRoot()->AddChild(cube);
+        cube->showWireframe = true;
         cube->Translate(position);
         cube->Scale(scale);
+        cube->GetTreeWithCube();
     }
 }
 
@@ -406,7 +426,7 @@ void ObjectsAnimationVisitor::init_point_givers(float x_length , float y_length,
         //add mouses
         shared_ptr<Model> mouse_model = createMouse();
         mouse_model->isHidden = true;
-        frog_model->Translate({0,0,0});
+        mouse_model->Translate({0,0,0});
         mouses_available.push_back(mouse_model);
         mouse_model->Rotate(-M_PI/2.0f, Movable::Axis::X);
         mouse_model->Scale(0.8f);
@@ -416,7 +436,7 @@ void ObjectsAnimationVisitor::init_point_givers(float x_length , float y_length,
         //add coins
         shared_ptr<Model> coin_model = createCoin();
         coin_model->isHidden = true;
-        frog_model->Translate({0,0,0});
+        coin_model->Translate({0,0,0});
         coins_available.push_back(coin_model);
         coin_model->Rotate(-M_PI/2.0f, Movable::Axis::X);
         coin_model->Scale(0.5f);

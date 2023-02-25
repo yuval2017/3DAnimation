@@ -18,6 +18,9 @@
 #define LoadingMenu_OP              9
 #define SPEED_COST                  50
 #define LIFE_COST                   30
+#define SELF_COLLIDE_COST           10
+#define OBJECT_COLLIDE_COST         20
+#define DOUBLE_SCORE_COST           60
 #define FROG_PRICE                  10
 #define MOUSE_PRICE                 50
 #define COIN_PRICE                  100
@@ -49,9 +52,10 @@ public:
     Stopper* selfCollisionStopper;
     Stopper* objectCollisionStopper;
 
-    float loadingProgress();
-
+    bool resetSnake;
     void inc_Score(int i);
+
+    void inc_speed();
 
 private :
     Data* data ;

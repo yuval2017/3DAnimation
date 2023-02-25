@@ -37,8 +37,10 @@ public:
     SoundManager* getSoundManager();
     bool init_flags[3] = {false, false,false};
     float done;
+    float start_time;
     void AddViewportCallback(Viewport* _viewport) override;
     void ViewportSizeCallback(Viewport* _viewport) override;
+    void resetCameras();
     ~BasicScene();
 private:
     Data* data;
@@ -97,7 +99,7 @@ private:
     GLuint backgroundImageTexture;
     ImVec2 startPos ;
     int windowFlags;
-    float start_time ;
+;
     std::vector<bool> events;
     void init_cameras(float fov,int width, int height,float near,float far);
 };

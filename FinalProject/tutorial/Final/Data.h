@@ -35,7 +35,7 @@ public:
     int message_size();
     void restart_game();
     void dec_life_bought();
-
+    int total_money;
     //game variables.
     bool gameMusic ;
     bool gameSound;
@@ -44,6 +44,9 @@ public:
     std::vector<int> back_to_main;
     int scores[4];
     bool checkScore(int score, int level);
+    void sub_total_money(int val);
+
+    void dec_double_score();
 
 private:
     void load_data();
@@ -51,7 +54,6 @@ private:
 
     static Data* instance;
     std::string msg;
-    int total_money;
     int life_bought;
     int object_collision;
     int self_collision;
@@ -60,4 +62,6 @@ private:
     nlohmann::json json_data;
     Data();
     ~Data();
+
+
 };
