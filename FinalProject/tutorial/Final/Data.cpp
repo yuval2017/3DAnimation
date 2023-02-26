@@ -109,6 +109,11 @@ void Data::inc_object_collision()
     sub_total_money(OBJECT_COLLIDE_COST);
 }
 
+void Data::dec_object_collision()
+{
+    object_collision--;
+    save_data();
+}
 
 void Data::inc_self_collision()
 {
@@ -116,6 +121,11 @@ void Data::inc_self_collision()
     sub_total_money(SELF_COLLIDE_COST);
 }
 
+void Data::dec_self_collision()
+{
+    self_collision--;
+    save_data();
+}
 
 void Data::inc_double_score()
 {

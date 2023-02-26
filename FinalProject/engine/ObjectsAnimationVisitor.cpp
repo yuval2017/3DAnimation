@@ -138,6 +138,10 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
         basicScene->getStatistics()->menu_flags[MainMenu_OP] = true;
         basicScene->start_time = 0.0;
     }
+    if(basicScene->getStatistics()->won){
+        basicScene->animate = false;
+        basicScene->getStatistics()->menu_flags[WinMenu_OP] = true;
+    }
 
     Visitor::Run(scene, camera);
 }
@@ -322,7 +326,6 @@ void ObjectsAnimationVisitor::CreateLevel1(std::vector<shared_ptr<Model>> &model
         cube->Scale(scale);
     }
 
-
 }
 void ObjectsAnimationVisitor::CreateLevel2(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords) {
     int n = 30;
@@ -349,6 +352,7 @@ void ObjectsAnimationVisitor::CreateLevel2(std::vector<shared_ptr<Model>> &model
         cube->Translate(position);
         cube->Scale(scale);
     }
+    basicScene->getStatistics()->speed *=2;
 }
 
 
@@ -378,6 +382,8 @@ void ObjectsAnimationVisitor::CreateLevel3(std::vector<shared_ptr<Model>> &model
         cube->Translate(position);
         cube->Scale(scale);
     }
+    basicScene->getStatistics()->speed /=2;
+    basicScene->getStatistics()->speed *=2.5;
 }
 
 

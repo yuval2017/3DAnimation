@@ -40,6 +40,9 @@ public:
     int self_collision;
     int double_score;
 
+    void dec_object_collision();
+
+    void dec_self_collision();
 
 private:
     void load_data();
