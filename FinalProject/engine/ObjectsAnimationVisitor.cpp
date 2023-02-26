@@ -533,11 +533,11 @@ void ObjectsAnimationVisitor::init_point_givers() {
         basicScene->GetRoot()->AddChild(frog);
         frogs_available.push_back(frog.get());
         std::shared_ptr<Model> mouse = createMouse();
-        frog->isHidden = false;
+        mouse->isHidden = false;
         basicScene->GetRoot()->AddChild(mouse);
         frogs_available.push_back(mouse.get());
         std::shared_ptr<Model> coin = createCoin();
-        frog->isHidden = false;
+        coin->isHidden = false;
         basicScene->GetRoot()->AddChild(coin);
         frogs_available.push_back(coin.get());
     }
