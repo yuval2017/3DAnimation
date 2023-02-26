@@ -559,8 +559,8 @@ void BasicScene::startMenu() {
             std::cout << "new game button pressed in start menu ." << endl;
             statistics->menu_flags[MainMenu_OP] = false;
             animate = true;
-            statistics->objectCollisionStopper.start(5);
-            statistics->selfCollisionStopper.start(5);
+            statistics->objectCollisionStopper.start(20);
+            statistics->selfCollisionStopper.start(20);
 //            if(data->double_score >0){
 //                data->dec_double_score();
 //                statistics->double_score=true;
@@ -923,20 +923,16 @@ void BasicScene::NextLevelMenu() {
             ImGui::Spacing();
         }
         ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 100);
-        if (ImGui::Button("Back ", ImVec2(200, 0))) {
+        if (ImGui::Button("Back to main", ImVec2(200, 0))) {
             init();
             std::cout << "Back button pressed in next level menu." << endl;
-            if(data->back_to_main.size() == 0 ){
-                soundManager->play_sound(std::to_string(BOO_SOUND));
-                statistics->menu_flags[SettingsMenu_OP] =false;
-                animate = true;
-            }
-            else{
-                statistics->menu_flags[SettingsMenu_OP] =false;
-                int ret = data->back_to_main.back();
-                data->back_to_main.pop_back();
-                statistics->menu_flags[ret] =true;
-            }
+            soundManager->play_sound(std::to_string(BOO_SOUND));
+            animate = true;
+            data->add_total_money(statistics->score / 10);
+            statistics->restart = true;
+            statistics->reset_game();
+            statistics->menu_flags[SettingsMenu_OP] = false;
+            statistics->menu_flags[MainMenu_OP] = true;
         }
         ImGui::PopStyleColor(7);
         ImGui::PopFont();
@@ -993,13 +989,9 @@ void BasicScene::WinMenu() {
                 saved = true;
 
             }
-            else if (saved){
-                data->set_message("your score was already saved");
-            }
-
         }
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 20; i++) {
             ImGui::Spacing();
         }
         // Get the current time in seconds
@@ -1021,15 +1013,14 @@ void BasicScene::WinMenu() {
         }
         else{
             ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 100);
-            if (ImGui::Button("Back ", ImVec2(200, 0))) {
+            if (ImGui::Button("Back to main", ImVec2(200, 0))) {
                 std::cout << "Back button pressed in win menu." << endl;
                 data->back_to_main.clear();
                 statistics->menu_flags[WinMenu_OP] =false;
-                statistics->menu_flags[MainMenu_OP] =true;
                 data->add_total_money(statistics->score/10);
                 statistics->reset_game();
                 statistics->restart = true;
-
+                statistics->menu_flags[MainMenu_OP] =true;
             }
         }
 
@@ -1039,8 +1030,15 @@ void BasicScene::WinMenu() {
         ImGui::PopFont();
         ImGui::PushFont(messageFont);
         ImGui::Text("%s", data->msg_c_str());
-        for(int i = 0; i< 100 ; i++){
-            ImGui::Spacing();
+        if(pos != -1) {
+            for (int i = 0; i < 30; i++) {
+                ImGui::Spacing();
+            }
+        }
+        if(saved){
+            for (int i = 0; i < 5; i++) {
+                ImGui::Spacing();
+            }
         }
         ImGui::PopFont();
         ImGui::PopStyleColor(3);
@@ -1163,7 +1161,11 @@ void BasicScene::LoseMenu() {
         for (int i = 0; i < 15; i++) {
             ImGui::Spacing();
         }
-
+        if(saved){
+            for (int i = 0; i < 5; i++) {
+                ImGui::Spacing();
+            }
+        }
         ImGui::PopFont();
         ImGui::PopStyleColor(6);
         endWindow();

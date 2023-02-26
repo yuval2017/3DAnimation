@@ -167,7 +167,15 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
         basicScene->start_time = 0.0;
     }
 
+    if(basicScene->getStatistics()->won){
+        basicScene->animate = false;
+        basicScene->getStatistics()->won = false;
+        basicScene->getStatistics()->menu_flags[WinMenu_OP] = true;
+        basicScene->start_time = 0.0;
+    }
     Visitor::Run(scene, camera);
+
+
 }
 void ObjectsAnimationVisitor::get_map_max_min(Eigen::Vector3f &max, Eigen::Vector3f &min){
     //generate random from snake head

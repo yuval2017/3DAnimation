@@ -61,7 +61,6 @@ void GameStatistics::inc_Score(int i) {
         } else {
             won = true;
             soundManager->play_sound(std::to_string(SUCCESS_SOUND));
-
         }
     }
 }
