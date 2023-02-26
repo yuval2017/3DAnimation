@@ -72,12 +72,12 @@ void BasicScene::init_cameras(float fov, int width, int height,float near, float
     cameras[2]->RotateByDegree(-15.f, Movable::Axis::X);
 
     //Set over-view
-    snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[3]);
+    //snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[3]);
     cameras[3]->Translate(Eigen::Vector3f(-5.f, 10.f, -50.f));
     cameras[3]->Rotate(M_PI, Movable::Axis::Y);
     cameras[3]->RotateByDegree(-15.f, Movable::Axis::X);
 
-    camera = cameras[0];
+    camera = cameras[3];
 
 }
 
@@ -89,7 +89,7 @@ void BasicScene::resetCameras(){
 
     snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[2]);
 
-    snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[3]);
+    //snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[3]);
 }
 
 
@@ -319,8 +319,8 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
                 camera->TranslateInSystem(system, {0, -0.1f, 0});
                 break;
             case GLFW_KEY_R:
-                animate = false;
-                snake->reset_sake();
+                animate = !animate;
+                //snake->reset_sake();
                 animate = true;
                 break;
             case GLFW_KEY_A:
@@ -403,7 +403,7 @@ void BasicScene::loadingMenu() {
         float current_time = ImGui::GetTime();
 
         // Calculate the progress as a value between 0 and 1
-        float progress =  (done == 3) ? std::min((current_time - start_time) / 30.f, 1.0f) : start_time;
+        float progress =  (done == 3) ? std::min((current_time - start_time) / 20.f, 1.0f) : start_time;
 
         // Display the progress as a percentage
         ImGui::Text("Percentage of Time Passed: %.2f%%", progress * 100.0f);
@@ -433,29 +433,41 @@ void BasicScene::startMenu() {
             std::cout << "new game button pressed in start menu ." << endl;
             statistics->menu_flags[MainMenu_OP] = false;
             animate = true;
-            statistics->objectCollisionStopper.start(15);
-            statistics->selfCollisionStopper.start(30);
-            if(data->double_score >0){
-                data->dec_double_score();
-                statistics->double_score=true;
-            }
+            statistics->objectCollisionStopper.start(5);
+            statistics->selfCollisionStopper.start(5);
+//            if(data->double_score >0){
+//                data->dec_double_score();
+//                statistics->double_score=true;
+//            }
         }
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
+
+        static char* mass = "";
 
         if (ImGui::Button("Tutorial", ImVec2(-1, 0))) {
-            if (data->message_size() == 0)
-                data->set_message(
-                        "Press the up,down,right,left,\n Keys to move around.\nBe aware of obstacles.\n"
+            if( std::strlen(mass)== 0) {
+                std::cout << "store button pressed in start menu  ." << endl;
+                mass = ("Press the up,down,right,left,\n Keys to move around.\nBe aware of obstacles.\n"
                         "Eat as much animals as you can.\nEach eat will gain you score points.\nGood Luck!");
-            else
-                data->set_message("");
+            }
+            else{
+                mass = "";
+            }
+
         }
+        ImGui::PopFont();
+        ImGui::PushFont(messageFont);
+        ImGui::Text( mass);
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
-
+        ImGui::PopFont();
+        for(int i = 0; i< 3 ; i++){
+            ImGui::Spacing();
+        }
+        ImGui::PushFont(regularFont);
         if (ImGui::Button("Store", ImVec2(-1, 0))) {
             std::cout << "store button pressed in start menu  ." << endl;
             statistics->menu_flags[MainMenu_OP] = false;
@@ -478,15 +490,10 @@ void BasicScene::startMenu() {
         }
 
         if (ImGui::Button("Settings", ImVec2(-1, 0))) {
-            if (data->message_size() == 0)
-            {
                 statistics->menu_flags[MainMenu_OP] = false;
                 data->back_to_main.push_back(MainMenu_OP);
                 statistics->menu_flags[SettingsMenu_OP] = true;
-            }
-            else {
-                data->set_message("");
-            }
+
         }
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
@@ -501,13 +508,7 @@ void BasicScene::startMenu() {
             ImGui::Spacing();
         }
         ImGui::PopFont();
-        ImGui::PushFont(messageFont);
-        ImGui::Text("%s", data->msg_c_str());
 
-        for(int i = 0; i< 3 ; i++){
-            ImGui::Spacing();
-        }
-        ImGui::PopFont();
         endWindow();
 
     }
@@ -570,7 +571,6 @@ void BasicScene::PausedMenu()
 
         if (ImGui::Button("Settings", ImVec2(-1, 0))) {
 
-            data->set_message("");
             std::cout << "setting menu button pressed in pause menu." << endl;
             statistics->menu_flags[PauseMenu_OP] = false;
             data->back_to_main.push_back(PauseMenu_OP);
@@ -579,7 +579,6 @@ void BasicScene::PausedMenu()
 
         }
         if (ImGui::Button("Surrender", ImVec2(-1, 0))) {
-            data->set_message("");
             std::cout << "Surrender button pressed in pause menu." << endl;
             statistics->menu_flags[PauseMenu_OP] = false;
             statistics->menu_flags[MainMenu_OP] = true;
@@ -588,8 +587,6 @@ void BasicScene::PausedMenu()
             soundManager->play_sound(std::to_string(BOO_SOUND));
             statistics->restart =true;
             statistics->reset_game();
-
-
         }
         ImGui::PopStyleColor(3);
         for(int i = 0; i< 3 ; i++){
