@@ -22,7 +22,7 @@
 #define GREY_MATERIAL 5
 #define GOLD_MATERIAL 6
 #define FROG_MATERIAL 7
-
+#define TREE_MATERIAL 8
 #define CUBE 0
 #define CYL 1
 #define SPHERE 2
@@ -34,8 +34,10 @@
 #define FROG 8
 #define MOUSE 9
 //increment every mesh or material
-#define NUMBER_OF_MATERIALS 8
+#define NUMBER_OF_MATERIALS 9
 #define NUMBER_OF_MESHES 10
+#define TREE_PATH "data/masktree_obj/masktree.obj"
+
 
 using namespace cg3d;
 class ModelsFactory {
@@ -61,6 +63,7 @@ public:
     //6) grey material
     //7) gold material
     //8) frog material
+    //9) tree material
 
     //meshes
     std::shared_ptr<Mesh> meshes[NUMBER_OF_MESHES];
@@ -78,9 +81,8 @@ public:
     std::shared_ptr<Model> bounding_boxes[NUMBER_OF_MESHES];
     igl::AABB<Eigen::MatrixXd, 3> trees[NUMBER_OF_MESHES];
 
-    std::shared_ptr<Model> CreateModel(int material_id, int mesh_id, std::string name);
-    std::shared_ptr<Model> CreateBricksCubeModel();
-
+    std::shared_ptr<Model> CreateModel(int material_id, int mesh_id, const std::string& name);
+    std::shared_ptr<Model> CreateModel2(int material_id, const std::string& path, std::string name);
 
     static ModelsFactory* getInstance();
     ModelsFactory(ModelsFactory const&) = delete;
