@@ -47,7 +47,6 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
         stopperSpecialBezier = new Stopper();
         stopperSpecialBezier->start(sec_between_specialbezier);
 
-        init_point_givers();
         //don't need to init it anymore
         is_visitor_inited = true;
         program = std::make_shared<Program>("../tutorial/shaders/phongShader");
@@ -57,10 +56,6 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
         //initiating the system length for the objects positions.
 
         //generating the Bezier objects.
-//        generateObjectBezier(BRICKS_MATERIAL,SPHERE, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
-//        std::shared_ptr<Model> truck = generateObjectBezier(PHONG_MATERIAL,TRUCK, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
-//        generateObjectBezier(PHONG_MATERIAL,SPHERE, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
-//        generateObjectBezier(PHONG_MATERIAL,CUBE, std::string(BEZIER_OBJECT_NAME) + " cube", 3.0f);
 
         //init the first level.
         CreateLevel1(models, coords);
@@ -71,7 +66,7 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
         if (basicScene->animate) {
             if(!(stopperSpecialBezier->is_countdown_running())){
 
-                std::shared_ptr<Model> sphere = ModelsFactory::getInstance()->CreateModel(GREEN_MATERIAL,SPHERE,std::string(SPECIAL_BEZIER_OBJECT_NAME) + "SPHERE");
+                std::shared_ptr<Model> sphere = createSphere();
                 Eigen::Vector3f endPoint ,point2, point3, point4;
 
                 //generate random from snake head
@@ -208,6 +203,11 @@ void ObjectsAnimationVisitor::removeFormerlevel(){
 
 }
 void ObjectsAnimationVisitor::loadNextLevel(int nextLevel){
+    for (auto & sphere : spheres) {
+        sphere->bezier->isHidden = true;
+        sphere->isHidden = true;
+        spheres.push_back(sphere);
+    }
     switch (nextLevel) {
         case 1:
             CreateLevel1(models, coords);
@@ -385,6 +385,21 @@ shared_ptr<Model> ObjectsAnimationVisitor::createFrog(){
     return frog;
 }
 
+shared_ptr<Model> ObjectsAnimationVisitor::createSphere(){
+    if(spheres.size() <= 0){
+        std::shared_ptr<Model> sphere = ModelsFactory::getInstance()->CreateModel(GREEN_MATERIAL,SPHERE,std::string(SPECIAL_BEZIER_OBJECT_NAME) + "SPHERE");
+        sphere->SetTreeAndCube(ModelsFactory::getInstance()->bounding_boxes[SPHERE],ModelsFactory::getInstance()->trees[SPHERE]);
+        spheres.push_back(sphere);
+        return sphere;
+    }else{
+        std::shared_ptr<Model> sphere = spheres.front();
+        spheres.pop_back();
+        sphere->bezier->isHidden = true;
+        sphere->isHidden = false;
+        return sphere;
+    }
+}
+
 
 shared_ptr<Model> ObjectsAnimationVisitor::createMouse(){
     ModelsFactory* factory = ModelsFactory::getInstance();
@@ -405,6 +420,7 @@ shared_ptr<Model> ObjectsAnimationVisitor::createCoin(){
 }
 
 void ObjectsAnimationVisitor::CreateLevel1(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords) {
+    init_point_givers();
     int n = 20;
     models.resize(0);
     coords.resize(0);
@@ -437,8 +453,23 @@ void ObjectsAnimationVisitor::CreateLevel1(std::vector<shared_ptr<Model>> &model
     tree->SetTreeAndCube(ModelsFactory::getInstance()->bounding_boxes[TREE],ModelsFactory::getInstance()->trees[TREE]);
     tree->Translate({10.0,0,10.0});
 
+    for (int i = 0; i < 5; i++) {
+        std::shared_ptr<Model> frog = createFrog();
+        frog->isHidden = true;
+        basicScene->GetRoot()->AddChild(frog);
+        frogs_available.push_back(frog.get());
+        std::shared_ptr<Model> mouse = createMouse();
+        mouse->isHidden = true;
+        basicScene->GetRoot()->AddChild(mouse);
+        frogs_available.push_back(mouse.get());
+        std::shared_ptr<Model> coin = createCoin();
+        coin->isHidden = true;
+        basicScene->GetRoot()->AddChild(coin);
+        frogs_available.push_back(coin.get());
+    }
 }
 void ObjectsAnimationVisitor::CreateLevel2(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords) {
+    init_point_givers();
     int n = 30;
     models.resize(0);
     coords.resize(0);
@@ -468,6 +499,7 @@ void ObjectsAnimationVisitor::CreateLevel2(std::vector<shared_ptr<Model>> &model
 
 
 void ObjectsAnimationVisitor::CreateLevel3(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords) {
+    init_point_givers();
     int n = 40;
     models.resize(0);
     coords.resize(0);
@@ -505,9 +537,6 @@ void ObjectsAnimationVisitor::GetCurrMapMaxLength(float &length_x, float &length
 
 
 void ObjectsAnimationVisitor::init_point_givers() {
-    for (int i = 0; i < num_of_models; ++i) {
-
-    }
     float dist = basicScene->level1->scale_factor[0];
     int half = dist/2;
     Eigen::Vector3f min_to_gen, max_to_gen;
@@ -527,20 +556,7 @@ void ObjectsAnimationVisitor::init_point_givers() {
         mousePoints.push(mouse_point);
         coinPoints.push(coin_point);
     }
-    for (int i = 0; i < 5; i++) {
-        std::shared_ptr<Model> frog = createFrog();
-        frog->isHidden = false;
-        basicScene->GetRoot()->AddChild(frog);
-        frogs_available.push_back(frog.get());
-        std::shared_ptr<Model> mouse = createMouse();
-        mouse->isHidden = false;
-        basicScene->GetRoot()->AddChild(mouse);
-        frogs_available.push_back(mouse.get());
-        std::shared_ptr<Model> coin = createCoin();
-        coin->isHidden = false;
-        basicScene->GetRoot()->AddChild(coin);
-        frogs_available.push_back(coin.get());
-    }
+
 }
 Eigen::Vector3f ObjectsAnimationVisitor::get_point(std::queue<Eigen::Vector3f> &coords){
     //create new point.

@@ -31,6 +31,7 @@ namespace cg3d {
         shared_ptr<Model> createFrog();
         shared_ptr<Model> createMouse();
         shared_ptr<Model> createCoin();
+        shared_ptr<Model> createSphere();
         void get_map_max_min(Eigen::Vector3f &max, Eigen::Vector3f &min);
 
     private:
@@ -53,6 +54,7 @@ namespace cg3d {
         std::vector<Model*> frogs_available;
         std::vector<Model*> mouses_available;
         std::vector<Model*> coins_available;
+        std::vector<std::shared_ptr<Model>> spheres;
         // Generate 3 points every sec1, sec2, sec3 seconds for len1, len2, len3 seconds
         double sec1 = 5.0; // generate frog points every 2 seconds
         double len1 = 20.0; // frog points should disappear after 10 seconds
@@ -63,7 +65,7 @@ namespace cg3d {
         int min_dist = 4;
         int num_of_points = 45;
         int num_of_models = 15;
-        Calculates* calculates ;
+        Calculates* calculates;
 
         Eigen::Vector3f get_point( std::queue<Eigen::Vector3f> &coords);
     };
