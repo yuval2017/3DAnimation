@@ -28,7 +28,7 @@ namespace cg3d {
         std::vector<Eigen::Vector3f> coords;
         void removeFormerlevel();
         void loadNextLevel(int nextLevel);
-        static shared_ptr<Model> createFrog();
+        shared_ptr<Model> createFrog();
         shared_ptr<Model> createMouse();
         shared_ptr<Model> createCoin();
         void get_map_max_min(Eigen::Vector3f &max, Eigen::Vector3f &min);
@@ -39,14 +39,8 @@ namespace cg3d {
         std::shared_ptr<Program> program;
         BasicScene *basicScene;
         bool is_visitor_inited = false;
-        float minx = -10.0f;
-        float maxx = 10.0f;
-        float miny = -5.0f;
-        float maxy = 5.0f;
-        float minz = -5.0f;
-        float maxz = 5.0f;
         float generate_random_number(float min, float max);
-        void init_point_givers(float x_length , float y_length, float z_length);
+        void init_point_givers();
         Stopper* stopperFrog;
         Stopper* stopperMouse;
         Stopper* stopperCoin;
@@ -56,9 +50,9 @@ namespace cg3d {
         std::queue<Eigen::Vector3f > frogPoints;
         std::queue<Eigen::Vector3f > mousePoints;
         std::queue<Eigen::Vector3f > coinPoints;
-        std::vector<shared_ptr<Model>> frogs_available;
-        std::vector<shared_ptr<Model>> mouses_available;
-        std::vector<shared_ptr<Model>> coins_available;
+        std::vector<Model*> frogs_available;
+        std::vector<Model*> mouses_available;
+        std::vector<Model*> coins_available;
         // Generate 3 points every sec1, sec2, sec3 seconds for len1, len2, len3 seconds
         double sec1 = 5.0; // generate frog points every 2 seconds
         double len1 = 20.0; // frog points should disappear after 10 seconds
@@ -70,6 +64,8 @@ namespace cg3d {
         int num_of_points = 45;
         int num_of_models = 15;
         Calculates* calculates ;
+
+        Eigen::Vector3f get_point( std::queue<Eigen::Vector3f> &coords);
     };
 }
 

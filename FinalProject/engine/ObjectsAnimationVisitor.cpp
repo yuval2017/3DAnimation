@@ -47,7 +47,7 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
         stopperSpecialBezier = new Stopper();
         stopperSpecialBezier->start(sec_between_specialbezier);
 
-        init_point_givers(x_length, y_length, z_length);
+        init_point_givers();
         //don't need to init it anymore
         is_visitor_inited = true;
         program = std::make_shared<Program>("../tutorial/shaders/phongShader");
@@ -101,49 +101,46 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
                 stopperSpecialBezier->start(sec_between_specialbezier);
             }
             if (!(stopperFrog->is_countdown_running())) {
-                for (auto frog: frogs_available) {
-                    if (frog->isHidden) {
-                        frog->isHidden = false;
-                        Eigen::Vector3f pos = frogPoints.front();
-                        frogPoints.pop();
-                        frogPoints.push(pos);
-                        frog->Translate(pos - frog->GetPosition());
-                        //std::cout<< "added frog model : "<<pos[0] <<", " << pos[1] <<", " << pos[2] <<std::endl;
-                        stopperFrog->start(sec1);
-                        frog->stopper.start(len1);
-                        break;
-                    }
+                Model *frog;
+                if(frogs_available.size()>0){
+                    frog = frogs_available.front();
+                    frogs_available.pop_back();
+                } else{
+                    frog = createFrog().get();
                 }
+                frog->isHidden = false;
+                Eigen::Vector3f pos = get_point(frogPoints);
+                frog->Translate(pos);
+                stopperFrog->start(sec1);
+                frog->stopper.start(len1);
             }
             if (!(stopperMouse->is_countdown_running())) {
-                for (auto mouse: mouses_available) {
-                    if (mouse->isHidden) {
-                        mouse->isHidden = false;
-                        Eigen::Vector3f pos = mousePoints.front();
-                        mousePoints.pop();
-                        mousePoints.push(pos);
-                        mouse->Translate(pos - mouse->GetPosition());
-                        //std::cout<< "added mouse model : "<<pos[0] <<", " << pos[1] <<", " << pos[2] <<std::endl;
-                        stopperMouse->start(sec2);
-                        mouse->stopper.start(len2);
-                        break;
-                    }
+                Model *mouse;
+                if(mouses_available.size()>0){
+                    mouse = mouses_available.front();
+                    mouses_available.pop_back();
+                } else{
+                    mouse = createMouse().get();
                 }
+                mouse->isHidden = false;
+                Eigen::Vector3f pos = get_point(mousePoints);
+                mouse->Translate(pos);
+                stopperMouse->start(sec2);
+                mouse->stopper.start(len2);
             }
             if (!(stopperCoin->is_countdown_running())) {
-                for (auto coin: coins_available) {
-                    if (coin->isHidden) {
-                        coin->isHidden = false;
-                        Eigen::Vector3f pos = coinPoints.front();
-                        coinPoints.pop();
-                        coinPoints.push(pos);
-                        coin->Translate(pos - coin->GetPosition());
-                        //std::cout<< "added coin model: "<<pos[0] <<", " << pos[1] <<", " << pos[2] <<std::endl;
-                        stopperCoin->start(sec3);
-                        coin->stopper.start(len3);
-                        break;
-                    }
+                Model *coin;
+                if(coins_available.size()>0){
+                    coin = coins_available.front();
+                    coins_available.pop_back();
+                } else{
+                    coin = createCoin().get();
                 }
+                coin->isHidden = false;
+                Eigen::Vector3f pos = get_point(coinPoints);
+                coin->Translate(pos);
+                stopperCoin->start(sec1);
+                coin->stopper.start(len1);
             }
         }
     }
@@ -210,9 +207,23 @@ void ObjectsAnimationVisitor::Visit(Model *model) {
     if(basicScene->animate) {
         if(model->name.find(TIMING) != std::string::npos){
             if(!model->stopper.is_countdown_running()){
+                //change the position.
+                model->Translate(Eigen::Vector3f(0.0f,0.0f,0.0f) - model->GetPosition());
+                //hide him
                 model->isHidden =true;
+                if(model->name.find(FROG_NAME) != std::string::npos){
+                    //return to list
+                    frogs_available.push_back(model);
+                }
+                if(model->name.find(MOUSE_NAME) != std::string::npos){
+                    //return to list
+                    mouses_available.push_back(model);
+                }
+                if(model->name.find(COIN_NAME) != std::string::npos){
+                    //return to list
+                    coins_available.push_back(model);
+                }
                 model->stopper.reset();
-                //std::cout << "model becomes hidden: "<< model->name << std::endl;
             }
         }else if (model->name.substr(0, strlen(SPECIAL_BEZIER_OBJECT_NAME)) == std::string(SPECIAL_BEZIER_OBJECT_NAME)) {
             int i = 0;
@@ -278,7 +289,7 @@ std::shared_ptr<Model> ObjectsAnimationVisitor::generateObjectBezier(int materia
     std::shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(material_id,model_id,name);
     basicScene->GetRoot()->AddChild(cube);
     cube->showWireframe = true;
-    Eigen::Vector3f location = Eigen::Vector3f (generate_random_number(minx,maxx),generate_random_number(miny,maxy),generate_random_number(minz,maxz));
+    Eigen::Vector3f location = Eigen::Vector3f (generate_random_number(0,5),generate_random_number(0,5),generate_random_number(0,5));
     cube->Translate(location);
     cube->Scale(scale,Movable::Axis::XYZ);
     setModelBezier(location,cube.get());
@@ -347,6 +358,9 @@ shared_ptr<Model> ObjectsAnimationVisitor::createFrog(){
     shared_ptr<Model> frog =  factory->CreateModel(GREEN_MATERIAL , FROG , std::string (EATING_OBJECT) + std::string(TIMING)+ std::string(FROG_NAME));
     frog->material->program->name = "green";
     frog->SetTreeAndCube(ModelsFactory::getInstance()->bounding_boxes[FROG],ModelsFactory::getInstance()->trees[FROG]);
+    frog->Rotate(-M_PI/2.0f, Movable::Axis::X);
+    frog->Rotate(M_PI, Movable::Axis::Z);
+    frogs_available.push_back(frog.get());
     return frog;
 }
 
@@ -357,15 +371,17 @@ shared_ptr<Model> ObjectsAnimationVisitor::createMouse(){
     mouse->material->program->name = "grey";
     mouse->Rotate(-M_PI/2.0f,Movable::Axis::X);
     mouse->SetTreeAndCube(ModelsFactory::getInstance()->bounding_boxes[MOUSE],ModelsFactory::getInstance()->trees[MOUSE]);
+    mouses_available.push_back(mouse.get());
     return mouse;
 }
 
 shared_ptr<Model> ObjectsAnimationVisitor::createCoin(){
-
     ModelsFactory* factory = ModelsFactory::getInstance();
     shared_ptr<Model> coin =  factory->CreateModel(GOLD_MATERIAL , COIN ,std::string(EATING_OBJECT)+  std::string(TIMING)+ std::string(COIN_NAME));
     coin->material->program->name = "gold";
     coin->SetTreeAndCube(ModelsFactory::getInstance()->bounding_boxes[COIN],ModelsFactory::getInstance()->trees[COIN]);
+    coin->Rotate(-M_PI/2.0f, Movable::Axis::X);
+    coins_available.push_back(coin.get());
     return coin;
 }
 
@@ -399,6 +415,7 @@ void ObjectsAnimationVisitor::CreateLevel1(std::vector<shared_ptr<Model>> &model
     }
     shared_ptr<Model> tree = ModelsFactory::getInstance()->CreateModel2(TREE_MATERIAL,TREE_PATH,std::string(COLLISION_OBJECT) + " tree");
     basicScene->AddChild(tree);
+    tree->SetTreeAndCube(ModelsFactory::getInstance()->bounding_boxes[TREE],ModelsFactory::getInstance()->trees[TREE]);
     tree->Translate({10.0,0,10.0});
 
 }
@@ -468,44 +485,51 @@ void ObjectsAnimationVisitor::GetCurrMapMaxLength(float &length_x, float &length
 }
 
 
-void ObjectsAnimationVisitor::init_point_givers(float x_length , float y_length, float z_length) {
+void ObjectsAnimationVisitor::init_point_givers() {
+    for (int i = 0; i < num_of_models; ++i) {
 
-    //create the points.
-    frogPoints = calculates->generatePointsInSystem(x_length, y_length, z_length, num_of_points,min_dist,
-                                               basicScene->snake->get_snake_head(),coords);
-    mousePoints = calculates->generatePointsInSystem(x_length, y_length, z_length, num_of_points,min_dist,
-                                                     basicScene->snake->get_snake_head(),coords);
-    coinPoints = calculates->generatePointsInSystem(x_length, y_length, z_length, num_of_points,min_dist,
-                                                    basicScene->snake->get_snake_head(),coords);
-
-    for( int i =0; i< num_of_models ; i++){
-        //add frogs.
-        shared_ptr<Model> frog_model = createFrog();
-        frog_model->isHidden = true;
-        frogs_available.push_back(frog_model);
-        basicScene->GetRoot()->AddChild(frog_model);
-        frog_model->Rotate(-M_PI/2.0f, Movable::Axis::X);
-        frog_model->Rotate(M_PI, Movable::Axis::Z);
-
-
-        //add mouses
-        shared_ptr<Model> mouse_model = createMouse();
-        mouse_model->isHidden = true;
-        mouses_available.push_back(mouse_model);
-        basicScene->GetRoot()->AddChild(mouse_model);
-        mouse_model->Rotate(-M_PI/2.0f, Movable::Axis::X);
-        //mouse_model->Scale(2.0f);
-        //std::cout << "mouse model created"<< std::endl;
-
-
-        //add coins
-        shared_ptr<Model> coin_model = createCoin();
-        coin_model->isHidden = true;
-        coins_available.push_back(coin_model);
-        basicScene->GetRoot()->AddChild(coin_model);
-        coin_model->Rotate(-M_PI/2.0f, Movable::Axis::X);
-        //coin_model->Scale(2.0f);
-        //std::cout << "coin model created"<< std::endl;
     }
-
+    float dist = basicScene->level1->scale_factor[0];
+    int half = dist/2;
+    Eigen::Vector3f min_to_gen, max_to_gen;
+    get_map_max_min(max_to_gen, min_to_gen);
+    for (int i = 0; i < num_of_models; i++) {
+        Eigen::Vector3f frog_point, mouse_point, coin_point;
+        if (i % 2 == 0){
+            frog_point = Calculates::getInstance()->generateRandomPoint(max_to_gen,min_to_gen,{0.0f,0.0f,0.0f},0 ,half);
+            mouse_point = Calculates::getInstance()->generateRandomPoint(max_to_gen,min_to_gen,{0.0f,0.0f,0.0f},0 ,half);
+            coin_point = Calculates::getInstance()->generateRandomPoint(max_to_gen,min_to_gen,{0.0f,0.0f,0.0f},0 ,half);
+        }else{
+            frog_point = Calculates::getInstance()->generateRandomPoint(max_to_gen,min_to_gen,{0.0f,0.0f,0.0f},half ,dist);
+            mouse_point = Calculates::getInstance()->generateRandomPoint(max_to_gen,min_to_gen,{0.0f,0.0f,0.0f},half ,dist);
+            coin_point = Calculates::getInstance()->generateRandomPoint(max_to_gen,min_to_gen,{0.0f,0.0f,0.0f},half ,dist);
+        }
+        frogPoints.push(frog_point);
+        mousePoints.push(mouse_point);
+        coinPoints.push(coin_point);
+    }
+}
+Eigen::Vector3f ObjectsAnimationVisitor::get_point(std::queue<Eigen::Vector3f> &coords){
+    //create new point.
+    if(coords.size()<0){
+        int dist = basicScene->level1->scale_factor[0];
+        int half = dist/2;
+        Eigen::Vector3f min_to_gen, max_to_gen;
+        random_device rd;
+        mt19937 gen(rd());
+        uniform_int_distribution p(0,1);
+        int max, min;
+        int i = p(gen);
+        if(i == 0){
+            max = half;
+            min = 0;
+        } else{
+            max = dist;
+            min = half;
+        }
+        get_map_max_min(max_to_gen, min_to_gen);
+        Eigen::Vector3f ans = Calculates::getInstance()->generateRandomPoint(max_to_gen, min_to_gen, Eigen::Vector3f::Zero(), min,max);
+        coords.push(ans);
+        return ans;
+    }
 }
