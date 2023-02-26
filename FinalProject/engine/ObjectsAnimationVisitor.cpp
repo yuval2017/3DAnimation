@@ -206,7 +206,6 @@ void ObjectsAnimationVisitor::loadNextLevel(int nextLevel){
     for (auto & sphere : spheres) {
         sphere->bezier->isHidden = true;
         sphere->isHidden = true;
-        spheres.push_back(sphere);
     }
     switch (nextLevel) {
         case 1:

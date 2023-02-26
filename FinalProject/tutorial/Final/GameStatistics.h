@@ -23,8 +23,8 @@
 #define OBJECT_COLLIDE_COST         20
 #define DOUBLE_SCORE_COST           60
 #define FROG_PRICE                  10
-#define MOUSE_PRICE                 50
-#define COIN_PRICE                  100
+#define MOUSE_PRICE                 20
+#define COIN_PRICE                  50
 #include "SoundManager.h"
 #include "Stopper.h"
 #include "Data.h"
