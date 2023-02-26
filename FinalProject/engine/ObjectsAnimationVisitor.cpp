@@ -101,46 +101,60 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
                 stopperSpecialBezier->start(sec_between_specialbezier);
             }
             if (!(stopperFrog->is_countdown_running())) {
-                Model *frog;
-                if(frogs_available.size()>0){
-                    frog = frogs_available.front();
+                if(!frogs_available.empty()){
+                    Model *frog = frogs_available.front();
                     frogs_available.pop_back();
+                    frog->isHidden = false;
+                    Eigen::Vector3f pos = get_point(frogPoints);
+                    frog->Translate(pos);
+                    frog->stopper.start(len1);
                 } else{
-                    frog = createFrog().get();
+                    std::shared_ptr<Model> frog = createFrog();
+                    frog->isHidden = false;
+                    basicScene->GetRoot()->AddChild(frog);
+                    Eigen::Vector3f pos = get_point(frogPoints);
+                    frog->Translate(pos);
+                    frog->stopper.start(len1);
                 }
-                frog->isHidden = false;
-                Eigen::Vector3f pos = get_point(frogPoints);
-                frog->Translate(pos);
                 stopperFrog->start(sec1);
-                frog->stopper.start(len1);
             }
             if (!(stopperMouse->is_countdown_running())) {
-                Model *mouse;
+
                 if(mouses_available.size()>0){
-                    mouse = mouses_available.front();
+                    Model *mouse = mouses_available.front();
                     mouses_available.pop_back();
+                    mouse->isHidden = false;
+                    Eigen::Vector3f pos = get_point(mousePoints);
+                    mouse->Translate(pos);
+                    mouse->stopper.start(len2);
                 } else{
-                    mouse = createMouse().get();
+                    std::shared_ptr<Model> mouse = createMouse();
+                    mouse->isHidden = false;
+                    basicScene->GetRoot()->AddChild(mouse);
+                    Eigen::Vector3f pos = get_point(mousePoints);
+                    mouse->Translate(pos);
+                    mouse->stopper.start(len2);
                 }
-                mouse->isHidden = false;
-                Eigen::Vector3f pos = get_point(mousePoints);
-                mouse->Translate(pos);
                 stopperMouse->start(sec2);
-                mouse->stopper.start(len2);
             }
             if (!(stopperCoin->is_countdown_running())) {
                 Model *coin;
                 if(coins_available.size()>0){
                     coin = coins_available.front();
                     coins_available.pop_back();
+                    coin->isHidden = false;
+                    Eigen::Vector3f pos = get_point(coinPoints);
+                    coin->Translate(pos);
+                    coin->stopper.start(len1);
                 } else{
-                    coin = createCoin().get();
+                    std::shared_ptr<Model> coin = createCoin();
+                    coin->isHidden = false;
+                    basicScene->GetRoot()->AddChild(coin);
+                    Eigen::Vector3f pos = get_point(coinPoints);
+                    coin->Translate(pos);
+                    coin->stopper.start(len1);
                 }
-                coin->isHidden = false;
-                Eigen::Vector3f pos = get_point(coinPoints);
-                coin->Translate(pos);
                 stopperCoin->start(sec1);
-                coin->stopper.start(len1);
             }
         }
     }
@@ -214,7 +228,7 @@ void ObjectsAnimationVisitor::loadNextLevel(int nextLevel){
 void ObjectsAnimationVisitor::Visit(Model *model) {
     if(basicScene->animate) {
         if(model->name.find(TIMING) != std::string::npos){
-            if(!model->stopper.is_countdown_running()){
+            if(!model->stopper.is_countdown_running() && !model->isHidden){
                 //change the position.
                 model->Translate(Eigen::Vector3f(0.0f,0.0f,0.0f) - model->GetPosition());
                 //hide him
@@ -368,7 +382,6 @@ shared_ptr<Model> ObjectsAnimationVisitor::createFrog(){
     frog->SetTreeAndCube(ModelsFactory::getInstance()->bounding_boxes[FROG],ModelsFactory::getInstance()->trees[FROG]);
     frog->Rotate(-M_PI/2.0f, Movable::Axis::X);
     frog->Rotate(M_PI, Movable::Axis::Z);
-    frogs_available.push_back(frog.get());
     return frog;
 }
 
@@ -379,7 +392,6 @@ shared_ptr<Model> ObjectsAnimationVisitor::createMouse(){
     mouse->material->program->name = "grey";
     mouse->Rotate(-M_PI/2.0f,Movable::Axis::X);
     mouse->SetTreeAndCube(ModelsFactory::getInstance()->bounding_boxes[MOUSE],ModelsFactory::getInstance()->trees[MOUSE]);
-    mouses_available.push_back(mouse.get());
     return mouse;
 }
 
@@ -389,7 +401,6 @@ shared_ptr<Model> ObjectsAnimationVisitor::createCoin(){
     coin->material->program->name = "gold";
     coin->SetTreeAndCube(ModelsFactory::getInstance()->bounding_boxes[COIN],ModelsFactory::getInstance()->trees[COIN]);
     coin->Rotate(-M_PI/2.0f, Movable::Axis::X);
-    coins_available.push_back(coin.get());
     return coin;
 }
 
@@ -516,10 +527,24 @@ void ObjectsAnimationVisitor::init_point_givers() {
         mousePoints.push(mouse_point);
         coinPoints.push(coin_point);
     }
+    for (int i = 0; i < 5; i++) {
+        std::shared_ptr<Model> frog = createFrog();
+        frog->isHidden = false;
+        basicScene->GetRoot()->AddChild(frog);
+        frogs_available.push_back(frog.get());
+        std::shared_ptr<Model> mouse = createMouse();
+        frog->isHidden = false;
+        basicScene->GetRoot()->AddChild(mouse);
+        frogs_available.push_back(mouse.get());
+        std::shared_ptr<Model> coin = createCoin();
+        frog->isHidden = false;
+        basicScene->GetRoot()->AddChild(coin);
+        frogs_available.push_back(coin.get());
+    }
 }
 Eigen::Vector3f ObjectsAnimationVisitor::get_point(std::queue<Eigen::Vector3f> &coords){
     //create new point.
-    if(coords.size()<0){
+    if(coords.size()<=0){
         int dist = basicScene->level1->scale_factor[0];
         int half = dist/2;
         Eigen::Vector3f min_to_gen, max_to_gen;
@@ -536,8 +561,13 @@ Eigen::Vector3f ObjectsAnimationVisitor::get_point(std::queue<Eigen::Vector3f> &
             min = half;
         }
         get_map_max_min(max_to_gen, min_to_gen);
-        Eigen::Vector3f ans = Calculates::getInstance()->generateRandomPoint(max_to_gen, min_to_gen, Eigen::Vector3f::Zero(), min,max);
+        Eigen::Vector3f ans = Calculates::getInstance()->generateRandomPoint(max_to_gen, min_to_gen, Eigen::Vector3f::Zero(), min + 5,max);
         coords.push(ans);
         return ans;
+    }else{
+        Eigen::Vector3f coord = coords.front().cast<float>();
+        coords.pop();
+        coords.push(coord);
+        return coord;
     }
 }
