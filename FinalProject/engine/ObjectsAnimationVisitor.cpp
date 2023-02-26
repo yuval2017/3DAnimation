@@ -134,7 +134,7 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
             }
             if (!(stopperCoin->is_countdown_running())) {
                 Model *coin;
-                if(coins_available.size()>0){
+                if(!coins_available.empty()){
                     coin = coins_available.front();
                     coins_available.pop_back();
                     coin->isHidden = false;
@@ -193,7 +193,7 @@ void ObjectsAnimationVisitor::get_map_max_min(Eigen::Vector3f &max, Eigen::Vecto
 
 void ObjectsAnimationVisitor::removeFormerlevel(){
 
-    for(shared_ptr<Model> model : models) {
+    for(const shared_ptr<Model>& model : models) {
         if (model != nullptr) {
             basicScene->GetRoot()->RemoveChild(model);
         }
@@ -203,10 +203,12 @@ void ObjectsAnimationVisitor::removeFormerlevel(){
 
 }
 void ObjectsAnimationVisitor::loadNextLevel(int nextLevel){
-    for (auto & sphere : spheres) {
-        sphere->bezier->isHidden = true;
+    for (auto & sphere : spheres_in_use) {
+        if(sphere->bezier != nullptr){
+            sphere->bezier->isHidden = true;
+        }
         sphere->isHidden = true;
-        spheres.push_back(sphere);
+        spheres_not_in_use.push_back(sphere);
     }
     switch (nextLevel) {
         case 1:
@@ -226,9 +228,9 @@ void ObjectsAnimationVisitor::loadNextLevel(int nextLevel){
 }
 
 void ObjectsAnimationVisitor::Visit(Model *model) {
-    if(basicScene->animate) {
+    if(!model->isHidden && basicScene->animate) {
         if(model->name.find(TIMING) != std::string::npos){
-            if(!model->stopper.is_countdown_running() && !model->isHidden){
+            if(!model->stopper.is_countdown_running()){
                 //change the position.
                 model->Translate(Eigen::Vector3f(0.0f,0.0f,0.0f) - model->GetPosition());
                 //hide him
@@ -307,18 +309,6 @@ void ObjectsAnimationVisitor::Visit(Model *model) {
     }
 }
 
-std::shared_ptr<Model> ObjectsAnimationVisitor::generateObjectBezier(int material_id ,int model_id, std::string name, float scale){
-    std::shared_ptr<Model> cube = ModelsFactory::getInstance()->CreateModel(material_id,model_id,name);
-    basicScene->GetRoot()->AddChild(cube);
-    cube->showWireframe = true;
-    Eigen::Vector3f location = Eigen::Vector3f (generate_random_number(0,5),generate_random_number(0,5),generate_random_number(0,5));
-    cube->Translate(location);
-    cube->Scale(scale,Movable::Axis::XYZ);
-    setModelBezier(location,cube.get());
-    cube->GetTree();
-    return cube;
-}
-
 void ObjectsAnimationVisitor::setModelBezier(Eigen::Vector3f vectors,Model *model){
     Calculates::getInstance()->generateRandomBeizierCurve(std::move(vectors),model->MG_Result);
     drawTheBeizerCurve(model);
@@ -386,16 +376,19 @@ shared_ptr<Model> ObjectsAnimationVisitor::createFrog(){
 }
 
 shared_ptr<Model> ObjectsAnimationVisitor::createSphere(){
-    if(spheres.size() <= 0){
+    if(spheres_not_in_use.empty()){
         std::shared_ptr<Model> sphere = ModelsFactory::getInstance()->CreateModel(GREEN_MATERIAL,SPHERE,std::string(SPECIAL_BEZIER_OBJECT_NAME) + "SPHERE");
         sphere->SetTreeAndCube(ModelsFactory::getInstance()->bounding_boxes[SPHERE],ModelsFactory::getInstance()->trees[SPHERE]);
-        spheres.push_back(sphere);
+        spheres_in_use.push_back(sphere);
         return sphere;
     }else{
-        std::shared_ptr<Model> sphere = spheres.front();
-        spheres.pop_back();
-        sphere->bezier->isHidden = true;
+        std::shared_ptr<Model> sphere = spheres_not_in_use.front();
+        spheres_not_in_use.pop_back();
+        if(sphere->bezier != nullptr){
+            sphere->bezier->isHidden = false;
+        }
         sphere->isHidden = false;
+        spheres_in_use.push_back(sphere);
         return sphere;
     }
 }

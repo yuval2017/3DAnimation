@@ -54,7 +54,9 @@ namespace cg3d {
         std::vector<Model*> frogs_available;
         std::vector<Model*> mouses_available;
         std::vector<Model*> coins_available;
-        std::vector<std::shared_ptr<Model>> spheres;
+        std::vector<std::shared_ptr<Model>> spheres_in_use;
+        std::vector<std::shared_ptr<Model>> spheres_not_in_use;
+
         // Generate 3 points every sec1, sec2, sec3 seconds for len1, len2, len3 seconds
         double sec1 = 5.0; // generate frog points every 2 seconds
         double len1 = 20.0; // frog points should disappear after 10 seconds
