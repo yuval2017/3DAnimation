@@ -78,11 +78,7 @@ void Data::dec_life_bought()
     life_bought--;
     save_data();
 }
-void Data::set_total_money(int val)
-{
-    total_money = val;
-    save_data();
-}
+
 
 void Data::add_total_money(int val)
 {

@@ -457,17 +457,16 @@ void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scan
                 camera->TranslateInSystem(system, {0, 0, -0.1f});
                 break;
             case GLFW_KEY_1:
-                if( pickedIndex > 0)
-                    pickedIndex--;
+                SetCamera(0);
                 break;
             case GLFW_KEY_2:
-                done_inite = true;
+                SetCamera(1);
                 break;
             case GLFW_KEY_3:
-                animate = !animate;
+                SetCamera(2);
                 break;
             case GLFW_KEY_4:
-                snake->with_skinning = !snake->with_skinning;
+                SetCamera(3);
                 break;
         }
     }
@@ -499,7 +498,7 @@ void BasicScene::init_helpers(){
 
     this->highScores = new HighScores();
     this->soundManager = SoundManager::getInstance();
-    //soundManager->play_game_music();
+    soundManager->play_game_music();
     this->animate = false;
     init_flags[2]= true;
     done++;
@@ -558,13 +557,11 @@ void BasicScene::startMenu() {
         if (ImGui::Button("Start Game", ImVec2(200, 0))) {
             std::cout << "new game button pressed in start menu ." << endl;
             statistics->menu_flags[MainMenu_OP] = false;
+            soundManager->set_game_play_music(std::string(THIRD_MUSIC));
             animate = true;
             statistics->objectCollisionStopper.start(20);
             statistics->selfCollisionStopper.start(20);
-//            if(data->double_score >0){
-//                data->dec_double_score();
-//                statistics->double_score=true;
-//            }
+
         }
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
@@ -674,8 +671,8 @@ void BasicScene::PausedMenu()
         ImGui::Text("%s", tmp2.c_str());
         ImGui::Text("Snake speed: ");
         ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
-        std::string tmp3 = std::to_string(statistics->speed);
-        ImGui::Text("%s", tmp3.c_str());
+        static int speed = std::round(statistics->speed);
+        ImGui::Text("%d", speed);
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
@@ -916,24 +913,25 @@ void BasicScene::NextLevelMenu() {
                 statistics->selfCollisionStopper.start(5);
                 animate = true;
             }
+
+            for(int i = 0; i< 3 ; i++){
+                ImGui::Spacing();
+            }
+            ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 100);
+            if (ImGui::Button("Back to main", ImVec2(200, 0))) {
+                std::cout << "Back button pressed in next level menu." << endl;
+                soundManager->play_sound(std::to_string(BOO_SOUND));
+                data->back_to_main.clear();
+                animate = false;
+                data->add_total_money(statistics->score / 10);
+                statistics->restart = true;
+                statistics->reset_game();
+                statistics->menu_flags[LevelMenu_OP] = false;
+                statistics->menu_flags[MainMenu_OP] = true;
+
+            }
         }
 
-
-        for(int i = 0; i< 3 ; i++){
-            ImGui::Spacing();
-        }
-        ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 100);
-        if (ImGui::Button("Back to main", ImVec2(200, 0))) {
-            init();
-            std::cout << "Back button pressed in next level menu." << endl;
-            soundManager->play_sound(std::to_string(BOO_SOUND));
-            animate = true;
-            data->add_total_money(statistics->score / 10);
-            statistics->restart = true;
-            statistics->reset_game();
-            statistics->menu_flags[SettingsMenu_OP] = false;
-            statistics->menu_flags[MainMenu_OP] = true;
-        }
         ImGui::PopStyleColor(7);
         ImGui::PopFont();
         for(int i = 0; i< 200 ; i++){
@@ -1197,14 +1195,18 @@ void BasicScene::StoreMenu() {
         std::string tmp11 = std::to_string(data->life_bought);
         ImGui::Text("%s", tmp11.c_str());
         ImGui::Spacing();
-        ImGui::Text("Level: ");
+        ImGui::Text("Self invisibility: ");
         ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
-        std::string tmp22 = std::to_string(statistics->level);
+        std::string tmp22 = std::to_string(data->self_collision);
         ImGui::Text("%s", tmp22.c_str());
-        ImGui::Text("Snake speed: ");
+        ImGui::Text("Object invisibility: ");
         ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
-        std::string tmp33 = std::to_string(std::round(statistics->speed));
-        ImGui::Text("%s", tmp33.c_str());
+        std::string tmp33 = std::to_string(data->object_collision);
+        ImGui::Text("%s", tmp22.c_str());
+        ImGui::Text("Double score: ");
+        ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
+        std::string tmp44 = std::to_string(data->double_score);
+        ImGui::Text("%s", tmp44.c_str());
         // Pop the style color to restore the previous style
         ImGui::PopStyleColor();
         for (int i = 0; i < 15; i++) {
@@ -1386,14 +1388,14 @@ void BasicScene::PlayMenu()
             if (selectedCamera)
                 ImGui::PopStyleColor();
         }
-        if(data->object_collision >0 & !statistics->selfCollisionStopper.is_countdown_running()) {
+        if((data->self_collision >0) && !statistics->selfCollisionStopper.is_countdown_running()) {
             ImGui::SameLine(ImGui::GetWindowWidth() - 220);
             if (ImGui::Button("Self invisible", ImVec2(100, 0))) {
                 data->dec_self_collision();
                 statistics->selfCollisionStopper.start(10);
             }
         }
-        if(data->object_collision >0 & !statistics->objectCollisionStopper.is_countdown_running()) {
+        if((data->object_collision >0) && !statistics->objectCollisionStopper.is_countdown_running()) {
             ImGui::SameLine(ImGui::GetWindowWidth() - 110);
             if (ImGui::Button("Object invisible", ImVec2(100, 0))) {
                 data->dec_object_collision();
@@ -1406,6 +1408,13 @@ void BasicScene::PlayMenu()
         ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
         std::string tmp = std::to_string(statistics->score);
         ImGui::Text("%s", tmp.c_str());
+        if(!statistics->double_score & (data->double_score >0)) {
+            ImGui::SameLine(ImGui::GetWindowWidth() - 110);
+            if (ImGui::Button("Double score", ImVec2(100, 0))) {
+                data->dec_double_score();
+                statistics->double_score = true;
+            }
+        }
         ImGui::Spacing();
         ImGui::Text("Level: ");
         ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
@@ -1526,9 +1535,7 @@ SoundManager* BasicScene::getSoundManager() {
 GameStatistics* BasicScene::getStatistics(){
     return this->statistics;
 }
-Data* BasicScene::getData(){
-    return this->data;
-}
+
 
 void BasicScene::ViewportSizeCallback(Viewport* _viewport)
 {
@@ -1554,6 +1561,7 @@ void BasicScene::AddViewportCallback(Viewport* _viewport)
           "\tmoving and standing.Eat as much animals and coins as you can.\n"
           "\tEach eat will gain you score points,\n"
           "\tand buying money for the store.\n"
+          "\t Yo can switch between cameras with the buttons or by the numbers 1-4\n"
           "\tIn the store you can buy game helpers\n"
           "\tsuch as extra life,double score, more speed etc.\n"
           "\tGood Luck!");
