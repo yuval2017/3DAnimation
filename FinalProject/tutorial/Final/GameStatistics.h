@@ -49,6 +49,7 @@ public:
     float get_progress();
     bool levelUp;
     bool restart;
+    bool won;
     void reset_game();
     Stopper selfCollisionStopper;
     Stopper objectCollisionStopper;
@@ -65,8 +66,6 @@ private :
     GameStatistics();
     GameStatistics(GameStatistics const&);              // Don't Implement.
     void operator=(GameStatistics const&); // Don't implement
-
-
 
 };
 

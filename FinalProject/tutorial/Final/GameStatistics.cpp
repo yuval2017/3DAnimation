@@ -56,11 +56,11 @@ void GameStatistics::inc_Score(int i) {
         if (level != num_of_levels) {
             levelUp = true;
             menu_flags[LevelMenu_OP] = true;
+            soundManager->play_sound(std::to_string(PROGRESS_SOUND));
 
         } else {
-            restart = true;
+            won = true;
             soundManager->play_sound(std::to_string(SUCCESS_SOUND));
-
         }
     }
 }
