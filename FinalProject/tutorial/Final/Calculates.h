@@ -59,5 +59,6 @@ public:
     getVertexTextureCoordinates(std::vector<Vertex> vertices, std::vector<Face> faces, std::string imagePath);
     std::vector<TexCoord> getVertexTextureCoordinates(Eigen::MatrixXd vertices, Eigen::MatrixXi faces, std::string imagePath);
     std::queue<Eigen::Vector3f> generatePointsInSystem(float x_length, float y_length, float z_length, int n,float min_dist, Eigen::Vector3f point, std::vector<Eigen::Vector3f> points);
+    Eigen::Vector3f generateRandomPoint(Eigen::Vector3f max, Eigen::Vector3f min, Eigen::Vector3f point, double min_d, double max_d);
 
 };

@@ -18,7 +18,6 @@ private:
 
     std::shared_ptr<cg3d::Camera> camera;
     std::shared_ptr<cg3d::Model> snake;
-    float speed = 1.0f;
     float scaleFactor = 1.0f;
 
 
@@ -47,12 +46,11 @@ private:
     int number_of_joints;
     float joint_length;
     Eigen::MatrixXd V_new;
-    void load_snake(std::string& path);
     void Calc_Next_Position(std::vector<Eigen::Vector3f> &p, std::vector<double> &ris_Array, std::vector<double> &lambdaI_Array, Eigen::Vector3d t);
-    void initSnake2();
 
 
 public:
+    float speed = 0.8;
     std::vector<std::shared_ptr<cg3d::Model>> bones;
     std::vector<Eigen::AlignedBox <double, 3>> snakeJointBoxes;
     Snake();
