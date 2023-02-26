@@ -18,9 +18,9 @@ namespace cg3d {
         void Run(Scene *scene, Camera *camera) override;
         void Visit(Model *model) override;
         void moveAccordingToBeizerCurve(Model *model);
-        void setModelBezier(Eigen::Vector3f vectors, std::shared_ptr<Model> model);
+        void setModelBezier(Eigen::Vector3f vectors, Model *model);
         std::shared_ptr<Model> generateObjectBezier(int material_id, int model_id, std::string name, float scale);
-        void drawTheBeizerCurve(std::shared_ptr<Model> model);
+        void drawTheBeizerCurve(Model *model);
         void CreateLevel1(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords);
         void CreateLevel2(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords);
         void CreateLevel3(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords);
@@ -31,6 +31,7 @@ namespace cg3d {
         static shared_ptr<Model> createFrog();
         shared_ptr<Model> createMouse();
         shared_ptr<Model> createCoin();
+        void get_map_max_min(Eigen::Vector3f &max, Eigen::Vector3f &min);
 
     private:
         void GetCurrMapMaxLength(float &length_x, float &length_y, float &length_z);
@@ -50,6 +51,8 @@ namespace cg3d {
         Stopper* stopperMouse;
         Stopper* stopperCoin;
         Stopper* snakeSpeed;
+        Stopper* stopperSpecialBezier;
+        int sec_between_specialbezier = 10;
         std::queue<Eigen::Vector3f > frogPoints;
         std::queue<Eigen::Vector3f > mousePoints;
         std::queue<Eigen::Vector3f > coinPoints;

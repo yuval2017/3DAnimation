@@ -4,6 +4,7 @@
 
 
 #define BEZIER_OBJECT_NAME "CollisionObject bezier"
+#define SPECIAL_BEZIER_OBJECT_NAME "CollisionObject special bezier"
 #define COLLISION_OBJECT "CollisionObject"
 #define EATING_OBJECT "EatingObject"
 #define BONE_NAME "bone"

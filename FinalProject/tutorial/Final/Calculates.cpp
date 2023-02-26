@@ -582,3 +582,31 @@ std::shared_ptr<Model> Calculates::createBox(Eigen::AlignedBox<double, 3>& box){
     meshList.push_back(m);
     return Model::Create( "cube",meshList,material);
 }
+
+Eigen::Vector3f Calculates::generateRandomPoint(Eigen::Vector3f max, Eigen::Vector3f min, Eigen::Vector3f point, double min_d, double max_d) {
+    Eigen::Vector3f random_point(3);
+    float x, y, z;
+    float r, theta, phi, d;
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_real_distribution<double> dis(-1.0, 1.0);
+    uniform_real_distribution<double> dis_d(min_d, max_d);
+
+    do {
+        d = (float)dis_d(gen);
+        // Generate a random point on the surface of a sphere with radius d
+        // and center at the given point
+        r = d;
+        theta = (float)dis(gen) * M_PI;
+        phi = (float)dis(gen) * 2.0 * M_PI;
+        x = point[0] + r * sin(theta) * cos(phi);
+        y = point[1] + r * sin(theta) * sin(phi);
+        z = point[2] + r * cos(theta);
+    } while (!(x < max[0] && x > min[0] && y < max[1] && y > min[1] && z < max[2] && z > min[2]));
+
+    random_point[0] = x;
+    random_point[1] = y;
+    random_point[2] = z;
+
+    return random_point;
+}

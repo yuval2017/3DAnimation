@@ -23,7 +23,6 @@
 
 Snake::Snake(){
     std::cout<< "Snake :) " << " \n"<< std::endl;
-
 }
 Snake::Snake(const std::shared_ptr<cg3d::Material>& material, const std::shared_ptr<cg3d::Movable>& root, std::shared_ptr<cg3d::Camera> _camera){
     ModelsFactory *factory = ModelsFactory::getInstance();
@@ -63,7 +62,7 @@ void Snake::SetSpeed(float new_speed){
     speed = new_speed;
 }
 void Snake::MoveLeft(){
-    direction = Eigen::Vector3d(0.8f, 0, 0.7f);
+    direction = Eigen::Vector3d(speed, 0, 0.7f);
 //    float angle_radians = -20.0f * M_PI / 180.0f;
 //    bones[bones.size() - 1]->Rotate(Eigen::Quaternionf(cos(angle_radians / 2.0), 0.0, sin(angle_radians / 2.0), 0.0).toRotationMatrix());
 //    if(!with_skinning) {
@@ -72,7 +71,7 @@ void Snake::MoveLeft(){
 //    }
 }
 void Snake::MoveRight(){
-    direction = Eigen::Vector3d(-0.8f, 0, 0.7f);
+    direction = Eigen::Vector3d(-speed, 0, 0.7f);
 //    float angle_radians = 20.0f * M_PI / 180.0f;
 //    bones[bones.size() - 1]->Rotate(Eigen::Quaternionf(cos(angle_radians / 2.0), 0.0, sin(angle_radians / 2.0), 0.0).toRotationMatrix());
 //    if(!with_skinning) {
@@ -82,7 +81,7 @@ void Snake::MoveRight(){
 //    }
 }
 void Snake::MoveUp(){
-    direction = Eigen::Vector3d(0, 0.8f, 0.7f);
+    direction = Eigen::Vector3d(0, speed, 0.7f);
 //    float angle_radians = 20.0f * M_PI / 180.0f;
 //    bones[bones.size() - 1]->Rotate(Eigen::Quaternionf(cos(angle_radians / 2.0), sin(angle_radians / 2.0), 0.0, 0.0).toRotationMatrix());
     //direction = Eigen::Vector3d(0, 0.8f, 0);
@@ -93,7 +92,7 @@ void Snake::MoveUp(){
 }
 
 void Snake::MoveDone(){
-    direction = Eigen::Vector3d(0, -0.8f, 0.7f);
+    direction = Eigen::Vector3d(0, -speed, 0.7f);
 //    float angle_radians = -20.0f * M_PI / 180.0f;
 //    bones[bones.size() - 1]->Rotate(Eigen::Quaternionf(cos(angle_radians / 2.0), sin(angle_radians / 2.0), 0.0, 0.0).toRotationMatrix());
 //    if(!with_skinning) {
@@ -221,7 +220,7 @@ void Snake::skinning(Eigen::Vector3d t) {
         Eigen::Matrix3f system = bones[i-1]->GetRotation().transpose();
         bones[i-1]->Translate( newPositionOfObject.cast<float>() - ikGetPosition(i-1,joint_length/2));
     }
-    direction = {0.0f,0.0f,0.7f};
+    direction = {0.0f,0.0f,speed};
 }
 
 
