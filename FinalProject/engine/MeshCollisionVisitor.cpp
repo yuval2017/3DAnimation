@@ -29,7 +29,7 @@ void cg3d::MeshCollisionVisitor::Visit(Model *model) {
         !(basicScene->getStatistics()->selfCollisionStopper.is_countdown_running()) &&
          (Calculates::getInstance()-> isMeshCollision(snake, model->shared_from_this(), ((snake)->GetTree()),
                                         model->GetTree()))){
-          std::cout << "collision with " << model->name << " \n" << std::endl;
+         // std::cout << "collision with " << model->name << " \n" << std::endl;
           handle_self_hit();
       }
       else if(!model->isHidden &&
@@ -38,18 +38,18 @@ void cg3d::MeshCollisionVisitor::Visit(Model *model) {
           if( (Calculates::getInstance()->
                   isMeshCollision(snake, model->shared_from_this(), ((snake)->GetTree()),
                                   model->GetTree()))) {
-              std::cout << "collision with " << model->name << " \n" << std::endl;
+           //   std::cout << "collision with " << model->name << " \n" << std::endl;
               handle_object_hit(model);
           }
       }
 
       else if( !model->isHidden &&
                 model->name.find(EATING_OBJECT) != std::string::npos ){
-          std::cout << " check collision with " << model->name << " \n" << std::endl;
+         // std::cout << " check collision with " << model->name << " \n" << std::endl;
           if (Calculates::getInstance()->
                   isMeshCollision(snake, model->shared_from_this(), ((snake)->GetTree()),
                                   model->GetTree())) {
-              std::cout << " mouse!! " << model->name << " \n" << std::endl;
+           //   std::cout << " mouse!! " << model->name << " \n" << std::endl;
               handle_eating(model);
           }
       }
