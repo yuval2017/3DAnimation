@@ -8,7 +8,6 @@
 #include "PickVisitor.h"
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "imgui_internal.h"
-#include "Renderer.h"
 #include "IglMeshLoader.h"
 #include "ModelsFactory.h"
 #define STB_IMAGE_IMPLEMENTATION
@@ -31,6 +30,9 @@ void BasicScene::Init(float fov, int width, int height, float near, float far) {
     setFonts();
     setStartPos();
     setImage();
+
+
+
 
 }
 

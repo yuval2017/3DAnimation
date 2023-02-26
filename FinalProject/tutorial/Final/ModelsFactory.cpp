@@ -43,6 +43,10 @@ ModelsFactory::ModelsFactory(){
     materials[GREY_MATERIAL] = {std::make_shared<Material>("grey_color", "shaders/phongShader")};
     materials[GREY_MATERIAL]->program->name = "grey";
 
+    //tree material
+    materials[TREE_MATERIAL] = std::make_shared<Material>("tree", "shaders/basicShader"); // default material
+    materials[TREE_MATERIAL]->AddTexture(0, "data/masktree_obj/tree2.tga", 2);
+
     //gold material
     materials[GOLD_MATERIAL] = {std::make_shared<Material>("gold_color", "shaders/phongShader")};
     materials[GOLD_MATERIAL]->program->name = "gold";
@@ -55,16 +59,16 @@ ModelsFactory::ModelsFactory(){
     meshes[SPHERE] = ObjLoader::MeshFromObj("sphere_mesh", {"data/sphere.obj"});
     meshes[TRUCK] = ObjLoader::MeshFromObj("sphere_mesh", {"data/truck.obj"});
     meshes[COIN] = ObjLoader::MeshFromObj("coin_mesh", {"data/coin.obj"});
-    //meshes[TREE] = ObjLoader::MeshFromObj("tree_mesh",{"data/tree2.obj"} );
-    //meshes[FROG] = {IglLoader::MeshFromFiles("frog_mesh", "data/frog/Frog.obj")};
     meshes[MOUSE] = {IglLoader::MeshFromFiles("mouse_mesh", "data/mouse/Mouse.obj")};
-    meshes[FROG] =  {IglLoader::MeshFromFiles("frog2_mesh", "data/frog2/Frog.obj")};
+    meshes[FROG] =  {IglLoader::MeshFromFiles("frog2_mesh", "data/frog/Frog.obj")};
+    meshes[TREE] = {IglLoader::MeshFromFiles("frog2_mesh", "data/masktree_obj/masktree.obj")};
+
     //need to implement but not in lines
     meshes[LINES] = NULL;
     meshes[SNAKE1] = ObjLoader::MeshFromObj("snake_mesh", {"data/snake1.obj"});
 
     for (int i = 0; i < NUMBER_OF_MESHES; i++) {
-        if(i != 3 && i != 7){
+        if(i != 3){
             create_bounding_box(i);
         }
     }
@@ -75,13 +79,13 @@ ModelsFactory *ModelsFactory::getInstance(){
     }
     return instancePtr;
 }
-std::shared_ptr<Model> ModelsFactory::CreateModel(int material_id, int mesh_id, std::string name){
-    std::shared_ptr<Model> model = Model::Create(name, meshes[mesh_id], materials[material_id]);
-    return model;
+std::shared_ptr<Model> ModelsFactory::CreateModel(int material_id, int mesh_id, const std::string& name){
+    return Model::Create(name, meshes[mesh_id], materials[material_id]);
 }
-std::shared_ptr<Model> ModelsFactory::CreateBricksCubeModel(){
-    return nullptr;
+std::shared_ptr<Model> ModelsFactory::CreateModel2(int material_id, const std::string& path, std::string name){
+    return ObjLoader::ModelFromObj(name , path, materials[material_id]);
 }
+
 void ModelsFactory::create_bounding_box(int mesh_id){
     igl::AABB<Eigen::MatrixXd, 3> tree;
     tree.init(meshes[mesh_id]->data[0].vertices, meshes[mesh_id]->data[0].faces);
