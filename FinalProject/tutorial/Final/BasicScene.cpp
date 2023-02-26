@@ -1450,8 +1450,8 @@ void BasicScene::endWindow() {
     float outline_size = 1.0f; // Size of the outline in pixels
     ImGui::Dummy(ImVec2(outline_size, outline_size)); // Add a dummy element to offset the text
     ImGui::SameLine(); // Render the text on the same line as the dummy element
-    ImVec2 cursor_pos = ImGui::GetCursorPos();
-    ImGui::SetCursorPos(ImVec2(cursor_pos.x, cursor_pos.y + ImGui::GetTextLineHeightWithSpacing()+80));
+    ImVec2 cursor_pos = ImVec2(10,ImGui::GetWindowHeight() - 50.0);
+    ImGui::SetCursorPos(cursor_pos);
     ImGui::BulletText("Snake Game By Yuval Hitter & Bar Damri. \n3D Animation Course\n");
 
     // Pop the style colors to restore the previous style
