@@ -78,7 +78,7 @@ private:
     ImFont* headerFont = nullptr;
     ImFont* regularFont = nullptr;
     ImFont* messageFont = nullptr;
-    unsigned char* backgroundImage ;
+    ImFont* leadersFont = nullptr;
     int window_width = 700;
     int window_height = 700 ;
     ImVec2 windowSize;
@@ -90,16 +90,23 @@ private:
 
     void SettingsMenu();
     void setStartPos();
-    void setWindow(const char* header);
+    void setWindow(const char* header,GLuint texture);
     void endWindow();
     void buttonStyle();
     void setBoxes();
     void initProperties( int width, int height);
     Score* generateRandomScore();
-    GLuint backgroundImageTexture;
+    unsigned char* backgroundImage ;
+    GLuint backgroundSnakeTexture;
+    GLuint backgroundStoreTexture;
+    GLuint backgroundLevelTexture;
+    GLuint backgroundLoseTexture;
+    GLuint backgroundWinTexture;
+    GLuint backgroundSettingsTexture;
+    GLuint backgroundLeadersTexture;
     ImVec2 startPos ;
     int windowFlags;
-;
+    char* getInstructions();
     std::vector<bool> events;
     void init_cameras(float fov,int width, int height,float near,float far);
 };

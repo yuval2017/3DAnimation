@@ -64,7 +64,7 @@ void SceneWithCameras::BuildImGui()
                     pickedModel->Scale(1.1f);
             }
             if (ImGui::Button("Dump model mesh data")) {
-                std::cout << "model name: " << pickedModel->name << std::endl;
+           //     std::cout << "model name: " << pickedModel->name << std::endl;
                 if (pickedModel->meshIndex > 0)
                     std::cout << "mesh index in use: " << pickedModel->meshIndex;
                 for (auto& mesh: pickedModel->GetMeshList()) {

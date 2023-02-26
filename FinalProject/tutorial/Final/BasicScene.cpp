@@ -116,21 +116,136 @@ void BasicScene::initProperties( int width, int height){
 
 
 void BasicScene::setImage(){
-    backgroundImage = stbi_load("../tutorial/Final/images/7x7.jpg", &image_width , &image_height, &channels, STBI_rgb_alpha);
+
+    //setting the snake texture.
+    backgroundImage = stbi_load("../tutorial/Final/images/snake/7x7.jpg", &image_width , &image_height, &channels, STBI_rgb_alpha);
     if (backgroundImage == NULL) {
         // Error handling if the image couldn't be loaded
-        std::cout << "image not loaded! " << std::endl;
+        std::cout << "snake image not loaded! " << std::endl;
     }
     else {
-        glGenTextures(1, &backgroundImageTexture);
-        glBindTexture(GL_TEXTURE_2D, backgroundImageTexture);
+        glGenTextures(1, &backgroundSnakeTexture);
+        glBindTexture(GL_TEXTURE_2D, backgroundSnakeTexture);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, backgroundImage);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         stbi_image_free(backgroundImage);
-        std::cout << "image loaded successfully! " << std::endl;
+        std::cout << "snake image loaded successfully! " << std::endl;
+    }
+
+
+    //setting the leaders texture.
+    backgroundImage = stbi_load("../tutorial/Final/images/leaders/8x8.png", &image_width , &image_height, &channels, STBI_rgb_alpha);
+    if (backgroundImage == NULL) {
+        // Error handling if the image couldn't be loaded
+        std::cout << "leaders image not loaded! " << std::endl;
+    }
+    else {
+        glGenTextures(1, &backgroundLeadersTexture);
+        glBindTexture(GL_TEXTURE_2D, backgroundLeadersTexture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, backgroundImage);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        stbi_image_free(backgroundImage);
+        std::cout << "leaders image loaded successfully! " << std::endl;
+    }
+
+
+    //setting the store texture.
+    backgroundImage = stbi_load("../tutorial/Final/images/store/8x8.png", &image_width , &image_height, &channels, STBI_rgb_alpha);
+    if (backgroundImage == NULL) {
+        // Error handling if the image couldn't be loaded
+        std::cout << "store image not loaded! " << std::endl;
+    }
+    else {
+        glGenTextures(1, &backgroundStoreTexture);
+        glBindTexture(GL_TEXTURE_2D, backgroundStoreTexture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, backgroundImage);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        stbi_image_free(backgroundImage);
+        std::cout << "store image loaded successfully! " << std::endl;
+    }
+
+
+    //setting the win texture.
+    backgroundImage = stbi_load("../tutorial/Final/images/win/8x8.png", &image_width , &image_height, &channels, STBI_rgb_alpha);
+    if (backgroundImage == NULL) {
+        // Error handling if the image couldn't be loaded
+        std::cout << "win image not loaded! " << std::endl;
+    }
+    else {
+        glGenTextures(1, &backgroundWinTexture);
+        glBindTexture(GL_TEXTURE_2D, backgroundWinTexture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, backgroundImage);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        stbi_image_free(backgroundImage);
+        std::cout << "win image loaded successfully! " << std::endl;
+    }
+
+
+    //setting the lose texture.
+    backgroundImage = stbi_load("../tutorial/Final/images/loose/8x8.jpg", &image_width , &image_height, &channels, STBI_rgb_alpha);
+    if (backgroundImage == NULL) {
+        // Error handling if the image couldn't be loaded
+        std::cout << "win image not loaded! " << std::endl;
+    }
+    else {
+        glGenTextures(1, &backgroundLoseTexture);
+        glBindTexture(GL_TEXTURE_2D, backgroundLoseTexture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, backgroundImage);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        stbi_image_free(backgroundImage);
+        std::cout << "win image loaded successfully! " << std::endl;
+    }
+
+
+    //setting the level texture.
+    backgroundImage = stbi_load("../tutorial/Final/images/level/8x8.jpg", &image_width , &image_height, &channels, STBI_rgb_alpha);
+    if (backgroundImage == NULL) {
+        // Error handling if the image couldn't be loaded
+        std::cout << "win image not loaded! " << std::endl;
+    }
+    else {
+        glGenTextures(1, &backgroundLevelTexture);
+        glBindTexture(GL_TEXTURE_2D, backgroundLevelTexture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, backgroundImage);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        stbi_image_free(backgroundImage);
+        std::cout << "win image loaded successfully! " << std::endl;
+    }
+
+    //setting the settings texture.
+    backgroundImage = stbi_load("../tutorial/Final/images/settings/8x8.jpg", &image_width , &image_height, &channels, STBI_rgb_alpha);
+    if (backgroundImage == NULL) {
+        // Error handling if the image couldn't be loaded
+        std::cout << "win image not loaded! " << std::endl;
+    }
+    else {
+        glGenTextures(1, &backgroundSettingsTexture);
+        glBindTexture(GL_TEXTURE_2D, backgroundSettingsTexture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, backgroundImage);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        stbi_image_free(backgroundImage);
+        std::cout << "win image loaded successfully! " << std::endl;
     }
 }
 
@@ -139,10 +254,12 @@ void BasicScene::setFonts() {
     ImFontConfig font_config;
     font_config.GlyphExtraSpacing = ImVec2(0.0f, 1.0f); // Set extra spacing for each glyph
     font_config.GlyphOffset = ImVec2(0.0f, -1.0f); // Set glyph offset to adjust for extra spacing
+    font_config.SizePixels = 20.0f;
     backgroundImage = stbi_load("../tutorial/Final/images/image.png", &image_width, &image_height, &channels, STBI_rgb_alpha);
-    headerFont = io.Fonts->AddFontFromFileTTF("../tutorial/Final/fonts/Broxford.otf", 18.0f, &font_config);
-    messageFont = io.Fonts->AddFontFromFileTTF("../tutorial/Final/fonts/Amena.otf", 14.0f, &font_config);
-    regularFont = io.Fonts->AddFontFromFileTTF("../tutorial/Final/fonts/Castron.otf", 14.0f, &font_config);
+    headerFont = io.Fonts->AddFontFromFileTTF("../tutorial/Final/fonts/Broxford.otf", 20.0f, &font_config);
+    messageFont = io.Fonts->AddFontFromFileTTF("../tutorial/Final/fonts/Amena.otf", 18.0f, &font_config);
+    leadersFont = io.Fonts->AddFontFromFileTTF("../tutorial/Final/fonts/Castron.otf", 30.0f, &font_config);
+    regularFont = io.Fonts->AddFontFromFileTTF("../tutorial/Final/fonts/Castron.otf", 20.0f, &font_config);
 }
 
 void BasicScene::setStartPos() {
@@ -395,7 +512,7 @@ void BasicScene::loadingMenu() {
     }
     if(statistics->menu_flags[LoadingMenu_OP]){
         animate = false;
-        setWindow("Loading");
+        setWindow("Loading",backgroundSnakeTexture);
         ImGui::PushFont(regularFont);
         // Get the current time in seconds
 
@@ -416,6 +533,9 @@ void BasicScene::loadingMenu() {
             statistics->menu_flags[LoadingMenu_OP] = false;
             statistics->menu_flags[MainMenu_OP] =true;
         }
+        for(int i= 0; i<100 ; i++){
+            ImGui::Spacing();
+        }
         ImGui::PopFont();
         endWindow();
     }
@@ -426,10 +546,11 @@ void BasicScene::startMenu() {
 
     if(statistics->menu_flags[MainMenu_OP]) {
         animate = false;
-        setWindow("3D Snake");
+        setWindow("3D Snake",backgroundSnakeTexture);
         ImGui::PushFont(regularFont);
         buttonStyle();
-        if (ImGui::Button("Start Game", ImVec2(-1, 0))) {
+        ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 100);
+        if (ImGui::Button("Start Game", ImVec2(200, 0))) {
             std::cout << "new game button pressed in start menu ." << endl;
             statistics->menu_flags[MainMenu_OP] = false;
             animate = true;
@@ -445,12 +566,11 @@ void BasicScene::startMenu() {
         }
 
         static char* mass = "";
-
-        if (ImGui::Button("Tutorial", ImVec2(-1, 0))) {
+        ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 100);
+        if (ImGui::Button("Tutorial", ImVec2(200, 0))) {
             if( std::strlen(mass)== 0) {
                 std::cout << "store button pressed in start menu  ." << endl;
-                mass = ("Press the up,down,right,left,\n Keys to move around.\nBe aware of obstacles.\n"
-                        "Eat as much animals as you can.\nEach eat will gain you score points.\nGood Luck!");
+                mass = getInstructions();
             }
             else{
                 mass = "";
@@ -468,7 +588,8 @@ void BasicScene::startMenu() {
             ImGui::Spacing();
         }
         ImGui::PushFont(regularFont);
-        if (ImGui::Button("Store", ImVec2(-1, 0))) {
+        ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 100);
+        if (ImGui::Button("Store", ImVec2(200, 0))) {
             std::cout << "store button pressed in start menu  ." << endl;
             statistics->menu_flags[MainMenu_OP] = false;
             data->back_to_main.push_back(MainMenu_OP);
@@ -478,8 +599,8 @@ void BasicScene::startMenu() {
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
-
-        if (ImGui::Button("Leaders", ImVec2(-1, 0))) {
+        ImGui::SameLine(ImGui::GetWindowWidth() / 2 -100 );
+        if (ImGui::Button("Leaders", ImVec2(200, 0))) {
             std::cout << "leaders button pressed in start menu  ." << endl;
             statistics->menu_flags[MainMenu_OP] = false;
             data->back_to_main.push_back(MainMenu_OP);
@@ -488,8 +609,8 @@ void BasicScene::startMenu() {
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
-
-        if (ImGui::Button("Settings", ImVec2(-1, 0))) {
+        ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 100);
+        if (ImGui::Button("Settings", ImVec2(200, 0))) {
                 statistics->menu_flags[MainMenu_OP] = false;
                 data->back_to_main.push_back(MainMenu_OP);
                 statistics->menu_flags[SettingsMenu_OP] = true;
@@ -498,13 +619,13 @@ void BasicScene::startMenu() {
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
-
-        if (ImGui::Button("Exit", ImVec2(-1, 0))) {
+        ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 100);
+        if (ImGui::Button("Exit", ImVec2(200, 0))) {
             delete soundManager;
             exit(0);
         }
         ImGui::PopStyleColor(3);
-        for(int i = 0; i< 3 ; i++){
+        for(int i = 0; i< 50 ; i++){
             ImGui::Spacing();
         }
         ImGui::PopFont();
@@ -517,7 +638,7 @@ void BasicScene::PausedMenu()
 {
     if(statistics->menu_flags[PauseMenu_OP]) {
         animate = false;
-        setWindow("Pause");
+        setWindow("Pause",backgroundSnakeTexture);
         ImGui::PushFont(regularFont);
         float progress = statistics->score;
         progress= progress/data->scores[statistics->level];
@@ -550,7 +671,8 @@ void BasicScene::PausedMenu()
             ImGui::Spacing();
         }
         buttonStyle();
-        if (ImGui::Button("Continue", ImVec2(-1, 0))) {
+        ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 100);
+        if (ImGui::Button("Continue", ImVec2(200, 0))) {
             std::cout << "continue button pressed in pause menu ." << endl;
             statistics->menu_flags[PauseMenu_OP] = false;
             animate = true;
@@ -558,8 +680,8 @@ void BasicScene::PausedMenu()
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
-
-        if (ImGui::Button("Store", ImVec2(-1, 0))) {
+        ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 100);
+        if (ImGui::Button("Store", ImVec2(100, 0))) {
             std::cout << "store menu button pressed in pause menu." << endl;
             statistics->menu_flags[PauseMenu_OP] = false;
             data->back_to_main.push_back(PauseMenu_OP);
@@ -568,8 +690,8 @@ void BasicScene::PausedMenu()
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
-
-        if (ImGui::Button("Settings", ImVec2(-1, 0))) {
+        ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 100);
+        if (ImGui::Button("Settings", ImVec2(200, 0))) {
 
             std::cout << "setting menu button pressed in pause menu." << endl;
             statistics->menu_flags[PauseMenu_OP] = false;
@@ -578,7 +700,9 @@ void BasicScene::PausedMenu()
 
 
         }
-        if (ImGui::Button("Surrender", ImVec2(-1, 0))) {
+
+        ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 100);
+        if (ImGui::Button("Surrender", ImVec2(200, 0))) {
             std::cout << "Surrender button pressed in pause menu." << endl;
             statistics->menu_flags[PauseMenu_OP] = false;
             statistics->menu_flags[MainMenu_OP] = true;
@@ -601,11 +725,14 @@ void BasicScene::SettingsMenu()
 {
     if(statistics->menu_flags[SettingsMenu_OP]) {
         animate = false;
-        setWindow("Settings");
-        ImGui::PushFont(regularFont);
-        setBoxes();
         ImVec4 black = ImVec4(0.0f, 0.0f, 0.0f, 1.0f); // set color to black
         ImGui::PushStyleColor(ImGuiCol_CheckMark, black); // set checkbox check color
+        ImGui::PushStyleColor(ImGuiCol_Button, black); // set checkbox check color
+        ImGui::PushStyleColor(ImGuiCol_Text, black); // set checkbox check color
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, black); // set checkbox check color
+        setWindow("Settings",backgroundSettingsTexture);
+        ImGui::PushFont(regularFont);
+        setBoxes();
         // Checkbox for sound on/off
         if ( data->gameMusic){
             if (ImGui::Checkbox("Music On", &data->gameMusic)) {
@@ -651,7 +778,7 @@ void BasicScene::SettingsMenu()
             ImGui::Spacing();
         }
 
-        ImGui::PopStyleColor();
+        ImGui::PushStyleColor(ImGuiCol_PopupBg, ImVec4(0, 0.5, 0, 1));
         static const char* music_names[] = { "Song 1", "Song 2", "Song 3"};
         static int current_music_index = 0;
         if (ImGui::BeginCombo("Music", music_names[current_music_index])) {
@@ -667,37 +794,46 @@ void BasicScene::SettingsMenu()
             }
             ImGui::EndCombo();
         }
-
+        ImGui::PopStyleColor();
         buttonStyle();
-        if (ImGui::Button("Fail sound", ImVec2(-1, 0))) {
+        for(int i = 0; i< 10 ; i++){
+            ImGui::Spacing();
+        }
+
+        ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 100);
+        if (ImGui::Button("Fail sound", ImVec2(200, 0))) {
             std::cout << "Fail sound button pressed in win menu." << endl;
             soundManager->play_sound(std::to_string(FAIL_SOUND));
         }
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
-        if (ImGui::Button("Health sound", ImVec2(-1, 0))) {
+        ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 100);
+        if (ImGui::Button("Health sound", ImVec2(200, 0))) {
             std::cout << "Health sound button pressed in win menu." << endl;
             soundManager->play_sound(std::to_string(HEALTH_SOUND));
         }
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
-        if (ImGui::Button("Hit sound", ImVec2(-1, 0))) {
+        ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 100);
+        if (ImGui::Button("Hit sound", ImVec2(200, 0))) {
             std::cout << "Hit sound button pressed in win menu." << endl;
             soundManager->play_sound(std::to_string(HIT_SOUND));
         }
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
-        if (ImGui::Button("Progress sound", ImVec2(-1, 0))) {
+        ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 100);
+        if (ImGui::Button("Progress sound", ImVec2(200, 0))) {
             std::cout << "Progress sound button pressed in win menu." << endl;
             soundManager->play_sound(std::to_string(PROGRESS_SOUND));
         }
         for(int i = 0; i< 5 ; i++){
             ImGui::Spacing();
         }
-        if (ImGui::Button("Back", ImVec2(-1, 0))) {
+        ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 100);
+        if (ImGui::Button("Back", ImVec2(200, 0))) {
             std::cout << "Back button pressed in win menu." << endl;
             if(data->back_to_main.size() == 0 ){
                 statistics->menu_flags[SettingsMenu_OP] =false;
@@ -710,7 +846,7 @@ void BasicScene::SettingsMenu()
                 statistics->menu_flags[ret] =true;
             }
         }
-        ImGui::PopStyleColor(3);
+        ImGui::PopStyleColor(7);
         ImGui::PopFont();
         endWindow();
     }
@@ -722,7 +858,7 @@ void BasicScene::NextLevelMenu() {
         if(start_time == 0.0 ) {
             start_time = ImGui::GetTime();
         }
-        setWindow("Level Up");
+        setWindow("Level Up",backgroundLevelTexture);
         ImGui::PushFont(regularFont);
         std::string tmp = std::to_string(statistics->level);
         ImGui::Text(" Current level: %s", tmp.c_str());
@@ -746,10 +882,11 @@ void BasicScene::NextLevelMenu() {
         ImGui::Text("Percentage of Time Passed: %.2f%%", progress * 100.0f);
 
         // Display the progress bar
-        ImGui::ProgressBar(progress, ImVec2(-1, 0), "");
+        ImGui::ProgressBar(progress, ImVec2(0, 0), "");
         // Call the callback function when progress reaches 100%
         if (progress >= 1.0f) {
-            if (ImGui::Button("Next level", ImVec2(-1, 0))) {
+            ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 100);
+            if (ImGui::Button("Next level", ImVec2(200, 0))) {
                 std::cout << "Next level button pressed in next level menu." << endl;
                 statistics->menu_flags[LevelMenu_OP] = false;
                 statistics->level++;
@@ -765,7 +902,8 @@ void BasicScene::NextLevelMenu() {
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
-        if (ImGui::Button("Back ", ImVec2(-1, 0))) {
+        ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 100);
+        if (ImGui::Button("Back ", ImVec2(200, 0))) {
             init();
             std::cout << "Back button pressed in next level menu." << endl;
             if(data->back_to_main.size() == 0 ){
@@ -793,7 +931,7 @@ void BasicScene::WinMenu() {
         if(start_time == 0.0 ) {
             start_time = ImGui::GetTime();
         }
-        setWindow("You Won!");
+        setWindow("You Won!",backgroundWinTexture);
         ImGui::PushFont(regularFont);
         ImGui::Text("Congratulations You finished the game!!");
         ImGui::Spacing();
@@ -821,7 +959,8 @@ void BasicScene::WinMenu() {
             ImGui::InputText("Input", name,IM_ARRAYSIZE(name));
             ImGui::Spacing();
             ImGui::Spacing();
-            if (ImGui::Button("Save", ImVec2(-1, 0)) && !saved) {
+            ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 100);
+            if (ImGui::Button("Save", ImVec2(200, 0)) && !saved) {
                 Score *scor = new Score();
                 scor->name = name;
                 scor->score = statistics->score;
@@ -849,10 +988,11 @@ void BasicScene::WinMenu() {
         ImGui::Text("Percentage of Time Passed: %.2f%%", progress * 100.0f);
 
         // Display the progress bar
-        ImGui::ProgressBar(progress, ImVec2(-1, 0), "");
+        ImGui::ProgressBar(progress, ImVec2(0, 0), "");
         // Call the callback function when progress reaches 100%
         if (progress >= 1.0f) {
-            if (ImGui::Button("Back ", ImVec2(-1, 0))) {
+            ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 100);
+            if (ImGui::Button("Back ", ImVec2(200, 0))) {
                 std::cout << "Back button pressed in win menu." << endl;
                 data->back_to_main.clear();
                 statistics->menu_flags[WinMenu_OP] =false;
@@ -886,7 +1026,7 @@ void BasicScene::LoseMenu() {
         if(start_time == 0.0 ) {
             start_time = ImGui::GetTime();
         }
-        setWindow("Game Over!");
+        setWindow("Game Over!",backgroundLoseTexture);
         ImGui::PushFont(regularFont);
         ImGui::Text("You lost..\nMaybe you will succeed next time.");
         for (int i = 0; i < 8; i++) {
@@ -916,7 +1056,8 @@ void BasicScene::LoseMenu() {
         ImGui::InputText("Input", name,IM_ARRAYSIZE(name));
         ImGui::Spacing();
         ImGui::Spacing();
-        if (ImGui::Button("Save", ImVec2(-1, 0)) && !saved) {
+            ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 100);
+        if (ImGui::Button("Save", ImVec2(200, 0)) && !saved) {
             Score *scor = new Score();
             scor->name = name;
             scor->score = statistics->score;
@@ -942,10 +1083,11 @@ void BasicScene::LoseMenu() {
         ImGui::Text("Percentage of Time Passed: %.2f%%", progress * 100.0f);
 
         // Display the progress bar
-        ImGui::ProgressBar(progress, ImVec2(-1, 0), "");
+        ImGui::ProgressBar(progress, ImVec2(0, 0), "");
         // Call the callback function when progress reaches 100%
         if (progress >= 1.0f) {
-            if (ImGui::Button("Back ", ImVec2(-1, 0))) {
+            ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 100);
+            if (ImGui::Button("Back ", ImVec2(200, 0))) {
                 std::cout << "Back button pressed in lose menu." << endl;
                 data->back_to_main.clear();
                 statistics->menu_flags[GameOverMenu_OP] = false;
@@ -975,9 +1117,10 @@ void BasicScene::StoreMenu() {
 
     if (statistics->menu_flags[StoreMenu_OP]) {
         animate = false;
-        setWindow("Store");
+        setWindow("Store",backgroundStoreTexture);
         ImGui::PushFont(regularFont);
-        buttonStyle();
+        // Push a black color onto the style stack
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 1.0f));
         ImGui::Text("You have total money of ");
         ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
         std::string tmp = std::to_string(data->total_money);
@@ -1001,10 +1144,16 @@ void BasicScene::StoreMenu() {
         ImGui::Text("%s", tmp22.c_str());
         ImGui::Text("Snake speed: ");
         ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
-        std::string tmp33 = std::to_string(statistics->speed);
+        std::string tmp33 = std::to_string(std::round(statistics->speed));
         ImGui::Text("%s", tmp33.c_str());
-
-        if (ImGui::Button("Buy speed - 50 coins", ImVec2(-1, 0)) ) {
+        // Pop the style color to restore the previous style
+        ImGui::PopStyleColor();
+        for(int i = 0; i< 15 ; i++){
+            ImGui::Spacing();
+        }
+        ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 250);
+        buttonStyle();
+        if (ImGui::Button("Buy speed - 50 coins", ImVec2(500, 0)) ) {
             if(data->total_money >=SPEED_COST) {
                 statistics->inc_speed();
                 soundManager->play_sound(std::to_string(KACHING_SOUND));
@@ -1016,8 +1165,8 @@ void BasicScene::StoreMenu() {
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
-
-        if (ImGui::Button("Buy extra life - 30 coins", ImVec2(-1, 0))) {
+        ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 250);
+        if (ImGui::Button("Buy extra life - 30 coins", ImVec2(500, 0))) {
             if(data->total_money >=LIFE_COST) {
             data->inc_life_bought();
             soundManager->play_sound(std::to_string(KACHING_SOUND));
@@ -1030,7 +1179,8 @@ void BasicScene::StoreMenu() {
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
-        if (ImGui::Button("Buy self collision invisibility - 10 coins", ImVec2(-1, 0))) {
+        ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 250);
+        if (ImGui::Button("Buy self collision invisibility - 10 coins", ImVec2(500, 0))) {
             if (data->total_money >= SELF_COLLIDE_COST) {
                 data->inc_self_collision();
                 soundManager->play_sound(std::to_string(KACHING_SOUND));
@@ -1041,8 +1191,8 @@ void BasicScene::StoreMenu() {
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
-
-        if (ImGui::Button("Buy obstacles collision invisibility - 20 coins", ImVec2(-1, 0))) {
+        ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 250);
+        if (ImGui::Button("Buy obstacles collision invisibility - 20 coins", ImVec2(500, 0))) {
             if (data->total_money >= OBJECT_COLLIDE_COST) {
                 data->inc_object_collision();
                 soundManager->play_sound(std::to_string(KACHING_SOUND));
@@ -1053,7 +1203,8 @@ void BasicScene::StoreMenu() {
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
-        if (ImGui::Button("Buy double score in game- 60 coins", ImVec2(-1, 0))) {
+        ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 250);
+        if (ImGui::Button("Buy double score in game- 60 coins", ImVec2(500, 0))) {
             if (data->total_money>= OBJECT_COLLIDE_COST) {
             data->inc_double_score();
             soundManager->play_sound(std::to_string(KACHING_SOUND));
@@ -1064,7 +1215,8 @@ void BasicScene::StoreMenu() {
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
-        if (ImGui::Button("Back", ImVec2(-1, 0))) {
+        ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 100);
+        if (ImGui::Button("Back", ImVec2(200, 0))) {
             std::cout << "Back button pressed in store menu." << endl;
             statistics->menu_flags[StoreMenu_OP] = false;
             if(data->back_to_main.size() == 0 ){
@@ -1093,24 +1245,53 @@ void BasicScene::LeadersMenu() {
 
     if (statistics->menu_flags[LeadersMenu_OP]) {
         animate = false;
-        setWindow("Leader Board");
+        setWindow("Leader Board",backgroundLeadersTexture);
         ImGui::PushFont(regularFont);
         this->highScores->loadHighScores();
         std::vector<std::string> names = highScores->extractPlayerNames();
         std::vector<int> scores = highScores->extractScores();
+        ImGui::PushFont(leadersFont);
+        // Push a black color onto the style stack
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.5f, 0.0f, 1.0f));
+
+        // Get the window width
+        float windowWidth = ImGui::GetWindowContentRegionWidth();
+
+        // Set the cursor position to the start of the window and display the first string
+
         if (names.size() == 0) {
             ImGui::BulletText("No Saved Scores!");
         } else {
             for (int i = 0; i <= names.size() - 1; i++) {
-                std::string text = names[i] + "\t|\t" + std::to_string(scores[i]) + "\n";
-                ImGui::BulletText("%s", text.c_str());
+                ImGui::SetCursorPosX(0.0f);
+                std::string name = names[i];
+                std::string score = std::to_string(scores[i]);
+
+                // Calculate the width of the second string
+                ImVec2 textSize2 = ImGui::CalcTextSize(score.c_str());
+                float textWidth2 = textSize2.x;
+
+                ImGui::Bullet();
+
+                ImGui::SameLine();
+                ImGui::Text("%s", name.c_str());
+
+                // Calculate the position to display the second string
+                float xPos = windowWidth / 2.0f - textWidth2 / 2.0f;
+
+                ImGui::SameLine(xPos);
+                ImGui::Text("%s", score.c_str());
             }
         }
+
+        ImGui::PopStyleColor(1);
+        ImGui::PopFont();
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
         buttonStyle();
-        if (ImGui::Button("Back", ImVec2(-1, 0))) {
+        ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 100);
+        if (ImGui::Button("Back", ImVec2(200, 0))) {
             std::cout << "Back button pressed in store menu." << endl;
             statistics->menu_flags[LeadersMenu_OP] = false;
             if(data->back_to_main.size() == 0){
@@ -1122,7 +1303,7 @@ void BasicScene::LeadersMenu() {
             }
         }
         ImGui::PopStyleColor(3);
-        for(int i = 0; i< 200 ; i++){
+        for(int i = 0; i< 70 ; i++){
             ImGui::Spacing();
         }
         ImGui::PopFont();
@@ -1163,6 +1344,11 @@ void BasicScene::PlayMenu()
         std::string tmp2 = std::to_string(statistics->level);
         ImGui::Text("%s", tmp2.c_str());
         ImGui::Spacing();
+        if(ImGui::Button("Pause",ImVec2(100, 0))){
+            animate = false;
+            statistics->menu_flags[PauseMenu_OP] = true;
+        }
+        ImGui::Spacing();
         ImGui::End();
     }
 }
@@ -1183,22 +1369,33 @@ void BasicScene::buttonStyle() {
 }
 void BasicScene::setBoxes() {
     ImGuiStyle& style = ImGui::GetStyle();
-    style.Colors[ImGuiCol_CheckMark] = ImVec4(0.0f, 0.5f, 0.0f, 1.0f);
+    style.Colors[ImGuiCol_CheckMark] = ImVec4(0.0f, 0.f, 0.0f, 1.0f);
     style.Colors[ImGuiCol_FrameBg] = ImVec4(0.0f, 0.5f, 0.0f, 1.0f);
 }
 void BasicScene::endWindow() {
+
     ImGui::PushFont(headerFont);
+    // Render black text with a white outline
+    ImGui::PushStyleColor(ImGuiCol_TextDisabled, ImVec4(1.0f, 1.0f, 1.0f, 1.0f)); // White outline color
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.0f, 0.0f, 0.0f, 1.0f)); // Black text color
+
+    // Render text with a small offset to simulate an outline effect
+    float outline_size = 1.0f; // Size of the outline in pixels
+    ImGui::Dummy(ImVec2(outline_size, outline_size)); // Add a dummy element to offset the text
+    ImGui::SameLine(); // Render the text on the same line as the dummy element
     ImVec2 cursor_pos = ImGui::GetCursorPos();
-    ImGui::SetCursorPos(ImVec2(cursor_pos.x, cursor_pos.y + ImGui::GetTextLineHeightWithSpacing()+200));
+    ImGui::SetCursorPos(ImVec2(cursor_pos.x, cursor_pos.y + ImGui::GetTextLineHeightWithSpacing()+80));
     ImGui::BulletText("Snake Game By Yuval Hitter & Bar Damri. \n3D Animation Course\n");
 
+    // Pop the style colors to restore the previous style
+    ImGui::PopStyleColor(2);
     //ImGui::BulletText("Snake Game By Yuval Hitter & Bar Damri. \n3D Animation Course\n");
     ImGui::PopFont();
     ImGui::PopStyleColor();
     ImGui::End();
     data->set_message("");
 }
-void BasicScene::setWindow(const char* header) {
+void BasicScene::setWindow(const char* header,GLuint texture) {
     ImGui::SetNextWindowPos(startPos);
     ImGui::SetNextWindowSize(windowSize);
     ImGui::SetNextWindowSizeConstraints(ImVec2(window_width, -1.0f), ImVec2(window_height, -1.0f));
@@ -1209,14 +1406,14 @@ void BasicScene::setWindow(const char* header) {
     ImVec2 window_pos = ImGui::GetWindowPos();
     ImVec2 image_pos = window_pos + ImGui::GetCursorPos();
     ImGui::GetWindowDrawList()->AddImage(
-            (void*)(intptr_t)backgroundImageTexture,
+            (void*)(intptr_t)texture,
             image_pos,
             image_pos + image_size,
             ImVec2(0, 0),
             ImVec2(1, 1),
             ImColor(255, 255, 255, 255)
     );
-
+    //ImGui::PopStyleColor(1);
     for(int i = 0; i< 3 ; i++){
         ImGui::Spacing();
     }
@@ -1279,4 +1476,18 @@ void BasicScene::AddViewportCallback(Viewport* _viewport)
     viewport = _viewport;
 
     Scene::AddViewportCallback(viewport);
+}
+
+
+ char* BasicScene::getInstructions(){
+
+   return ("\tWelcome to the 3D snake game! \n"
+          "\tPress the up,down,right,left keys to move with the snake\n"
+          "\taround the map. Be aware of obstacles,\n"
+          "\tmoving and standing.Eat as much animals and coins as you can.\n"
+          "\tEach eat will gain you score points,\n"
+          "\tand buying money for the store.\n"
+          "\tIn the store you can buy game helpers\n"
+          "\tsuch as extra life,double score, more speed etc.\n"
+          "\tGood Luck!");
 }
