@@ -90,7 +90,7 @@ private:
 
     void SettingsMenu();
     void setStartPos();
-    void setWindow(const char* header,GLuint texture);
+    void setWindow(const char* header,GLuint texture, ImVec4 color);
     void endWindow();
     void buttonStyle();
     void setBoxes();

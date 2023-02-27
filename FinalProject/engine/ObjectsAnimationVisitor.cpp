@@ -99,7 +99,7 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
     if(basicScene->getStatistics()->levelUp){
         basicScene->animate = false;
         basicScene->start_time= 0.0f;
-        removeFormerlevel();
+        //removeFormerlevel();
         loadNextLevel(basicScene->getStatistics()->level+1);
         basicScene->snake->reset_sake();
         basicScene->resetCameras();
@@ -107,16 +107,22 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
     }
     else if(basicScene->getStatistics()->restart){
         basicScene->animate = false;
-        removeFormerlevel();
+        //removeFormerlevel();
         loadNextLevel(1);
         basicScene->snake->reset_sake();
         basicScene->resetCameras();
         basicScene->getStatistics()->restart = false;
-        basicScene->getStatistics()->menu_flags[MainMenu_OP] = true;
-        basicScene->start_time = 0.0;
+        int size = basicScene->getData()->back_to_main.size();
+        if( size ==0) {
+//            basicScene->getStatistics()->menu_flags[MainMenu_OP] = true;
+        }else{
+//            int next = basicScene->getData()->back_to_main.front();
+//            basicScene->getData()->back_to_main.pop_back();
+//            basicScene->getStatistics()->menu_flags[next] = true;
+        }
+//        basicScene->start_time = 0.0;
     }
-
-    if(basicScene->getStatistics()->won){
+    else if(basicScene->getStatistics()->won){
         basicScene->animate = false;
         basicScene->getStatistics()->won = false;
         basicScene->getStatistics()->menu_flags[WinMenu_OP] = true;
@@ -144,7 +150,6 @@ void ObjectsAnimationVisitor::removeFormerlevel(){
         special_bezier_not_in_use.push_back(bz);
     }
     special_bezier_in_use.clear();
-    coords.clear();
     clearAllAliveObjects(frogs_in_use,frogs_not_in_use);
     clearAllAliveObjects(mouses_in_use,mouses_not_in_use);
     clearAllAliveObjects(coins_in_use, coins_not_in_use);
@@ -157,6 +162,7 @@ void ObjectsAnimationVisitor::clearAllAliveObjects(std::vector<std::shared_ptr<M
     }
     objects_in_use.clear();
 }
+
 void ObjectsAnimationVisitor::loadNextLevel(int nextLevel){
     switch (nextLevel) {
         case 1:
@@ -530,6 +536,7 @@ void ObjectsAnimationVisitor::CreateLevel3(std::vector<shared_ptr<Model>> &model
         coords.push_back(position);
         std::shared_ptr<Model> cube = createBrick();
         cube->Translate(position);
+        cube->Scale(scale);
     }
 }
 

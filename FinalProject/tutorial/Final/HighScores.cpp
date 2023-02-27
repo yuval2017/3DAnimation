@@ -1,7 +1,8 @@
 
-#include <sys/stat.h>
 #include "HighScores.h"
 #include <sstream>
+#include <sys/stat.h>
+
 
 HighScores::HighScores() {
     this->numOfScoresInTable = 0;
