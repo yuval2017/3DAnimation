@@ -296,8 +296,8 @@ void ObjectsAnimationVisitor::Visit(Scene *scene) {
             std::shared_ptr<Model> coin = createCoin();
             Eigen::Vector3f pos = get_point(coinPoints);
             coin->Translate(pos);
-            coin->stopper.start(len1);
-            stopperCoin->start(sec1);
+            coin->stopper.start(len3);
+            stopperCoin->start(sec3);
         }
     }
     for(const std::shared_ptr<Model>& model: special_bezier_in_use) {
@@ -555,6 +555,21 @@ void ObjectsAnimationVisitor::CreateLevel1(std::vector<shared_ptr<Model>> &model
     sphere_scale = 1.0f;
     int n = 100;
     init_point_givers();
+    for (const std::shared_ptr<Model> &frog: frogs_not_in_use){
+        frog->Scale(frog_scale);
+    }
+    for (const std::shared_ptr<Model> &mouse: mouses_not_in_use){
+        mouse->Scale(mouse_scale);
+    }
+    for (const std::shared_ptr<Model> &coin: coins_not_in_use){
+        coin->Scale(coin_scale);
+    }
+    for (const std::shared_ptr<Model> &sphere: special_bezier_in_use){
+        sphere->Scale(sphere_scale);
+    }
+    for (const std::shared_ptr<Model> &brick: bricks_not_in_use){
+        brick->Scale(brick_scale);
+    }
     generatePointsInMapLevel(coords, n);
     for (int i = 0; i < n; i++) {
         Eigen::Vector3f position = coords[i];
@@ -579,13 +594,19 @@ void ObjectsAnimationVisitor::CreateLevel2(std::vector<shared_ptr<Model>> &model
     init_point_givers();
     int n = 150;
     for (const std::shared_ptr<Model> &frog: frogs_not_in_use){
-        frog->Scale(0.3);
+        frog->Scale(frog_scale);
     }
     for (const std::shared_ptr<Model> &mouse: mouses_not_in_use){
-        mouse->Scale(0.3);
+        mouse->Scale(mouse_scale);
     }
     for (const std::shared_ptr<Model> &coin: coins_not_in_use){
-        coin->Scale(0.5);
+        coin->Scale(coin_scale);
+    }
+    for (const std::shared_ptr<Model> &sphere: special_bezier_in_use){
+        sphere->Scale(sphere_scale);
+    }
+    for (const std::shared_ptr<Model> &brick: bricks_not_in_use){
+        brick->Scale(brick_scale);
     }
     generatePointsInMapLevel(coords, n);
     for (int i = 0; i < n; i++) {
@@ -607,13 +628,27 @@ void ObjectsAnimationVisitor::CreateLevel3(std::vector<shared_ptr<Model>> &model
     sphere_scale = 2.0f;
     init_point_givers();
     int n = 200;
+    for (const std::shared_ptr<Model> &frog: frogs_not_in_use){
+        frog->Scale(frog_scale);
+    }
+    for (const std::shared_ptr<Model> &mouse: mouses_not_in_use){
+        mouse->Scale(mouse_scale);
+    }
+    for (const std::shared_ptr<Model> &coin: coins_not_in_use){
+        coin->Scale(coin_scale);
+    }
+    for (const std::shared_ptr<Model> &sphere: special_bezier_in_use){
+        sphere->Scale(sphere_scale);
+    }
+    for (const std::shared_ptr<Model> &brick: bricks_not_in_use){
+        brick->Scale(brick_scale);
+    }
     generatePointsInMapLevel(coords, n);
     for (int i = 0; i < n; i++) {
         Eigen::Vector3f position = coords[i];
         coords.push_back(position);
         std::shared_ptr<Model> cube = createBrick();
         cube->Translate(position);
-        cube->Scale(2);
     }
 }
 
