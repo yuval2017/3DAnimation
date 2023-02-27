@@ -37,10 +37,12 @@ namespace cg3d {
         shared_ptr<Model> createCoin();
         shared_ptr<Model> createSphere();
         shared_ptr<Model> createBrick();
+        shared_ptr<Model> createBezier();
         //remove
         void removeFrog(const shared_ptr<Model>& frog);
         void removeMouse(const shared_ptr<Model>& mouse);
         void removeCoin(const shared_ptr<Model>& coin);
+        void removeBezier(const shared_ptr<Model>& coin);
         void removeSphere(const shared_ptr<Model>& sphere);
         void removeBricks(const shared_ptr<Model>& cube);
 
@@ -62,7 +64,10 @@ namespace cg3d {
         Stopper* stopperCoin;
         Stopper* snakeSpeed;
         Stopper* stopperSpecialBezier;
+        Stopper *stopperBezier;
         int sec_between_specialbezier = 10;
+        int sec_bezier = 10;
+        int len_bezier = 70;
         std::queue<Eigen::Vector3f > frogPoints;
         std::queue<Eigen::Vector3f > mousePoints;
         std::queue<Eigen::Vector3f > coinPoints;
