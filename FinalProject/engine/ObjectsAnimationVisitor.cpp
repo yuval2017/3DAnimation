@@ -156,7 +156,6 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
     if(basicScene->getStatistics()->levelUp){
         basicScene->animate = false;
         basicScene->start_time= 0.0f;
-        //removeFormerlevel();
         loadNextLevel(basicScene->getStatistics()->level+1);
         basicScene->snake->reset_sake();
         basicScene->resetCameras();
@@ -164,20 +163,19 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
     }
     else if(basicScene->getStatistics()->restart){
         basicScene->animate = false;
-        //removeFormerlevel();
         loadNextLevel(1);
         basicScene->snake->reset_sake();
         basicScene->resetCameras();
         basicScene->getStatistics()->restart = false;
         int size = basicScene->getData()->back_to_main.size();
         if( size ==0) {
-//            basicScene->getStatistics()->menu_flags[MainMenu_OP] = true;
+            basicScene->getStatistics()->menu_flags[MainMenu_OP] = true;
         }else{
-//            int next = basicScene->getData()->back_to_main.front();
-//            basicScene->getData()->back_to_main.pop_back();
-//            basicScene->getStatistics()->menu_flags[next] = true;
+            int next = basicScene->getData()->back_to_main.front();
+            basicScene->getData()->back_to_main.pop_back();
+            basicScene->getStatistics()->menu_flags[next] = true;
         }
-//        basicScene->start_time = 0.0;
+          basicScene->start_time = 0.0;
     }
     else if(basicScene->getStatistics()->won){
         basicScene->animate = false;
@@ -198,15 +196,34 @@ void ObjectsAnimationVisitor::get_map_max_min(Eigen::Vector3f &max, Eigen::Vecto
 }
 
 
-void ObjectsAnimationVisitor::removeFormerlevel(){
+void ObjectsAnimationVisitor::removeFormerlevel(int index){
 
-    for(const shared_ptr<Model>& model : models) {
-        if (model != nullptr) {
-            basicScene->GetRoot()->RemoveChild(model);
-        }
+    switch (index) {
+
+        case 1 :
+            if(!basicScene->level1->isHidden){
+                basicScene->level1->isHidden = true;
+            }
+            break;
+        case 2 :
+            if(!basicScene->level1->isHidden){
+                basicScene->level1->isHidden = true;
+            }
+            break;
+        case 3 :
+            if(!basicScene->level1->isHidden){
+                basicScene->level1->isHidden = true;
+            }
+            break;
+
     }
-    models.clear();
-    coords.clear();
+//    for(const shared_ptr<Model>& model : models) {
+//        if (model != nullptr) {
+//            basicScene->GetRoot()->RemoveChild(model);
+//        }
+//    }
+//    models.clear();
+//    coords.clear();
 }
 
 void ObjectsAnimationVisitor::loadNextLevel(int nextLevel){
@@ -220,12 +237,15 @@ void ObjectsAnimationVisitor::loadNextLevel(int nextLevel){
     }
     switch (nextLevel) {
         case 1:
+            removeFormerlevel(3);
             CreateLevel1(models, coords);
             break;
         case 2:
+            removeFormerlevel(1);
             CreateLevel2(models, coords);
             break;
         case 3:
+            removeFormerlevel(1);
             CreateLevel3(models, coords);
             break;
         default:
@@ -418,6 +438,8 @@ shared_ptr<Model> ObjectsAnimationVisitor::createCoin(){
 }
 
 void ObjectsAnimationVisitor::CreateLevel1(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords) {
+
+    basicScene->level1->isHidden =false;
     init_point_givers();
     int n = 20;
     models.resize(0);
@@ -450,7 +472,8 @@ void ObjectsAnimationVisitor::CreateLevel1(std::vector<shared_ptr<Model>> &model
     basicScene->AddChild(tree);
     tree->SetTreeAndCube(ModelsFactory::getInstance()->bounding_boxes[TREE],ModelsFactory::getInstance()->trees[TREE]);
     tree->Translate({10.0,0,10.0});
-
+    basicScene->getStatistics()->speed = 1;
+    basicScene->snake->speed = 1;
     for (int i = 0; i < 5; i++) {
         std::shared_ptr<Model> frog = createFrog();
         frog->isHidden = true;
@@ -467,6 +490,7 @@ void ObjectsAnimationVisitor::CreateLevel1(std::vector<shared_ptr<Model>> &model
     }
 }
 void ObjectsAnimationVisitor::CreateLevel2(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords) {
+    basicScene->level2->isHidden =false;
     init_point_givers();
     int n = 30;
     models.resize(0);
@@ -482,7 +506,8 @@ void ObjectsAnimationVisitor::CreateLevel2(std::vector<shared_ptr<Model>> &model
     int scale = 4;
     std::vector<Calculates::ObjectInfo> cubes;
     Calculates::getInstance()->setRandomCubeLocations(x_length, y_length, z_length, n,  scale, cubes);
-
+    basicScene->getStatistics()->speed = 2;
+    basicScene->snake->speed = 2;
     for (int i = 0; i < n; i++) {
         Eigen::Vector3f position = cubes[i].position.cast<float>();
         coords.push_back(position);
@@ -497,6 +522,7 @@ void ObjectsAnimationVisitor::CreateLevel2(std::vector<shared_ptr<Model>> &model
 
 
 void ObjectsAnimationVisitor::CreateLevel3(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords) {
+    basicScene->level3->isHidden =false;
     init_point_givers();
     int n = 40;
     models.resize(0);
@@ -512,7 +538,8 @@ void ObjectsAnimationVisitor::CreateLevel3(std::vector<shared_ptr<Model>> &model
     int scale = 5;
     std::vector<Calculates::ObjectInfo> cubes;
     Calculates::getInstance()->setRandomCubeLocations(x_length, y_length, z_length, n,  scale, cubes);
-
+    basicScene->getStatistics()->speed = 3;
+    basicScene->snake->speed = 3;
     for (int i = 0; i < n; i++) {
         Eigen::Vector3f position = cubes[i].position.cast<float>();
         coords.push_back(position);

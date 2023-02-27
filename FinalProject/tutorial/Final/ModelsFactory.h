@@ -14,15 +14,17 @@
 #include <igl/AABB.h>
 
 
-#define BASIC_MATERIAL 0
-#define PHONG_MATERIAL 1
+#define BASIC_MATERIAL  0
+#define PHONG_MATERIAL  1
 #define BRICKS_MATERIAL 2
-#define DAYLIGHT_MATERIAL 3
-#define GREEN_MATERIAL 4
-#define GREY_MATERIAL 5
-#define GOLD_MATERIAL 6
-#define FROG_MATERIAL 7
-#define TREE_MATERIAL 8
+#define DAYLIGHT_MATERIAL   3
+#define GREEN_MATERIAL  4
+#define GREY_MATERIAL   5
+#define GOLD_MATERIAL   6
+#define FROG_MATERIAL   7
+#define TREE_MATERIAL   8
+#define LEVEL2_MAP      9
+#define LEVEL3_MAP      10
 #define CUBE 0
 #define CYL 1
 #define SPHERE 2
@@ -34,7 +36,7 @@
 #define FROG 8
 #define MOUSE 9
 //increment every mesh or material
-#define NUMBER_OF_MATERIALS 9
+#define NUMBER_OF_MATERIALS 11
 #define NUMBER_OF_MESHES 10
 #define TREE_PATH "data/masktree_obj/masktree.obj"
 
@@ -64,6 +66,8 @@ public:
     //7) gold material
     //8) frog material
     //9) tree material
+    //10)level2 map
+    //11) level3 map
 
     //meshes
     std::shared_ptr<Mesh> meshes[NUMBER_OF_MESHES];

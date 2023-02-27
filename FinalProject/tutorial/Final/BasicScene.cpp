@@ -36,6 +36,11 @@ void BasicScene::Init(float fov, int width, int height, float near, float far) {
 }
 
 
+void BasicScene::SetCamera(int index)
+{
+    camera = cameras[index];
+    viewport->camera = camera;
+}
 void BasicScene::init_cameras(float fov, int width, int height,float near, float far) {
 
     //Set camera list
@@ -71,7 +76,7 @@ void BasicScene::init_cameras(float fov, int width, int height,float near, float
     cameras[2]->RotateByDegree(-15.f, Movable::Axis::X);
 
     //Set over-view
-    //snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[3]);
+    snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[3]);
     cameras[3]->Translate(Eigen::Vector3f(-5.f, 10.f, -50.f));
     cameras[3]->Rotate(M_PI, Movable::Axis::Y);
     cameras[3]->RotateByDegree(-15.f, Movable::Axis::X);
@@ -79,7 +84,6 @@ void BasicScene::init_cameras(float fov, int width, int height,float near, float
     camera = cameras[3];
 
 }
-
 void BasicScene::resetCameras(){
     //set the cameras on the new snake after level up.
     snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[0]);
@@ -88,18 +92,8 @@ void BasicScene::resetCameras(){
 
     snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[2]);
 
-    //snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[3]);
+    snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[3]);
 }
-
-
-BasicScene::BasicScene(std::string name, Display* display) : SceneWithImGui(std::move(name), display)
-{
-    ImGui::GetIO().IniFilename = nullptr;
-    ImGui::StyleColorsDark();
-    ImGuiStyle& style = ImGui::GetStyle();
-    style.FrameRounding = 5.0f;
-}
-
 void BasicScene::initProperties( int width, int height){
     windowFlags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar |
                   ImGuiWindowFlags_NoResize |ImGuiWindowFlags_NoBringToFrontOnFocus  |
@@ -111,9 +105,6 @@ void BasicScene::initProperties( int width, int height){
     data = Data::getInstance();
     windowSize = ImVec2(window_width, window_height);
 }
-
-
-
 void BasicScene::setImage(){
 
     //setting the snake texture.
@@ -247,7 +238,6 @@ void BasicScene::setImage(){
         std::cout << "win image loaded successfully! " << std::endl;
     }
 }
-
 void BasicScene::setFonts() {
     ImGuiIO &io = ImGui::GetIO();
     ImFontConfig font_config;
@@ -255,21 +245,17 @@ void BasicScene::setFonts() {
     font_config.GlyphOffset = ImVec2(0.0f, -1.0f); // Set glyph offset to adjust for extra spacing
     font_config.SizePixels = 20.0f;
     headerFont = io.Fonts->AddFontFromFileTTF("../tutorial/Final/fonts/Broxford.otf", 24.0f, &font_config);
-    messageFont = io.Fonts->AddFontFromFileTTF("../tutorial/Final/fonts/Amena.otf", 18.0f, &font_config);
+    messageFont = io.Fonts->AddFontFromFileTTF("../tutorial/Final/fonts/Amena.otf", 20.0f, &font_config);
     leadersFont = io.Fonts->AddFontFromFileTTF("../tutorial/Final/fonts/Castron.otf", 30.0f, &font_config);
     regularFont = io.Fonts->AddFontFromFileTTF("../tutorial/Final/fonts/Castron.otf", 20.0f, &font_config);
 }
-
 void BasicScene::setStartPos() {
 
     int height = (screen_height - window_height)/2.0f  ;
     int width = (screen_width - window_width)/2.0f ;
     startPos = ImVec2(width,height);
-     height = (screen_height - image_height)/2.0f  ;
-     width = (screen_width - image_width)/2.0f ;
 
 }
-
 void BasicScene::BuildImGui(){
     loadingMenu();
     startMenu();
@@ -282,208 +268,6 @@ void BasicScene::BuildImGui(){
     SettingsMenu();
     PlayMenu();
 }
-
-void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, const Eigen::Matrix4f& view, const Eigen::Matrix4f& model)
-{
-    Scene::Update(program, proj, view, model);
-    char * green = "green";
-    char* grey = "grey";
-    char* gold = "gold";
-    int resgreen = (program.name).compare(green);
-    int resgrey = (program.name).compare(grey);
-    int resgold = (program.name).compare(gold);
-    if( resgreen == 0 ){
-        program.SetUniform4f("lightColor", 0.8f, 0.9f, 0.6f, 1.0f);
-        program.SetUniform4f("Kai", 0.2f, 0.4f, 0.1f, 1.0f);
-        program.SetUniform4f("Kdi", 0.2f, 0.4f, 0.1f, 1.0f);
-        program.SetUniform1f("specular_exponent", 10.0f);
-        program.SetUniform4f("light_position", 0.0, 15.0f, 0.0, 1.0f);
-    }
-    else if(resgrey == 0){
-        program.SetUniform4f("lightColor", 0.7f, 0.7f, 0.7f, 1.0f);
-        program.SetUniform4f("Kai", 0.3f, 0.3f, 0.3f, 1.0f);
-        program.SetUniform4f("Kdi", 0.3f, 0.3f, 0.3f, 1.0f);
-        program.SetUniform1f("specular_exponent", 20.0f);
-        program.SetUniform4f("light_position", 0.0, 15.0f, 0.0, 1.0f);
-    }
-    else if(resgold == 0){
-        program.SetUniform4f("lightColor", 1.0f, 0.8f, 0.1f, 1.0f);
-        program.SetUniform4f("Kai", 0.8f, 0.6f, 0.1f, 1.0f);
-        program.SetUniform4f("Kdi", 0.8f, 0.6f, 0.1f, 1.0f );
-        program.SetUniform1f("specular_exponent", 50.0f);
-        program.SetUniform4f("light_position", 0.0, 15.0f, 0.0, 1.0f);
-    }
-    else{
-        program.SetUniform4f("lightColor", 0.8f, 0.3f, 0.0f, 0.5f);
-        program.SetUniform4f("Kai", 1.0f, 0.3f, 0.6f, 1.0f);
-        program.SetUniform4f("Kdi", 0.5f, 0.5f, 0.0f, 1.0f);
-        program.SetUniform1f("specular_exponent", 5.0f);
-        program.SetUniform4f("light_position", 0.0, 15.0f, 0.0, 1.0f);
-    }
-
-
-}
-
-void BasicScene::MouseCallback(Viewport* viewport, int x, int y, int button, int action, int mods, int buttonState[])
-{
-//    // note: there's a (small) chance the button state here precedes the mouse press/release event
-//
-//    if (action == GLFW_PRESS && animate) { // default mouse button press behavior
-//        PickVisitor visitor;
-//        visitor.Init();
-//        renderer->RenderViewportAtPos(x, y, &visitor); // pick using fixed colors hack
-//        auto modelAndDepth = visitor.PickAtPos(x, renderer->GetWindowHeight() - y);
-//        renderer->RenderViewportAtPos(x, y); // draw again to avoid flickering
-//        pickedModel = modelAndDepth.first ? std::dynamic_pointer_cast<Model>(modelAndDepth.first->shared_from_this()) : nullptr;
-//        pickedModelDepth = modelAndDepth.second;
-//        camera->GetRotation().transpose();
-//        xAtPress = x;
-//        yAtPress = y;
-        // if (pickedModel)
-        //     debug("found ", pickedModel->isPickable ? "pickable" : "non-pickable", " model at pos ", x, ", ", y, ": ",
-        //           pickedModel->name, ", depth: ", pickedModelDepth);
-        // else
-        //     debug("found nothing at pos ", x, ", ", y);
-
-//        if (pickedModel && !pickedModel->isPickable)
-//            pickedModel = nullptr; // for non-pickable models we need only pickedModelDepth for mouse movement calculations later
-//
-//        if (pickedModel)
-//            pickedToutAtPress = pickedModel->GetTout();
-//        else
-//            cameraToutAtPress = camera->GetTout();
-//    }
-}
-
-void BasicScene::ScrollCallback(Viewport* viewport, int x, int y, int xoffset, int yoffset, bool dragging, int buttonState[])
-{
-    // note: there's a (small) chance the button state here precedes the mouse press/release event
-    auto system = camera->GetRotation().transpose();
-    if (pickedModel) {
-        pickedModel->TranslateInSystem(system, {0, 0, -float(yoffset)});
-        pickedToutAtPress = pickedModel->GetTout();
-    } else {
-        camera->TranslateInSystem(system, {0, 0, -float(yoffset)});
-        cameraToutAtPress = camera->GetTout();
-    }
-}
-
-void BasicScene::CursorPosCallback(Viewport* viewport, int x, int y, bool dragging, int* buttonState)
-{
-    if (dragging && animate) {
-        auto system = camera->GetRotation().transpose() * GetRotation();
-        auto moveCoeff = camera->CalcMoveCoeff(pickedModelDepth, viewport->width);
-        auto angleCoeff = camera->CalcAngleCoeff(viewport->width);
-        if (pickedModel) {
-            //pickedModel->SetTout(pickedToutAtPress);
-            if (buttonState[GLFW_MOUSE_BUTTON_RIGHT] != GLFW_RELEASE)
-                pickedModel->TranslateInSystem(system, {-float(xAtPress - x) / moveCoeff, float(yAtPress - y) / moveCoeff, 0});
-            if (buttonState[GLFW_MOUSE_BUTTON_MIDDLE] != GLFW_RELEASE)
-                pickedModel->RotateInSystem(system, float(xAtPress - x) / angleCoeff, Axis::Z);
-            if (buttonState[GLFW_MOUSE_BUTTON_LEFT] != GLFW_RELEASE) {
-                pickedModel->RotateInSystem(system, float(xAtPress - x) / angleCoeff, Axis::Y);
-                pickedModel->RotateInSystem(system, float(yAtPress - y) / angleCoeff, Axis::X);
-            }
-        } else {
-            // camera->SetTout(cameraToutAtPress);
-            if (buttonState[GLFW_MOUSE_BUTTON_RIGHT] != GLFW_RELEASE)
-                root->TranslateInSystem(system, {-float(xAtPress - x) / moveCoeff/10.0f, float( yAtPress - y) / moveCoeff/10.0f, 0});
-            if (buttonState[GLFW_MOUSE_BUTTON_MIDDLE] != GLFW_RELEASE)
-                root->RotateInSystem(system, float(x - xAtPress) / 180.0f, Axis::Z);
-            if (buttonState[GLFW_MOUSE_BUTTON_LEFT] != GLFW_RELEASE) {
-                root->RotateInSystem(system, float(x - xAtPress) / angleCoeff, Axis::Y);
-                root->RotateInSystem(system, float(y - yAtPress) / angleCoeff, Axis::X);
-            }
-        }
-        xAtPress =  x;
-        yAtPress =  y;
-    }
-}
-
-void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scancode, int action, int mods)
-{
-    auto system = camera->GetRotation().transpose();
-
-    if (action == GLFW_PRESS || action == GLFW_REPEAT) {
-        switch (key) // NOLINT(hicpp-multiway-paths-covered)
-        {
-            case GLFW_KEY_ESCAPE:
-                glfwSetWindowShouldClose(window, GLFW_TRUE);
-                break;
-            case GLFW_KEY_UP:
-                snake->MoveUp();
-                break;
-            case GLFW_KEY_DOWN:
-                snake->MoveDone();
-                break;
-            case GLFW_KEY_LEFT:
-                snake->MoveLeft();
-
-                break;
-            case GLFW_KEY_RIGHT:
-                snake->MoveRight();
-                break;
-            case GLFW_KEY_W:
-                camera->TranslateInSystem(system, {0, 0.1f, 0});
-                break;
-            case GLFW_KEY_P:
-                if(animate) {
-                    animate = false;
-                    statistics->menu_flags[PauseMenu_OP] = true;
-                }
-                else{
-                    statistics->menu_flags[PauseMenu_OP] = false;
-                    animate = true;
-                }
-                break;
-            case GLFW_KEY_S:
-                camera->TranslateInSystem(system, {0, -0.1f, 0});
-                break;
-            case GLFW_KEY_R:
-                animate = !animate;
-                //snake->reset_sake();
-                animate = true;
-                break;
-            case GLFW_KEY_A:
-                camera->TranslateInSystem(system, {-0.1f, 0, 0});
-                break;
-            case GLFW_KEY_D:
-                camera->TranslateInSystem(system, {0.1f, 0, 0});
-                break;
-            case GLFW_KEY_B:
-                camera->TranslateInSystem(system, {0, 0, 0.1f});
-                break;
-            case GLFW_KEY_C:
-                if(animate) {
-                    statistics->inc_Score(1,1,1);
-                }
-                break;
-            case GLFW_KEY_F:
-                camera->TranslateInSystem(system, {0, 0, -0.1f});
-                break;
-            case GLFW_KEY_1:
-                SetCamera(0);
-                break;
-            case GLFW_KEY_2:
-                SetCamera(1);
-                break;
-            case GLFW_KEY_3:
-                SetCamera(2);
-                break;
-            case GLFW_KEY_4:
-                SetCamera(3);
-                break;
-        }
-    }
-}
-
-Eigen::Vector3f BasicScene::GetSpherePos()
-{
-    Eigen::Vector3f l = Eigen::Vector3f(1.6f,0,0);
-    Eigen::Vector3f res;
-    return res;
-}
-
 void BasicScene::init_objects() {
     AddChild(root = Movable::Create("root")); // a common (invisible) parent object for all the shapes
     level1 = ModelsFactory::getInstance()->CreateModel(DAYLIGHT_MATERIAL,CUBE,"background");
@@ -491,6 +275,18 @@ void BasicScene::init_objects() {
     level1->Scale(200, Axis::XYZ);
     level1->SetPickable(false);
     level1->SetStatic();
+    level2 = ModelsFactory::getInstance()->CreateModel(LEVEL2_MAP,CUBE,"background");
+    AddChild(level2);
+    level2->Scale(200, Axis::XYZ);
+    level2->SetPickable(false);
+    level2->SetStatic();
+    level3 = ModelsFactory::getInstance()->CreateModel(LEVEL3_MAP,CUBE,"background");
+    AddChild(level3);
+    level3->Scale(200, Axis::XYZ);
+    level3->SetPickable(false);
+    level3->SetStatic();
+    currLevelMap = level1;
+
     auto program = std::make_shared<Program>("shaders/phongShader");
     material =  std::make_shared<Material>("material", program); // empty material
     material->AddTexture(0, "textures/box0.bmp", 2);
@@ -509,6 +305,15 @@ void BasicScene::init_helpers(){
     done++;
 
 }
+Eigen::Vector3f BasicScene::GetSpherePos()
+{
+    Eigen::Vector3f l = Eigen::Vector3f(1.6f,0,0);
+    Eigen::Vector3f res;
+    return res;
+}
+
+
+
 
 void BasicScene::loadingMenu() {
 
@@ -525,7 +330,7 @@ void BasicScene::loadingMenu() {
         float current_time = ImGui::GetTime();
 
         // Calculate the progress as a value between 0 and 1
-        float progress =  (done == 3) ? std::min((current_time - start_time) / 120.f, 1.0f) : start_time;
+        float progress =  (done == 3) ? std::min((current_time - start_time) / 110.f, 1.0f) : start_time;
 
 
         // Call the callback function when progress reaches 100%
@@ -549,8 +354,6 @@ void BasicScene::loadingMenu() {
         endWindow();
     }
 }
-
-
 void BasicScene::startMenu() {
 
     if(statistics->menu_flags[MainMenu_OP]) {
@@ -878,6 +681,10 @@ void BasicScene::NextLevelMenu() {
         ImGui::PushStyleColor(ImGuiCol_Button, black); // set checkbox check color
         ImGui::PushStyleColor(ImGuiCol_Text, black); // set checkbox check color
         ImGui::PushStyleColor(ImGuiCol_WindowBg, black); // set checkbox check color
+        // Set the background color of the text to light gray
+        ImGui::PushStyleColor(ImGuiCol_TextDisabled, ImVec4(1.0f, 1.0f, 1.0f, 1.0f));
+        ImVec4 backgroundColor = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+
 
         setWindow("Level Up",backgroundLevelTexture,black);
         ImGui::PushFont(regularFont);
@@ -900,14 +707,27 @@ void BasicScene::NextLevelMenu() {
         int frogs = data->frog_Scores[statistics->level +1];
         int mice = data->mouse_Scores[statistics->level +1];
         ImGui::Text("Next goal:");
+        // Get the cursor position and text size
+
+        ImVec2 textSize = ImGui::CalcTextSize(" Number of frogs: %d . \t");
+        ImVec2 cursorPos = ImGui::GetCursorScreenPos()+ImVec2(120,-(textSize.y+5));
+        // Draw the background rectangle
+        ImGui::SameLine();
+        ImGui::GetWindowDrawList()->AddRectFilled(cursorPos + ImVec2(ImGui::GetWindowWidth()/2,0), cursorPos + textSize+ImVec2(0,100), ImGui::GetColorU32(backgroundColor));
         ImGui::SameLine(ImGui::GetWindowWidth()/2);
-        ImGui::Text(" Number of frogs: %d",frogs);
+        ImGui::Text(" Number of frogs: %d .",frogs);
+        ImGui::Text("");
+        textSize = ImGui::CalcTextSize("Number of mice: %d \t");
+        cursorPos = ImGui::GetCursorScreenPos()+ImVec2(120,-(textSize.y+5));
+        // Draw the background rectangle
+        ImGui::SameLine();
+        ImGui::GetWindowDrawList()->AddRectFilled(cursorPos + ImVec2(ImGui::GetWindowWidth()/2,0), cursorPos + textSize+ textSize+ImVec2(0,100), ImGui::GetColorU32(backgroundColor));
         ImGui::SameLine(ImGui::GetWindowWidth()/2);
         ImGui::Text("Number of mice: %d",mice);
         for (int i = 0; i < 3; i++) {
             ImGui::Spacing();
         }
-
+        ImGui::PopStyleColor();
         buttonStyle();
         // Get the current time in seconds
         float current_time = ImGui::GetTime();
@@ -966,8 +786,6 @@ void BasicScene::NextLevelMenu() {
         endWindow();
     }
 }
-
-
 void BasicScene::WinMenu() {
 
     if (statistics->menu_flags[WinMenu_OP]) {
@@ -995,7 +813,8 @@ void BasicScene::WinMenu() {
                 }
             }
         }
-       static bool saved = false;
+        static bool saved = false;
+        static char* msg ;
         if(pos != -1){
             ImGui::Text("Please type your name to save in\nleader board: ");
             static char name[256] = ""; // buffer to store the input string
@@ -1009,6 +828,7 @@ void BasicScene::WinMenu() {
                 scor->score = statistics->score;
                 highScores->saveToHighScores(scor, pos);
                 data->set_message("your score was saved!");
+                std::memset(name, 0, sizeof(name));
                 saved = true;
 
             }
@@ -1052,7 +872,7 @@ void BasicScene::WinMenu() {
         }
         ImGui::PopFont();
         ImGui::PushFont(messageFont);
-        ImGui::Text("%s", data->msg_c_str());
+        ImGui::Text("%s",msg);
         if(pos != -1) {
             for (int i = 0; i < 30; i++) {
                 ImGui::Spacing();
@@ -1068,8 +888,6 @@ void BasicScene::WinMenu() {
         endWindow();
     }
 }
-
-
 void BasicScene::LoseMenu() {
 
     if (statistics->menu_flags[GameOverMenu_OP]) {
@@ -1127,6 +945,7 @@ void BasicScene::LoseMenu() {
             }
         }
         static bool saved = false;
+        static char* msg;
         if (pos != -1) {
             ImGui::Text("Please type your name to save in\nleader board: ");
             static char name[256] = ""; // buffer to store the input string
@@ -1140,6 +959,7 @@ void BasicScene::LoseMenu() {
                 scor->score = statistics->score;
                 highScores->saveToHighScores(scor, pos);
                 data->set_message("your score was saved!");
+                std::memset(name, 0, sizeof(name));
                 saved = true;
             }
         }
@@ -1164,7 +984,6 @@ void BasicScene::LoseMenu() {
                 std::cout << "Back button pressed in lose menu." << endl;
                 data->back_to_main.clear();
                 statistics->menu_flags[GameOverMenu_OP] = false;
-
                 data->add_total_money(statistics->score / 10);
                 statistics->reset_game();
                 statistics->objectCollisionStopper.reset();
@@ -1180,7 +999,7 @@ void BasicScene::LoseMenu() {
         }
         ImGui::PopFont();
         ImGui::PushFont(messageFont);
-        ImGui::Text("%s", data->msg_c_str());
+        ImGui::Text("%s",msg);
         for (int i = 0; i < 15; i++) {
             ImGui::Spacing();
         }
@@ -1442,14 +1261,6 @@ void BasicScene::PlayMenu()
         ImGui::End();
     }
 }
-
-
-void BasicScene::SetCamera(int index)
-{
-    camera = cameras[index];
-    viewport->camera = camera;
-}
-
 void BasicScene::buttonStyle() {
     // Set button color to dark green
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.5f, 0.0f, 1.0f));
@@ -1522,9 +1333,13 @@ void BasicScene::setWindow(const char* header,GLuint texture, ImVec4 color) {
     }
 
 }
+
+
 BasicScene::~BasicScene(){
     delete soundManager;
 }
+
+
 Score* BasicScene::generateRandomScore() {
     // Generate random score between 0 and 100
     std::random_device rd;
@@ -1543,14 +1358,30 @@ Score* BasicScene::generateRandomScore() {
     ret->score = score;
     return ret;
 }
-
 SoundManager* BasicScene::getSoundManager() {
     return soundManager;
 }
-
 GameStatistics* BasicScene::getStatistics(){
     return this->statistics;
 }
+char* BasicScene::getInstructions(){
+
+    return ("\tWelcome to the 3D snake game! \n"
+            "\tPress the up,down,right,left keys to move with the snake\n"
+            "\taround the map. Be aware of obstacles,\n"
+            "\tmoving and standing.Eat as much animals and coins as you can.\n"
+            "\tEach eat will gain you score points,\n"
+            "\tand buying money for the store.\n"
+            "\tFor each level, there is number of animals to eat to pass it.\n"
+            "\t You can switch between cameras with the buttons or by the numbers 1-4\n"
+            "\tIn the store you can buy game helpers\n"
+            "\tsuch as extra life,double score, more speed etc.\n"
+            "\tGood Luck!");
+}
+Data *BasicScene::getData() {
+    return data;
+}
+
 
 
 void BasicScene::ViewportSizeCallback(Viewport* _viewport)
@@ -1560,30 +1391,206 @@ void BasicScene::ViewportSizeCallback(Viewport* _viewport)
 
     // note: we don't need to call Scene::ViewportSizeCallback since we are setting the projection of all the cameras
 }
-
 void BasicScene::AddViewportCallback(Viewport* _viewport)
 {
     viewport = _viewport;
 
     Scene::AddViewportCallback(viewport);
 }
+BasicScene::BasicScene(std::string name, Display* display) : SceneWithImGui(std::move(name), display)
+{
+    ImGui::GetIO().IniFilename = nullptr;
+    ImGui::StyleColorsDark();
+    ImGuiStyle& style = ImGui::GetStyle();
+    style.FrameRounding = 5.0f;
+}
+void BasicScene::Update(const Program& program, const Eigen::Matrix4f& proj, const Eigen::Matrix4f& view, const Eigen::Matrix4f& model)
+{
+    Scene::Update(program, proj, view, model);
+    char * green = "green";
+    char* grey = "grey";
+    char* gold = "gold";
+    int resgreen = (program.name).compare(green);
+    int resgrey = (program.name).compare(grey);
+    int resgold = (program.name).compare(gold);
+    if( resgreen == 0 ){
+        program.SetUniform4f("lightColor", 0.8f, 0.9f, 0.6f, 1.0f);
+        program.SetUniform4f("Kai", 0.2f, 0.4f, 0.1f, 1.0f);
+        program.SetUniform4f("Kdi", 0.2f, 0.4f, 0.1f, 1.0f);
+        program.SetUniform1f("specular_exponent", 10.0f);
+        program.SetUniform4f("light_position", 0.0, 15.0f, 0.0, 1.0f);
+    }
+    else if(resgrey == 0){
+        program.SetUniform4f("lightColor", 0.7f, 0.7f, 0.7f, 1.0f);
+        program.SetUniform4f("Kai", 0.3f, 0.3f, 0.3f, 1.0f);
+        program.SetUniform4f("Kdi", 0.3f, 0.3f, 0.3f, 1.0f);
+        program.SetUniform1f("specular_exponent", 20.0f);
+        program.SetUniform4f("light_position", 0.0, 15.0f, 0.0, 1.0f);
+    }
+    else if(resgold == 0){
+        program.SetUniform4f("lightColor", 1.0f, 0.8f, 0.1f, 1.0f);
+        program.SetUniform4f("Kai", 0.8f, 0.6f, 0.1f, 1.0f);
+        program.SetUniform4f("Kdi", 0.8f, 0.6f, 0.1f, 1.0f );
+        program.SetUniform1f("specular_exponent", 50.0f);
+        program.SetUniform4f("light_position", 0.0, 15.0f, 0.0, 1.0f);
+    }
+    else{
+        program.SetUniform4f("lightColor", 0.8f, 0.3f, 0.0f, 0.5f);
+        program.SetUniform4f("Kai", 1.0f, 0.3f, 0.6f, 1.0f);
+        program.SetUniform4f("Kdi", 0.5f, 0.5f, 0.0f, 1.0f);
+        program.SetUniform1f("specular_exponent", 5.0f);
+        program.SetUniform4f("light_position", 0.0, 15.0f, 0.0, 1.0f);
+    }
 
 
- char* BasicScene::getInstructions(){
+}
+void BasicScene::MouseCallback(Viewport* viewport, int x, int y, int button, int action, int mods, int buttonState[])
+{
+//    // note: there's a (small) chance the button state here precedes the mouse press/release event
+//
+//    if (action == GLFW_PRESS && animate) { // default mouse button press behavior
+//        PickVisitor visitor;
+//        visitor.Init();
+//        renderer->RenderViewportAtPos(x, y, &visitor); // pick using fixed colors hack
+//        auto modelAndDepth = visitor.PickAtPos(x, renderer->GetWindowHeight() - y);
+//        renderer->RenderViewportAtPos(x, y); // draw again to avoid flickering
+//        pickedModel = modelAndDepth.first ? std::dynamic_pointer_cast<Model>(modelAndDepth.first->shared_from_this()) : nullptr;
+//        pickedModelDepth = modelAndDepth.second;
+//        camera->GetRotation().transpose();
+//        xAtPress = x;
+//        yAtPress = y;
+    // if (pickedModel)
+    //     debug("found ", pickedModel->isPickable ? "pickable" : "non-pickable", " model at pos ", x, ", ", y, ": ",
+    //           pickedModel->name, ", depth: ", pickedModelDepth);
+    // else
+    //     debug("found nothing at pos ", x, ", ", y);
 
-   return ("\tWelcome to the 3D snake game! \n"
-          "\tPress the up,down,right,left keys to move with the snake\n"
-          "\taround the map. Be aware of obstacles,\n"
-          "\tmoving and standing.Eat as much animals and coins as you can.\n"
-          "\tEach eat will gain you score points,\n"
-          "\tand buying money for the store.\n"
-           "\tFor each level, there is number of animals to eat to pass it.\n"
-          "\t You can switch between cameras with the buttons or by the numbers 1-4\n"
-          "\tIn the store you can buy game helpers\n"
-          "\tsuch as extra life,double score, more speed etc.\n"
-          "\tGood Luck!");
+//        if (pickedModel && !pickedModel->isPickable)
+//            pickedModel = nullptr; // for non-pickable models we need only pickedModelDepth for mouse movement calculations later
+//
+//        if (pickedModel)
+//            pickedToutAtPress = pickedModel->GetTout();
+//        else
+//            cameraToutAtPress = camera->GetTout();
+//    }
+}
+void BasicScene::ScrollCallback(Viewport* viewport, int x, int y, int xoffset, int yoffset, bool dragging, int buttonState[])
+{
+    // note: there's a (small) chance the button state here precedes the mouse press/release event
+    auto system = camera->GetRotation().transpose();
+    if (pickedModel) {
+        pickedModel->TranslateInSystem(system, {0, 0, -float(yoffset)});
+        pickedToutAtPress = pickedModel->GetTout();
+    } else {
+        camera->TranslateInSystem(system, {0, 0, -float(yoffset)});
+        cameraToutAtPress = camera->GetTout();
+    }
+}
+void BasicScene::CursorPosCallback(Viewport* viewport, int x, int y, bool dragging, int* buttonState)
+{
+    if (dragging && animate) {
+        auto system = camera->GetRotation().transpose() * GetRotation();
+        auto moveCoeff = camera->CalcMoveCoeff(pickedModelDepth, viewport->width);
+        auto angleCoeff = camera->CalcAngleCoeff(viewport->width);
+        if (pickedModel) {
+            //pickedModel->SetTout(pickedToutAtPress);
+            if (buttonState[GLFW_MOUSE_BUTTON_RIGHT] != GLFW_RELEASE)
+                pickedModel->TranslateInSystem(system, {-float(xAtPress - x) / moveCoeff, float(yAtPress - y) / moveCoeff, 0});
+            if (buttonState[GLFW_MOUSE_BUTTON_MIDDLE] != GLFW_RELEASE)
+                pickedModel->RotateInSystem(system, float(xAtPress - x) / angleCoeff, Axis::Z);
+            if (buttonState[GLFW_MOUSE_BUTTON_LEFT] != GLFW_RELEASE) {
+                pickedModel->RotateInSystem(system, float(xAtPress - x) / angleCoeff, Axis::Y);
+                pickedModel->RotateInSystem(system, float(yAtPress - y) / angleCoeff, Axis::X);
+            }
+        } else {
+            // camera->SetTout(cameraToutAtPress);
+            if (buttonState[GLFW_MOUSE_BUTTON_RIGHT] != GLFW_RELEASE)
+                root->TranslateInSystem(system, {-float(xAtPress - x) / moveCoeff/10.0f, float( yAtPress - y) / moveCoeff/10.0f, 0});
+            if (buttonState[GLFW_MOUSE_BUTTON_MIDDLE] != GLFW_RELEASE)
+                root->RotateInSystem(system, float(x - xAtPress) / 180.0f, Axis::Z);
+            if (buttonState[GLFW_MOUSE_BUTTON_LEFT] != GLFW_RELEASE) {
+                root->RotateInSystem(system, float(x - xAtPress) / angleCoeff, Axis::Y);
+                root->RotateInSystem(system, float(y - yAtPress) / angleCoeff, Axis::X);
+            }
+        }
+        xAtPress =  x;
+        yAtPress =  y;
+    }
+}
+void BasicScene::KeyCallback(Viewport* viewport, int x, int y, int key, int scancode, int action, int mods)
+{
+    auto system = camera->GetRotation().transpose();
+
+    if (action == GLFW_PRESS || action == GLFW_REPEAT) {
+        switch (key) // NOLINT(hicpp-multiway-paths-covered)
+        {
+            case GLFW_KEY_ESCAPE:
+                glfwSetWindowShouldClose(window, GLFW_TRUE);
+                break;
+            case GLFW_KEY_UP:
+                snake->MoveUp();
+                break;
+            case GLFW_KEY_DOWN:
+                snake->MoveDone();
+                break;
+            case GLFW_KEY_LEFT:
+                snake->MoveLeft();
+
+                break;
+            case GLFW_KEY_RIGHT:
+                snake->MoveRight();
+                break;
+            case GLFW_KEY_W:
+                camera->TranslateInSystem(system, {0, 0.1f, 0});
+                break;
+            case GLFW_KEY_P:
+                if(animate) {
+                    animate = false;
+                    statistics->menu_flags[PauseMenu_OP] = true;
+                }
+                else{
+                    statistics->menu_flags[PauseMenu_OP] = false;
+                    animate = true;
+                }
+                break;
+            case GLFW_KEY_S:
+                camera->TranslateInSystem(system, {0, -0.1f, 0});
+                break;
+            case GLFW_KEY_R:
+                animate = !animate;
+                //snake->reset_sake();
+                animate = true;
+                break;
+            case GLFW_KEY_A:
+                camera->TranslateInSystem(system, {-0.1f, 0, 0});
+                break;
+            case GLFW_KEY_D:
+                camera->TranslateInSystem(system, {0.1f, 0, 0});
+                break;
+            case GLFW_KEY_B:
+                camera->TranslateInSystem(system, {0, 0, 0.1f});
+                break;
+            case GLFW_KEY_C:
+                if(animate) {
+                    statistics->inc_Score(1,1,1);
+                }
+                break;
+            case GLFW_KEY_F:
+                camera->TranslateInSystem(system, {0, 0, -0.1f});
+                break;
+            case GLFW_KEY_1:
+                SetCamera(0);
+                break;
+            case GLFW_KEY_2:
+                SetCamera(1);
+                break;
+            case GLFW_KEY_3:
+                SetCamera(2);
+                break;
+            case GLFW_KEY_4:
+                SetCamera(3);
+                break;
+        }
+    }
 }
 
-Data *BasicScene::getData() {
-    return data;
-}

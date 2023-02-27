@@ -26,7 +26,7 @@ namespace cg3d {
         void CreateLevel3(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords);
         std::vector<std::shared_ptr<Model>> models;
         std::vector<Eigen::Vector3f> coords;
-        void removeFormerlevel();
+        void removeFormerlevel(int index );
         void loadNextLevel(int nextLevel);
         shared_ptr<Model> createFrog();
         shared_ptr<Model> createMouse();

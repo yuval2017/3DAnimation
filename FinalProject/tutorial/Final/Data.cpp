@@ -102,7 +102,7 @@ void Data::checkFileds(nlohmann::json json ) {
     bool sc = true;
     bool ds = true;
     bool scoreL1 = true;
-    std::ifstream file("data.json");
+    std::ifstream file(fileName);
     if (file.is_open()) {
         if (!json.contains(TOTAL_MONEY_NAME)) {
             // Add "name" field with default value if it doesn't exist
@@ -163,13 +163,12 @@ void Data::checkFileds(nlohmann::json json ) {
 
 void Data::save_data()
 {
-    json data;
-    data["total_money"] = total_money;
-    data["life_bought"] = life_bought;
-    data["object_collision"] = object_collision;
-    data["self_collision"] = self_collision;
-    data["double_score"] = double_score;
-
+    nlohmann::json data;
+    data[TOTAL_MONEY_NAME] = total_money;
+    data[LIFE_BOUGHT_NAME] = life_bought;
+    data[OBJECT_COLLISION_NAME] = object_collision;
+    data[SELF_COLLISION_NAME] = self_collision;
+    data[DOUBLE_SCORE_NAME] = double_score;
     for(int j = 0; j < 2 ; j++ ) {
         for (int i = 1; i < sizeof(mouse_Scores); i++) {
             std::string name = std::string("scoreLevel");
@@ -184,11 +183,10 @@ void Data::save_data()
 
         }
     }
-    std::ofstream file("data.json");
-    if (file.is_open()) {
-        file << data;
-        file.close();
-    }
+    std::ofstream file(fileName);
+    file << std::setw(4) << data << std::endl;
+    file.flush();
+    file.close();
 }
 
 void Data::dec_life_bought()
@@ -253,16 +251,6 @@ void Data::set_message(std::string other)
     this->msg = std::move(other);
 }
 
-void Data::restart_game()
-{
-    this->msg = "";
-}
-
-
-const char* Data::msg_c_str() const
-{
-    return this->msg.c_str();
-}
 
 
 bool Data::checkScore(int mouseScore, int frogScore, int level) {
