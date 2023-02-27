@@ -536,7 +536,7 @@ void ObjectsAnimationVisitor::CreateLevel3(std::vector<shared_ptr<Model>> &model
         coords.push_back(position);
         std::shared_ptr<Model> cube = createBrick();
         cube->Translate(position);
-        cube->Scale(scale);
+        cube->Scale(2);
     }
 }
 
