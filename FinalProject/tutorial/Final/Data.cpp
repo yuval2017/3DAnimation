@@ -1,9 +1,19 @@
 
 #include "Data.h"
 #include <fstream>
-#include <sstream>
 #include "nlohmann/json.hpp"
 #include "GameStatistics.h"
+#define LIFE_BOUGHT_NAME            "life_bought"
+#define TOTAL_MONEY_NAME            "total_money"
+#define OBJECT_COLLISION_NAME       "object_collision"
+#define SELF_COLLISION_NAME         "self_collision"
+#define DOUBLE_SCORE_NAME           "double_score"
+#define SCORE_LEVEL_1_NAME          "scoreLevel1"
+#define SCORE_LEVEL_2_NAME          "scoreLevel2"
+#define SCORE_LEVEL_3_NAME          "scoreLevel3"
+#define MOUSE_NAME                  "0"
+#define FROG_NAME                   "1"
+
 using json = nlohmann::json;
 
 Data* Data::instance = 0;
@@ -29,23 +39,51 @@ Data::Data()
     load_data();
 }
 
-void Data::load_data()
-{
-    std::ifstream file("data.json");
-    if (file.is_open()) {
-        json data;
-        file >> data;
-        total_money = data["total_money"];
-        life_bought = data["life_bought"];
-        object_collision = data["object_collision"];
-        self_collision = data["self_collision"];
-        double_score = data["double_score"];
-        scores[1] = data["scoreLevel1"];
-        scores[2] = data["scoreLevel2"];
-        scores[3] = data["scoreLevel3"];
+void Data::load_data() {
+
+
+    std::__fs::filesystem::path filePath(fileName);
+    //error handling, file not exists or not json file.
+    if (!std::__fs::filesystem::exists(filePath)) {
+        // Create scores.json if it doesn't exist.
+        std::ofstream file(filePath);
         file.close();
     }
-    else {
+    std::ifstream();
+    try {
+        std::ifstream fileReader(fileName);
+        //Avoid parse problems.
+        fileReader >> json_data;
+        fileReader.close();
+    }
+    catch (const std::exception &e) {
+        std::ofstream fileReader(fileName);
+        std::stringstream ss;
+        json_data = nlohmann::json::object();
+        fileReader << std::setw(4) << json_data;
+        fileReader.close();
+    }
+
+    checkFileds(json_data);
+
+    std::ifstream file(fileName);
+    if (file.is_open()) {
+        file >> json_data;
+
+        //validate fields existence.
+        total_money = json_data[TOTAL_MONEY_NAME];
+        life_bought = json_data[LIFE_BOUGHT_NAME];
+        object_collision = json_data[OBJECT_COLLISION_NAME];
+        self_collision = json_data[SELF_COLLISION_NAME];
+        double_score = json_data[DOUBLE_SCORE_NAME];
+        mouse_Scores[1] = json_data[SCORE_LEVEL_1_NAME][MOUSE_NAME];
+        mouse_Scores[2] = json_data[SCORE_LEVEL_2_NAME][MOUSE_NAME];
+        mouse_Scores[3] = json_data[SCORE_LEVEL_3_NAME][MOUSE_NAME];
+        frog_Scores[1] = json_data[SCORE_LEVEL_1_NAME][FROG_NAME];
+        frog_Scores[2] = json_data[SCORE_LEVEL_2_NAME][FROG_NAME];
+        frog_Scores[3] = json_data[SCORE_LEVEL_1_NAME][FROG_NAME];
+        file.close();
+    } else {
         // file does not exist or cannot be opened, set default values
         total_money = 0;
         life_bought = 0;
@@ -55,6 +93,74 @@ void Data::load_data()
     }
 }
 
+
+void Data::checkFileds(nlohmann::json json ) {
+
+    bool tm = true;
+    bool lb = true;
+    bool oc = true;
+    bool sc = true;
+    bool ds = true;
+    bool scoreL1 = true;
+    std::ifstream file("data.json");
+    if (file.is_open()) {
+        if (!json.contains(TOTAL_MONEY_NAME)) {
+            // Add "name" field with default value if it doesn't exist
+            tm = false;
+        }
+        if (!json.contains(LIFE_BOUGHT_NAME)) {
+            // Add "name" field with default value if it doesn't exist
+            lb = false;
+        }
+        if (!json.contains(OBJECT_COLLISION_NAME)) {
+            // Add "name" field with default value if it doesn't exist
+            oc = false;
+        }
+        if (!json.contains(SELF_COLLISION_NAME)) {
+            // Add "name" field with default value if it doesn't exist
+            sc = false;
+        }
+        if (!json.contains(DOUBLE_SCORE_NAME)) {
+            // Add "name" field with default value if it doesn't exist
+            ds = false;
+        }
+        if (!json.contains(SCORE_LEVEL_1_NAME)) {
+            // Add "name" field with default value if it doesn't exist
+            scoreL1 = false;
+        }
+        if (!tm) {
+            json.emplace(TOTAL_MONEY_NAME, 0);
+        }
+        if (!lb) {
+            json.emplace(LIFE_BOUGHT_NAME, 0);
+        }
+        if (!oc) {
+            json.emplace(OBJECT_COLLISION_NAME, 0);
+        }
+        if (!sc) {
+            json.emplace(SELF_COLLISION_NAME, 0);
+        }
+        if (!ds) {
+            json.emplace(DOUBLE_SCORE_NAME, 0);
+        }
+        if (!scoreL1) {
+            json.emplace(SCORE_LEVEL_1_NAME, json::object({{"0", 10},
+                                                           {"1", 10}}));
+            json.emplace(SCORE_LEVEL_2_NAME, json::object({{"0", 15},
+                                                           {"1", 15}}));
+            json.emplace(SCORE_LEVEL_3_NAME, json::object({{"0", 20},
+                                                           {"1", 20}}));
+        }
+        file.close();
+        std::ofstream fileWriter(fileName);
+        fileWriter << std::setw(4) << json << std::endl;
+        fileWriter.flush();
+        fileWriter.close();
+    }
+}
+
+
+
 void Data::save_data()
 {
     json data;
@@ -63,9 +169,21 @@ void Data::save_data()
     data["object_collision"] = object_collision;
     data["self_collision"] = self_collision;
     data["double_score"] = double_score;
-    data["scoreLevel1"] = scores[1];
-    data["scoreLevel2"] = scores[2];
-    data["scoreLevel3"] = scores[3];
+
+    for(int j = 0; j < 2 ; j++ ) {
+        for (int i = 1; i < sizeof(mouse_Scores); i++) {
+            std::string name = std::string("scoreLevel");
+            std::string index = std::to_string(i);
+            name = name + index;
+            if(j ==0 ){
+                data[name][j] = mouse_Scores[i];
+            }
+            else{
+                data[name][j] = frog_Scores[i];
+            }
+
+        }
+    }
     std::ofstream file("data.json");
     if (file.is_open()) {
         file << data;
@@ -146,13 +264,9 @@ const char* Data::msg_c_str() const
     return this->msg.c_str();
 }
 
-int Data::message_size()
-{
-    return this->msg.size();
-}
 
-bool Data::checkScore(int score, int level) {
-    if(score >= scores[level]){
+bool Data::checkScore(int mouseScore, int frogScore, int level) {
+    if(mouseScore >= mouse_Scores[level] & frogScore >=frog_Scores[level]){
         return true;
     }
     return false;

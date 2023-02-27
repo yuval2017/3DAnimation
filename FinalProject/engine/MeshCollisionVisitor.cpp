@@ -79,7 +79,7 @@ void MeshCollisionVisitor::handle_eating(Model *model) {
         model->isHidden = true;
         model->stopper.reset();
         basicScene->getSoundManager()->play_sound(std::to_string(HIT_SOUND));
-        basicScene->getStatistics()->inc_Score(COIN_PRICE);
+        basicScene->getStatistics()->inc_Score(0,0,1);
 
 
     }
@@ -88,7 +88,7 @@ void MeshCollisionVisitor::handle_eating(Model *model) {
         model->isHidden = true;
         model->stopper.reset();
         basicScene->getSoundManager()->play_sound(std::to_string(HIT_SOUND));
-        basicScene->getStatistics()->inc_Score(FROG_PRICE);
+        basicScene->getStatistics()->inc_Score(0,1,0);
 
     }
     else if(model->name.find(MOUSE_NAME) != std::string::npos){
@@ -96,7 +96,7 @@ void MeshCollisionVisitor::handle_eating(Model *model) {
         model->isHidden = true;
         model->stopper.reset();
         basicScene->getSoundManager()->play_sound(std::to_string(HIT_SOUND));
-        basicScene->getStatistics()->inc_Score(MOUSE_PRICE);
+        basicScene->getStatistics()->inc_Score(1,0,0);
 
     }
 }

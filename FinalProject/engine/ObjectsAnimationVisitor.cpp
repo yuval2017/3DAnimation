@@ -156,7 +156,7 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
     if(basicScene->getStatistics()->levelUp){
         basicScene->animate = false;
         basicScene->start_time= 0.0f;
-        removeFormerlevel();
+        //removeFormerlevel();
         loadNextLevel(basicScene->getStatistics()->level+1);
         basicScene->snake->reset_sake();
         basicScene->resetCameras();
@@ -164,12 +164,18 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
     }
     else if(basicScene->getStatistics()->restart){
         basicScene->animate = false;
-        removeFormerlevel();
+        //removeFormerlevel();
         loadNextLevel(1);
         basicScene->snake->reset_sake();
         basicScene->resetCameras();
         basicScene->getStatistics()->restart = false;
-        basicScene->getStatistics()->menu_flags[MainMenu_OP] = true;
+        if(basicScene->getData()->back_to_main.size()==0) {
+            basicScene->getStatistics()->menu_flags[MainMenu_OP] = true;
+        }else{
+            int next = basicScene->getData()->back_to_main.front();
+            basicScene->getData()->back_to_main.pop_back();
+            basicScene->getStatistics()->menu_flags[next];
+        }
         basicScene->start_time = 0.0;
     }
 
@@ -191,6 +197,7 @@ void ObjectsAnimationVisitor::get_map_max_min(Eigen::Vector3f &max, Eigen::Vecto
     min << min_to_gen[0]*basicScene->level1->scale_factor[0], min_to_gen[1]*basicScene->level1->scale_factor[1], min_to_gen[2]*basicScene->level1->scale_factor[2];
 }
 
+
 void ObjectsAnimationVisitor::removeFormerlevel(){
 
     for(const shared_ptr<Model>& model : models) {
@@ -200,8 +207,8 @@ void ObjectsAnimationVisitor::removeFormerlevel(){
     }
     models.clear();
     coords.clear();
-
 }
+
 void ObjectsAnimationVisitor::loadNextLevel(int nextLevel){
     for (auto & sphere : spheres_in_use) {
         if(sphere->bezier != nullptr){

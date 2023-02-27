@@ -3,5 +3,9 @@
         "name": "bar",
         "score": 2000
     },
-    "numOfScores": 1
+    "1": {
+        "name": "Bar",
+        "score": 280
+    },
+    "numOfScores": 2
 }

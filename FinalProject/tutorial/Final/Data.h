@@ -3,6 +3,10 @@
 
 #include <string>
 #include "nlohmann/json.hpp"
+#include <iostream>
+#include <sstream>
+#include <sys/stat.h>
+#include <filesystem>
 
 class Data {
 public:
@@ -30,29 +34,27 @@ public:
     float musicVolume ;
     float soundVolume ;
     std::vector<int> back_to_main;
-    int scores[4];
-    bool checkScore(int score, int level);
+    int mouse_Scores[4];
+    int frog_Scores[4];
+    bool checkScore(int mouseScore, int frogScore, int level);
     void sub_total_money(int val);
-
+    void dec_object_collision();
+    void dec_self_collision();
     void dec_double_score();
     int life_bought;
     int object_collision;
     int self_collision;
     int double_score;
 
-    void dec_object_collision();
 
-    void dec_self_collision();
 
 private:
     void load_data();
     void save_data();
-
+    void checkFileds(nlohmann::json json);
     static Data* instance;
     std::string msg;
-
-
-
+    const char* fileName = "../tutorial/Final/data.json";
     nlohmann::json json_data;
     Data();
     ~Data();

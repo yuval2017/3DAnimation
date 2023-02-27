@@ -36,35 +36,30 @@ public:
     static GameStatistics* getInstance();
     char characterName[256] = "";
     bool menu_flags[11] = {false, false,false, false,false, false,false, false,false,false, false};
-    bool back_to_main=false;
     //Stopper timer;
     const int num_of_levels =3;
     int level;
-    int score ;
-    int num_of_strikes;
-    int strikes_used;
+    int mousesNum ;
+    int frogsNum;
+    int score;
     bool double_score;
     float speed ;
-    void reset_level_data();
-    float get_progress();
     bool levelUp;
     bool restart;
     bool won;
+    void inc_Score(int mouse, int frog, int coin);
     void reset_game();
     Stopper selfCollisionStopper;
     Stopper objectCollisionStopper;
 
-    bool resetSnake;
-    void inc_Score(int i);
 
-    void inc_speed();
 
 private :
     Data* data ;
     SoundManager* soundManager;
     static GameStatistics* instance;
     GameStatistics();
-    GameStatistics(GameStatistics const&);              // Don't Implement.
+    GameStatistics(GameStatistics const&);  // Don't Implement.
     void operator=(GameStatistics const&); // Don't implement
 
 };

@@ -16,18 +16,13 @@ GameStatistics* GameStatistics::getInstance()
     return instance;
 }
 
-
-float GameStatistics::get_progress(){
-    return score/data->scores[level];
-}
-
 GameStatistics::GameStatistics() {
 
     level = 1;
     speed = 1.0;
     score = 0;
-    num_of_strikes = 0 ;
-    strikes_used = 0 ;
+    mousesNum = 0;
+    frogsNum = 0;
     double_score = false;
     levelUp = false;
     data = Data::getInstance();
@@ -39,20 +34,26 @@ void GameStatistics::reset_game() {
     level = 1;
     speed = 1.0;
     score = 0;
-    strikes_used = 0 ;
+    mousesNum = 0;
+    frogsNum = 0;
     double_score = false;
     levelUp = false;
     selfCollisionStopper.reset();
     objectCollisionStopper.reset();
 }
 
-void GameStatistics::inc_Score(int i) {
+void GameStatistics::inc_Score(int mouse, int frog, int coin) {
 
+
+    frogsNum+=frog;
+    mousesNum+=mouse;
+    int scor = 0;
+    scor += (mouse*MOUSE_PRICE)+ (frog*FROG_PRICE) + (coin*COIN_PRICE);
     if(double_score){
-        i=i*2;
+        scor*=2;
     }
-    score+=i;
-    if(data->checkScore(score,level)) {
+    score+=scor;
+    if(data->checkScore(mousesNum,frogsNum,level)) {
         if (level != num_of_levels) {
             levelUp = true;
             menu_flags[LevelMenu_OP] = true;
@@ -63,10 +64,4 @@ void GameStatistics::inc_Score(int i) {
             soundManager->play_sound(std::to_string(SUCCESS_SOUND));
         }
     }
-}
-
-void GameStatistics::inc_speed() {
-
-    speed++;
-    data->sub_total_money(SPEED_COST);
 }

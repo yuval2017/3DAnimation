@@ -4,7 +4,7 @@
 #include <vector>
 #include "json.hpp"
 #include <string> 
-
+#include <filesystem>
 
 typedef struct {
 	std::string name;
@@ -25,7 +25,7 @@ public:
 
 private :
 
-	const char* fileName ="./scores.json";
+	const char* fileName ="../tutorial/Final/scores.json";
 	nlohmann::json j;
     int maxScoresInTable = 5;
 	int numOfScoresInTable;
