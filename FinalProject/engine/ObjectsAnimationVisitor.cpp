@@ -205,7 +205,7 @@ void ObjectsAnimationVisitor::removeFormerlevel(){
 void ObjectsAnimationVisitor::loadNextLevel(int nextLevel){
     for (auto & sphere : spheres_in_use) {
         if(sphere->bezier != nullptr){
-            sphere->bezier->isHidden = true;
+            basicScene->GetRoot()->RemoveChild(sphere->bezier);
         }
         sphere->isHidden = true;
         spheres_not_in_use.push_back(sphere);
