@@ -3,7 +3,7 @@ from threading import Thread
 from time import sleep
 import sys
 
-stop_music = True
+stop_music = False
 terminate = False
 play_sound = False
 is_sound_mute = False

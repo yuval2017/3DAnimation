@@ -365,6 +365,7 @@ void BasicScene::startMenu() {
         ImGui::SameLine(ImGui::GetWindowWidth() / 2 - 100);
         if (ImGui::Button("Start Game", ImVec2(200, 0))) {
             std::cout << "new game button pressed in start menu ." << endl;
+            statistics->reset_game();
             statistics->menu_flags[MainMenu_OP] = false;
             soundManager->switch_game_music(std::string(FIRST_MUSIC));
             animate = true;
@@ -529,7 +530,6 @@ void BasicScene::PausedMenu()
             data->add_total_money(statistics->score/10);
             data->back_to_main.push_back(LoadingMenu_OP);
             statistics->restart =true;
-            statistics->reset_game();
         }
         ImGui::PopStyleColor(3);
         for(int i = 0; i< 3 ; i++){
@@ -846,9 +846,9 @@ void BasicScene::WinMenu() {
                 data->back_to_main.clear();
                 statistics->menu_flags[WinMenu_OP] =false;
                 data->add_total_money(statistics->score/10);
-                statistics->reset_game();
+                data->back_to_main.push_back(LoadingMenu_OP);
                 statistics->restart = true;
-                statistics->menu_flags[LoadingMenu_OP] =true;
+
             }
         }
 
@@ -914,7 +914,9 @@ void BasicScene::LoseMenu() {
                 statistics->selfCollisionStopper.start(10);
                 statistics->objectCollisionStopper.start(10);
                 statistics->menu_flags[GameOverMenu_OP] = false;
+                data->back_to_main.push_back(LoadingMenu_OP);
                 animate = true;
+                statistics->restart =true;
 
             }
 
