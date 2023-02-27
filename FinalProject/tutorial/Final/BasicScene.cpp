@@ -278,12 +278,12 @@ void BasicScene::init_objects() {
     level1->SetStatic();
     level2 = ModelsFactory::getInstance()->CreateModel(LEVEL2_MAP,CUBE,"background");
     AddChild(level2);
-    level2->Scale(200, Axis::XYZ);
+    level2->Scale(400, Axis::XYZ);
     level2->SetPickable(false);
     level2->SetStatic();
     level3 = ModelsFactory::getInstance()->CreateModel(LEVEL3_MAP,CUBE,"background");
     AddChild(level3);
-    level3->Scale(200, Axis::XYZ);
+    level3->Scale(300, Axis::XYZ);
     level3->SetPickable(false);
     level3->SetStatic();
     currLevelMap = level1;
@@ -1253,6 +1253,8 @@ void BasicScene::PlayMenu()
         ImGui::End();
     }
 }
+
+
 void BasicScene::buttonStyle() {
     // Set button color to dark green
     ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.0f, 0.5f, 0.0f, 1.0f));
