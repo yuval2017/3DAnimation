@@ -32,12 +32,12 @@ ModelsFactory::ModelsFactory(){
 
     //cube map shader material LEVEL 2
     materials[LEVEL2_MAP] = {std::make_shared<Material>("level 2 map", "shaders/cubemapShader")};
-    materials[LEVEL2_MAP]->AddTexture(0, "textures/cubemaps/Level2Map/Stairs/Stairs_", 3);
+    materials[LEVEL2_MAP]->AddTexture(0, "../tutorial/textures/cubemaps/Level2Map/Stairs/Stairs_", 3);
 
 
     //cube map shader material LEVEL 3
     materials[LEVEL3_MAP] = {std::make_shared<Material>("level 3 map", "shaders/cubemapShader")};
-    materials[LEVEL3_MAP]->AddTexture(0, "textures/cubemaps/Level3Map/Teide/Teide_", 3);
+    materials[LEVEL3_MAP]->AddTexture(0, "../tutorial/textures/cubemaps/Level3Map/Teide/Teide_", 3);
 
 
     //frog material
@@ -47,7 +47,7 @@ ModelsFactory::ModelsFactory(){
 
     //green material
     materials[GREEN_MATERIAL] = {std::make_shared<Material>("green_color", "shaders/phongShader")};
-    //materials[GREEN_MATERIAL]->program->name = "green";
+    materials[GREEN_MATERIAL]->program->name = "green";
 
     //grey material
     materials[GREY_MATERIAL] = {std::make_shared<Material>("grey_color", "shaders/phongShader")};

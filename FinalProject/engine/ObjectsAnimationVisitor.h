@@ -42,7 +42,7 @@ namespace cg3d {
         void removeMouse(const shared_ptr<Model>& mouse);
         void removeCoin(const shared_ptr<Model>& coin);
         void removeSphere(const shared_ptr<Model>& sphere);
-        void removeBricks(shared_ptr<Model> cube);
+        void removeBricks(const shared_ptr<Model>& cube);
 
 
 
