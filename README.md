@@ -9,8 +9,102 @@ In order to run one of those assignments, do as explained:
 - Open the specific assignment folder with your IDE.
 - Run the bin files in the project. 
 
-  ## Assignment 1 
-  Implementing mesh reduction for a given shape represented by vertices and faces. For each reduction, 10% of the mesh number will be reduced. 
+
+  ## Final project
+  
+  The projets mission was creating 3D snake animation game.
+  The project was spose to include each and every one of the assignment 1 to 3.
+  The project contains:
+  - The snake constructed from 16 links. 
+  - 4 cameras that can be switched with different point of view on the game.
+  - The game contains sevaral menues that will be explained bellow.
+  - The skinning is implemented using Dual Quaternion Skinning as instructed. We create 16 cylinders and the weights are calculated by the distance of t each point from the 2 closest cylinders.
+  - We used collision detection ad taughted in class. The collision visitor handling each collision depending on the model type.
+  - During the game, The objects( in shapes of frogs,mice and coins along with the regular shapes as spheres and cubes) are show and disappear in random locations on the map. 
+  - Scoring machine is made by the poins gained by each eaten model. To pass between levels, the player will need to eat specific amount of mice and frogs(the coins are extra point objects) that will be mentioned before the level start, and on the menu during the game.
+  - We used the first loop of the FABRIK algorithm to calculate the next position of the links in relatio to the link before.
+ 
+ - The music contains 2 kinds of sound. The background music that is played during the game and in the menues. And sounds played during specific actions as purchase in the store, eatings of the snake, and even between levels(and more). The music and sounds can be shut off and can be sound controled in every step during the game.
+  - The objects and maps are loaded with special texture.
+  - During the game, every few seconds, there are objects moving according to Bezier curve + Bezier splines, and disappear. (The curve itself is also showed in the map). We generate the curve randomly, so the objects move in changed speed.
+  - The game contains 10 menues written using ImGui.
+  - PrevenGng self-collision of the snake is a game bonus, that can be purchased in the store.
+  - Special ideas are all around the game. From the menues, to the sound control, the store, the Bazier curve showed and much more!
+  
+  
+  ### Menues
+  There game contains 10 different menues in it. Each one serves a specific porpose.
+  
+  ### Loading menu
+  This menu made for loading the game when needed some time to do so. The menu contains progress bar of the time left and precentage feedback.
+  When the countdown is over, the player will be moved automatically to the start menu of the game.
+  
+  ### Start menu
+  This is also the main menu of the game. Every time the game is up, it will be the first to be showen after the loading. Also, it can be reaced from the lose-menu and the win-menu for new games.
+  
+ This menu contains also fast access to:
+ - New game start.
+ - Settings menu.
+ - Game tutorial.
+ - Hall of fame (Leaders board).
+ - The store.
+ - Game exit.
+ 
+ ### Hall of fame
+ This menu contains the highest scores on the game. the number of scores can be changed the every wanted number.
+ 
+ ### Store
+ This menu contains all the goods can be gained in the game.
+ The goods are : 
+ - Self invisibility - The snake is immuned in front of self collision.
+ - Object invisibility - The snake is immuned in front of obstacles collision.
+ - Extra life - Can make the player cuntinue the game where it stopped in case of game over.
+ - Double score - Doubles the score gained during the game.
+ 
+ This menu will present also feedback of the goods already purchased by the player and available to use.
+  
+### Settings menu 
+This menu contains game settings that can be changed be the user. 
+From this menu, the user can on/off the game music and the sound effects. 
+Also, the player can change the volume of each one of them.
+
+
+### Tutorial menu 
+Is an explenation on how to play the game. The explenation is openeede and closed by the right button click.
+
+
+### Play menu
+This menu appears as much is the game runs. It shows he player feedback on his progress. 
+Some of the information includes: 
+
+- Level number.
+- Level goals needed for level up.
+- Cameras buttons. Where the player can change his point of view during the game.
+- Special abilities buttons that appears if available.
+
+
+### Win menu
+That appears if the player finished the game. 
+If the player is a high scorer, he will be asked to enter his name to save the score.
+
+
+### Lose menu
+That appears if the player lost the game. 
+If the player is a high scorer, he will be asked to enter his name to save the score just like in the win menu.
+
+
+### Level menu 
+This menu contains information on the player status. 
+The data presented contains :
+- The next level number.
+- His score till now.
+-Number of animals he ate until now.
+-The naxt level goals.
+
+
+
+## Assignment 1 
+Implementing mesh reduction for a given shape represented by vertices and faces. For each reduction, 10% of the mesh number will be reduced. 
 The changes were in the classes:
   
 
@@ -216,3 +310,5 @@ camera (perpendicular to camera plane). When no object is picked translate the w
   - angle : The rotation angle of the links.
   - addCyl : Adding cylinder flag.
   - scaleFactor : The scale factor of the shaped made during the init.
+  
+  
