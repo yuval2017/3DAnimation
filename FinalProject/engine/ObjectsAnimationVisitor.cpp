@@ -66,8 +66,8 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
             mouse->Rotate(-M_PI / 2.0f, Movable::Axis::X);
             mouse->SetTreeAndCube(ModelsFactory::getInstance()->bounding_boxes[MOUSE],
                                   ModelsFactory::getInstance()->trees[MOUSE]);
-            mouses_not_in_use.push_back(mouse);
             basicScene->GetRoot()->AddChild(mouse);
+            mouses_not_in_use.push_back(mouse);
             mouse->isHidden = true;
             mouse->Scale(mouse_scale);
 
@@ -232,7 +232,7 @@ void ObjectsAnimationVisitor::loadNextLevel(int nextLevel){
             CreateLevel2(models, coords);
             break;
         case 3:
-            removeFormerlevel(1);
+            removeFormerlevel(2);
             CreateLevel3(models, coords);
             break;
         default:
@@ -271,7 +271,7 @@ void ObjectsAnimationVisitor::Visit(Scene *scene) {
             if (!coin->stopper.is_countdown_running()) {
                 coins_to_remove.push_back(coin);
             }else{
-                coin->Rotate(0.3f, Movable::Axis::Z);
+               // coin->Rotate(0.3f, Movable::Axis::Z);
             }
         }
         for(const std::shared_ptr<Model>& coin: coins_to_remove){
@@ -384,7 +384,6 @@ void ObjectsAnimationVisitor::drawTheBeizerCurve(Model *model) {
     int number_of_points_in_bezier = 100;
     std::vector<double> line_space = Calculates::getInstance()->linspace(0,1,number_of_points_in_bezier);
     Eigen::Vector3d drawingColor = Eigen::RowVector3d(0, 0, 2);
-
     Eigen::MatrixXf vertices(number_of_points_in_bezier,3);
     for (int i = 0; i < number_of_points_in_bezier; ++i) {
         double ti = line_space[i];
