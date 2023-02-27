@@ -206,6 +206,7 @@ void ObjectsAnimationVisitor::loadNextLevel(int nextLevel){
     for (auto & sphere : spheres_in_use) {
         if(sphere->bezier != nullptr){
             basicScene->GetRoot()->RemoveChild(sphere->bezier);
+            sphere->bezier = nullptr;
         }
         sphere->isHidden = true;
         spheres_not_in_use.push_back(sphere);
@@ -384,9 +385,6 @@ shared_ptr<Model> ObjectsAnimationVisitor::createSphere(){
     }else{
         std::shared_ptr<Model> sphere = spheres_not_in_use.front();
         spheres_not_in_use.pop_back();
-        if(sphere->bezier != nullptr){
-            sphere->bezier->isHidden = false;
-        }
         sphere->isHidden = false;
         spheres_in_use.push_back(sphere);
         return sphere;

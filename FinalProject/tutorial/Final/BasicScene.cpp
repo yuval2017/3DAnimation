@@ -557,7 +557,7 @@ void BasicScene::startMenu() {
         if (ImGui::Button("Start Game", ImVec2(200, 0))) {
             std::cout << "new game button pressed in start menu ." << endl;
             statistics->menu_flags[MainMenu_OP] = false;
-            soundManager->set_game_play_music(std::string(THIRD_MUSIC));
+            soundManager->switch_game_music(std::string(THIRD_MUSIC));
             animate = true;
             statistics->objectCollisionStopper.start(20);
             statistics->selfCollisionStopper.start(20);
@@ -773,7 +773,7 @@ void BasicScene::SettingsMenu()
         // Slider for music volume control
         if(ImGui::SliderFloat("Music Volume", &data->musicVolume, 0.0f, 1.0f) ){
             std::cout<< "Music Volume value changed to : " << data->musicVolume <<endl;
-            soundManager->set_game_play_music(std::to_string(data->musicVolume));
+            soundManager->set_game_play_music_volume(std::to_string(data->musicVolume));
         }
         // Slider for sound volume control
         if(ImGui::SliderFloat("Game Sounds Volume", &data->soundVolume, 0.0f, 1.0f) ){

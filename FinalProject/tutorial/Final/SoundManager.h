@@ -40,9 +40,9 @@ public:
     void play_game_music();
     void stop_all_game_sounds();
     void restart_game_sounds();
-    void switch_game_music(std::string new_game_music);
-    void set_sounds_volume(std::string new_vulume);
-    void set_game_play_music(std::string new_vulume);
+    void switch_game_music(const std::string& new_game_music);
+    void set_sounds_volume(const std::string& new_vulume);
+    void set_game_play_music_volume(const std::string& new_vulume);
 
 
 private:
