@@ -80,6 +80,7 @@ private:
     //SoundManager* sound_manager;
     ImFont* headerFont = nullptr;
     ImFont* regularFont = nullptr;
+    ImFont* playFont = nullptr;
     ImFont* messageFont = nullptr;
     ImFont* leadersFont = nullptr;
     int window_width = 700;

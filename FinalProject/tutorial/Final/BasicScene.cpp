@@ -58,9 +58,9 @@ void BasicScene::init_cameras(float fov, int width, int height,float near, float
 
     // Set front
     snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[0]);
-    cameras[0]->Translate(Eigen::Vector3f(1.f, 1.f, -6.f));
+    cameras[0]->Translate(Eigen::Vector3f(0.2f, 1.f, -6.f));
     cameras[0]->Rotate(M_PI, Movable::Axis::Y);
-    cameras[0]->Rotate(-M_PI/18, Movable::Axis::X);
+    cameras[0]->Rotate(-M_PI/30, Movable::Axis::X);
 
 
     // Set mid snake view
@@ -248,6 +248,7 @@ void BasicScene::setFonts() {
     messageFont = io.Fonts->AddFontFromFileTTF("../tutorial/Final/fonts/Amena.otf", 20.0f, &font_config);
     leadersFont = io.Fonts->AddFontFromFileTTF("../tutorial/Final/fonts/Castron.otf", 30.0f, &font_config);
     regularFont = io.Fonts->AddFontFromFileTTF("../tutorial/Final/fonts/Castron.otf", 20.0f, &font_config);
+    playFont = io.Fonts->AddFontFromFileTTF("../tutorial/Final/fonts/Castron.otf", 14.0f, &font_config);
 }
 void BasicScene::setStartPos() {
 
@@ -330,7 +331,7 @@ void BasicScene::loadingMenu() {
         float current_time = ImGui::GetTime();
 
         // Calculate the progress as a value between 0 and 1
-        float progress =  (done == 3) ? std::min((current_time - start_time) / 110.f, 1.0f) : start_time;
+        float progress =  (done == 3) ? std::min((current_time - start_time) / 30.f, 1.0f) : start_time;
 
 
         // Call the callback function when progress reaches 100%
@@ -365,7 +366,7 @@ void BasicScene::startMenu() {
         if (ImGui::Button("Start Game", ImVec2(200, 0))) {
             std::cout << "new game button pressed in start menu ." << endl;
             statistics->menu_flags[MainMenu_OP] = false;
-            soundManager->switch_game_music(std::string(THIRD_MUSIC));
+            soundManager->switch_game_music(std::string(FIRST_MUSIC));
             animate = true;
             statistics->objectCollisionStopper.start(20);
             statistics->selfCollisionStopper.start(20);
@@ -707,21 +708,9 @@ void BasicScene::NextLevelMenu() {
         int frogs = data->frog_Scores[statistics->level +1];
         int mice = data->mouse_Scores[statistics->level +1];
         ImGui::Text("Next goal:");
-        // Get the cursor position and text size
-
-        ImVec2 textSize = ImGui::CalcTextSize(" Number of frogs: %d . \t");
-        ImVec2 cursorPos = ImGui::GetCursorScreenPos()+ImVec2(120,-(textSize.y+5));
-        // Draw the background rectangle
-        ImGui::SameLine();
-        ImGui::GetWindowDrawList()->AddRectFilled(cursorPos + ImVec2(ImGui::GetWindowWidth()/2,0), cursorPos + textSize+ImVec2(0,100), ImGui::GetColorU32(backgroundColor));
         ImGui::SameLine(ImGui::GetWindowWidth()/2);
         ImGui::Text(" Number of frogs: %d .",frogs);
         ImGui::Text("");
-        textSize = ImGui::CalcTextSize("Number of mice: %d \t");
-        cursorPos = ImGui::GetCursorScreenPos()+ImVec2(120,-(textSize.y+5));
-        // Draw the background rectangle
-        ImGui::SameLine();
-        ImGui::GetWindowDrawList()->AddRectFilled(cursorPos + ImVec2(ImGui::GetWindowWidth()/2,0), cursorPos + textSize+ textSize+ImVec2(0,100), ImGui::GetColorU32(backgroundColor));
         ImGui::SameLine(ImGui::GetWindowWidth()/2);
         ImGui::Text("Number of mice: %d",mice);
         for (int i = 0; i < 3; i++) {
@@ -731,12 +720,8 @@ void BasicScene::NextLevelMenu() {
         buttonStyle();
         // Get the current time in seconds
         float current_time = ImGui::GetTime();
-
         // Calculate the progress as a value between 0 and 1
         float progress =  (done == 3) ? std::min((current_time - start_time) / 10.f, 1.0f) : start_time;
-
-
-
 
         if (progress < 1.0f) {
             // Display the progress as a percentage
@@ -814,7 +799,7 @@ void BasicScene::WinMenu() {
             }
         }
         static bool saved = false;
-        static char* msg ;
+        static char* msg= "" ;
         if(pos != -1){
             ImGui::Text("Please type your name to save in\nleader board: ");
             static char name[256] = ""; // buffer to store the input string
@@ -841,7 +826,7 @@ void BasicScene::WinMenu() {
         float current_time = ImGui::GetTime();
 
         // Calculate the progress as a value between 0 and 1
-        float progress =  (done == 3) ? std::min((current_time - start_time) / 30.f, 1.0f) : start_time;
+        float progress = std::min((current_time - start_time) / 30.f, 1.0f) ;
 
 
         if (progress < 1.0f) {
@@ -945,7 +930,7 @@ void BasicScene::LoseMenu() {
             }
         }
         static bool saved = false;
-        static char* msg;
+        static char* msg = "";
         if (pos != -1) {
             ImGui::Text("Please type your name to save in\nleader board: ");
             static char name[256] = ""; // buffer to store the input string
@@ -970,7 +955,7 @@ void BasicScene::LoseMenu() {
         float current_time = ImGui::GetTime();
 
         // Calculate the progress as a value between 0 and 1
-        float progress = (done == 3) ? std::min((current_time - start_time) / 10.f, 1.0f) : start_time;
+        float progress = std::min((current_time - start_time) / 10.f, 1.0f) ;
 
 
         if (progress < 1.0f) {
@@ -999,6 +984,8 @@ void BasicScene::LoseMenu() {
         }
         ImGui::PopFont();
         ImGui::PushFont(messageFont);
+        ImVec2 cursor_pos = ImVec2(10,ImGui::GetWindowHeight() - 180.0);
+        ImGui::SetCursorPos(cursor_pos);
         ImGui::Text("%s",msg);
         for (int i = 0; i < 15; i++) {
             ImGui::Spacing();
@@ -1016,7 +1003,7 @@ void BasicScene::LoseMenu() {
 }
 void BasicScene::StoreMenu() {
 
-    static char * msg;
+    static char * msg= "";
     if (statistics->menu_flags[StoreMenu_OP]) {
         animate = false;
         // Push a black color onto the style stack
@@ -1198,11 +1185,13 @@ void BasicScene::LeadersMenu() {
 void BasicScene::PlayMenu()
 {
     if(animate) {
+
         int flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize;
         bool* pOpen = nullptr;
         ImGui::Begin("Game Menu", pOpen, flags);
+        ImGui::PushFont(playFont);
         ImGui::SetWindowPos(ImVec2(0, 0), ImGuiCond_Always);
-        ImGui::SetWindowSize(ImVec2(screen_width, 130), ImGuiCond_Always);
+        ImGui::SetWindowSize(ImVec2(screen_width, 150), ImGuiCond_Always);
         ImGui::Text("Camera: ");
         for (int i = 0; i < cameras.size(); i++) {
             ImGui::SameLine(0);
@@ -1214,49 +1203,50 @@ void BasicScene::PlayMenu()
             if (selectedCamera)
                 ImGui::PopStyleColor();
         }
+
+        ImGui::Spacing();
+        ImGui::Text("Total score: ");
+        ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
+        ImGui::Text("%d",statistics->score );
+        ImGui::Spacing();
+        ImGui::Text("Level: ");
+        ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
+        ImGui::Text("%d", statistics->level);
+        int frogs = data->frog_Scores[statistics->level];
+        int mice = data->mouse_Scores[statistics->level];
+        ImGui::Text("Level goal");
+        ImGui::SameLine(100);
+        ImGui::Text(" Frogs: %d / %d",statistics->frogsNum,frogs);
+        ImGui::SameLine(200);
+        ImGui::Text(" Mice: %d / %d",statistics->mousesNum,mice);
+        ImGui::Spacing();
+        if(ImGui::Button("Pause",ImVec2(100, 0))){
+            animate = false;
+            statistics->menu_flags[PauseMenu_OP] = true;
+        }
+
+        if(!statistics->double_score & (data->double_score >0)) {
+            ImGui::SameLine(120);
+            if (ImGui::Button("Double score", ImVec2(100, 0))) {
+                data->dec_double_score();
+                statistics->double_score = true;
+            }
+        }
         if((data->self_collision >0) && !statistics->selfCollisionStopper.is_countdown_running()) {
-            ImGui::SameLine(ImGui::GetWindowWidth() - 220);
+            ImGui::SameLine(230);
             if (ImGui::Button("Self invisible", ImVec2(100, 0))) {
                 data->dec_self_collision();
                 statistics->selfCollisionStopper.start(10);
             }
         }
         if((data->object_collision >0) && !statistics->objectCollisionStopper.is_countdown_running()) {
-            ImGui::SameLine(ImGui::GetWindowWidth() - 110);
-            if (ImGui::Button("Object invisible", ImVec2(100, 0))) {
+            ImGui::SameLine(340);
+            if (ImGui::Button("Obj invisible", ImVec2(100, 0))) {
                 data->dec_object_collision();
                 statistics->objectCollisionStopper.start(10);
             }
         }
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Text("Total score: ");
-        ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
-        ImGui::Text("%d",statistics->score );
-        if(!statistics->double_score & (data->double_score >0)) {
-            ImGui::SameLine(ImGui::GetWindowWidth() - 110);
-            if (ImGui::Button("Double score", ImVec2(100, 0))) {
-                data->dec_double_score();
-                statistics->double_score = true;
-            }
-        }
-        ImGui::Spacing();
-        ImGui::Text("Level: ");
-        ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
-        ImGui::Text("%d", statistics->level);
-        if(ImGui::Button("Pause",ImVec2(100, 0))){
-            animate = false;
-            statistics->menu_flags[PauseMenu_OP] = true;
-        }
-        int frogs = data->frog_Scores[statistics->level];
-        int mice = data->mouse_Scores[statistics->level];
-        ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
-        ImGui::Text(" Frogs: %d / %d",statistics->frogsNum,frogs);
-        ImGui::SameLine(0.0f, ImGui::GetStyle().ItemInnerSpacing.x);
-        ImGui::Text(" Mice: %d / %d",statistics->mousesNum,mice);
-
-
-
+        ImGui::PopFont();
         ImGui::Spacing();
         ImGui::End();
     }

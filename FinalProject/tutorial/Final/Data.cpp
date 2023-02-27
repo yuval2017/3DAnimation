@@ -49,7 +49,6 @@ void Data::load_data() {
         std::ofstream file(filePath);
         file.close();
     }
-    std::ifstream();
     try {
         std::ifstream fileReader(fileName);
         //Avoid parse problems.
@@ -81,7 +80,7 @@ void Data::load_data() {
         mouse_Scores[3] = json_data[SCORE_LEVEL_3_NAME][MOUSE_NAME];
         frog_Scores[1] = json_data[SCORE_LEVEL_1_NAME][FROG_NAME];
         frog_Scores[2] = json_data[SCORE_LEVEL_2_NAME][FROG_NAME];
-        frog_Scores[3] = json_data[SCORE_LEVEL_1_NAME][FROG_NAME];
+        frog_Scores[3] = json_data[SCORE_LEVEL_3_NAME][FROG_NAME];
         file.close();
     } else {
         // file does not exist or cannot be opened, set default values
@@ -90,6 +89,12 @@ void Data::load_data() {
         object_collision = 0;
         self_collision = 0;
         double_score = 0;
+        mouse_Scores[1] = 10;
+        mouse_Scores[2] = 15;
+        mouse_Scores[3] = 20;
+        frog_Scores[1] = 10;
+        frog_Scores[2] = 15;
+        frog_Scores[3] =20;
     }
 }
 
@@ -144,12 +149,9 @@ void Data::checkFileds(nlohmann::json json ) {
             json.emplace(DOUBLE_SCORE_NAME, 0);
         }
         if (!scoreL1) {
-            json.emplace(SCORE_LEVEL_1_NAME, json::object({{"0", 10},
-                                                           {"1", 10}}));
-            json.emplace(SCORE_LEVEL_2_NAME, json::object({{"0", 15},
-                                                           {"1", 15}}));
-            json.emplace(SCORE_LEVEL_3_NAME, json::object({{"0", 20},
-                                                           {"1", 20}}));
+            json.emplace(SCORE_LEVEL_1_NAME, json::object({{"0", 10},{"1", 10}}));
+            json.emplace(SCORE_LEVEL_2_NAME, json::object({{"0", 15},{"1", 15}}));
+            json.emplace(SCORE_LEVEL_3_NAME, json::object({{"0", 20},{"1", 20}}));
         }
         file.close();
         std::ofstream fileWriter(fileName);
@@ -169,20 +171,12 @@ void Data::save_data()
     data[OBJECT_COLLISION_NAME] = object_collision;
     data[SELF_COLLISION_NAME] = self_collision;
     data[DOUBLE_SCORE_NAME] = double_score;
-    for(int j = 0; j < 2 ; j++ ) {
-        for (int i = 1; i < sizeof(mouse_Scores); i++) {
-            std::string name = std::string("scoreLevel");
-            std::string index = std::to_string(i);
-            name = name + index;
-            if(j ==0 ){
-                data[name][j] = mouse_Scores[i];
-            }
-            else{
-                data[name][j] = frog_Scores[i];
-            }
-
-        }
-    }
+    data[SCORE_LEVEL_1_NAME][MOUSE_NAME] = mouse_Scores[1];
+    data[SCORE_LEVEL_2_NAME][MOUSE_NAME] = mouse_Scores[2];
+    data[SCORE_LEVEL_3_NAME][MOUSE_NAME] = mouse_Scores[3];
+    data[SCORE_LEVEL_1_NAME][FROG_NAME] = frog_Scores[1];
+    data[SCORE_LEVEL_2_NAME][FROG_NAME] = frog_Scores[2];
+    data[SCORE_LEVEL_3_NAME][FROG_NAME] = frog_Scores[3];
     std::ofstream file(fileName);
     file << std::setw(4) << data << std::endl;
     file.flush();

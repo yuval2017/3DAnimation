@@ -192,24 +192,6 @@ void ObjectsAnimationVisitor::removeFormerlevel(int index){
     clearAllAliveObjects(coins_in_use, coins_not_in_use);
     clearAllAliveObjects(bricks_in_use, bricks_not_in_use);
 
-    switch (index) {
-        case 1 :
-            if(!basicScene->level1->isHidden){
-                basicScene->level2->isHidden = true;
-            }
-            break;
-        case 2 :
-            if(!basicScene->level2->isHidden){
-                basicScene->level3->isHidden = true;
-            }
-            break;
-        case 3 :
-            if(!basicScene->level3->isHidden){
-                basicScene->level1->isHidden = true;
-            }
-            break;
-
-    }
 }
 void ObjectsAnimationVisitor::clearAllAliveObjects(std::vector<std::shared_ptr<Model>> &objects_in_use, std::vector<std::shared_ptr<Model>> &objects_not_in_use){
     for(const shared_ptr<Model>& model : objects_in_use) {
@@ -225,18 +207,42 @@ void ObjectsAnimationVisitor::loadNextLevel(int nextLevel){
     switch (nextLevel) {
         case 1:
             removeFormerlevel(3);
+            if(!basicScene->level2->isHidden){
+                basicScene->level2->isHidden = true;
+            }
+            if(!basicScene->level3->isHidden){
+                basicScene->level3->isHidden = true;
+            }
             CreateLevel1(models, coords);
             break;
         case 2:
             removeFormerlevel(1);
+            if(!basicScene->level1->isHidden){
+                basicScene->level1->isHidden = true;
+            }
+            if(!basicScene->level3->isHidden){
+                basicScene->level3->isHidden = true;
+            }
             CreateLevel2(models, coords);
             break;
         case 3:
             removeFormerlevel(2);
+            if(!basicScene->level1->isHidden){
+                basicScene->level1->isHidden = true;
+            }
+            if(!basicScene->level2->isHidden){
+                basicScene->level2->isHidden = true;
+            }
             CreateLevel3(models, coords);
             break;
         default:
-            //level 1;
+            removeFormerlevel(3);
+            if(!basicScene->level2->isHidden){
+                basicScene->level2->isHidden = true;
+            }
+            if(!basicScene->level3->isHidden){
+                basicScene->level3->isHidden = true;
+            }
             CreateLevel1(models, coords);
             break;
     }
@@ -547,6 +553,7 @@ void ObjectsAnimationVisitor::generatePointsInMapLevel(std::vector<Eigen::Vector
 }
 
 void ObjectsAnimationVisitor::CreateLevel1(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords) {
+    basicScene->currLevelMap = basicScene->level1;
     basicScene->level1->isHidden = false;
     frog_scale = 0.5f;
     mouse_scale = 0.5f;
@@ -568,8 +575,12 @@ void ObjectsAnimationVisitor::CreateLevel1(std::vector<shared_ptr<Model>> &model
     tree->SetTreeAndCube(ModelsFactory::getInstance()->bounding_boxes[TREE], ModelsFactory::getInstance()->trees[TREE]);
     tree->Translate({10.0, 0, 10.0});
 
+basicScene->getStatistics()->speed=1;
+basicScene->snake->speed=1;
+
 }
 void ObjectsAnimationVisitor::CreateLevel2(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords) {
+    basicScene->currLevelMap = basicScene->level2;
     basicScene->level2->isHidden =false;
     frog_scale = 0.3f;
     mouse_scale = 0.3f;
@@ -594,11 +605,14 @@ void ObjectsAnimationVisitor::CreateLevel2(std::vector<shared_ptr<Model>> &model
         std::shared_ptr<Model> cube = createBrick();
         cube->Translate(position);
     }
+    basicScene->getStatistics()->speed=1.5;
+    basicScene->snake->speed=1.5;
 }
 
 
 
 void ObjectsAnimationVisitor::CreateLevel3(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords) {
+    basicScene->currLevelMap = basicScene->level3;
     basicScene->level3->isHidden =false;
     frog_scale = 0.1f;
     mouse_scale = 0.1f;
@@ -615,6 +629,8 @@ void ObjectsAnimationVisitor::CreateLevel3(std::vector<shared_ptr<Model>> &model
         cube->Translate(position);
         cube->Scale(2);
     }
+    basicScene->getStatistics()->speed=2;
+    basicScene->snake->speed=2;
 }
 
 
