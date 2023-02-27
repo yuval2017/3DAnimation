@@ -16,7 +16,6 @@ void Stopper::start(int sec) {
     }
 }
 
-//TODO equal??
 bool Stopper::is_countdown_running()  {
     if(in_stop){
         return true;
