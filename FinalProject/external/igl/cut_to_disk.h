@@ -13,7 +13,7 @@ namespace igl
   // Nothing else about the cuts (including number, total length, or smoothness)
   // is guaranteed to be optimal.
   //
-  // Simply-connected components without boundary (topological spheres_in_use) are left
+  // Simply-connected components without boundary (topological special_bezier_in_use) are left
   // untouched (delete any edge if you really want a disk). 
   // All other connected components are cut into disks. Meshes with boundary are
   // supported; boundary edges will be included as cuts.

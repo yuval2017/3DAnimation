@@ -54,7 +54,7 @@ public:
     void generateRandomBeizierCurve(Eigen::Vector3f vector, Eigen::Matrix <float, 4, 3 > &MG_Result);
     bool doCubesIntersect(const Eigen::Vector3d& c1, const Eigen::Vector3d& c2, double cubeSize);
     void setRandomCubeLocations(double domainX, double domainY, double domainZ,
-                                int numCubes, double cubeSize, std::vector<ObjectInfo> &cubes);
+                                int numCubes, double cubeSize, std::vector<Eigen::Vector3f> &coords);
     std::vector<TexCoord>
     getVertexTextureCoordinates(std::vector<Vertex> vertices, std::vector<Face> faces, std::string imagePath);
     std::vector<TexCoord> getVertexTextureCoordinates(Eigen::MatrixXd vertices, Eigen::MatrixXi faces, std::string imagePath);

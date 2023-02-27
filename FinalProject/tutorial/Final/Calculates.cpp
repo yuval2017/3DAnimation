@@ -381,7 +381,7 @@ bool Calculates::isBoxesIntersect(Eigen::AlignedBox<double, 3>& boxA, Eigen::Ali
 }
 
 void Calculates::setRandomCubeLocations(double domainX, double domainY, double domainZ,
-                                                     int numCubes, double cubeSize, std::vector<ObjectInfo> &cubes) {
+                                                     int numCubes, double cubeSize, std::vector<Eigen::Vector3f> &coords) {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> disX(-domainX/2 + cubeSize/2, domainX/2 - cubeSize/2);
@@ -389,7 +389,7 @@ void Calculates::setRandomCubeLocations(double domainX, double domainY, double d
     std::uniform_real_distribution<> disZ(-domainZ/2 + cubeSize/2, domainZ/2 - cubeSize/2);
 
 
-    while (cubes.size() < numCubes) {
+    while (coords.size() < numCubes) {
         // Generate random cube center
         double x = disX(gen);
         double y = disY(gen);
@@ -405,8 +405,8 @@ void Calculates::setRandomCubeLocations(double domainX, double domainY, double d
 
         // Check if cube intersects with any other cubes
         bool intersects = false;
-        for (const auto& c : cubes) {
-            if (doCubesIntersect(p, c.position, cubeSize)) {
+        for (const auto& c : coords) {
+            if (doCubesIntersect(p, c.cast<double>(), cubeSize)) {
                 intersects = true;
                 break;
             }
@@ -416,13 +416,10 @@ void Calculates::setRandomCubeLocations(double domainX, double domainY, double d
         }
 
         // Add cube center to vector
-        ObjectInfo object;
-        object.position = p;
-        object.type = 'c';
-        cubes.push_back(object);
+        Eigen::Vector3f object;
+        object = p.cast<float>();
+        coords.push_back(object);
     }
-
-
 }
 
 bool Calculates::doCubesIntersect(const Eigen::Vector3d& c1, const Eigen::Vector3d& c2, double cubeSize) {

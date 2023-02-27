@@ -6,6 +6,7 @@
 #include "../tutorial/Final/BasicScene.h"
 //#include <GL.h>
 #include "Utility.h"
+#include "../tutorial/Final/ObjectsNames.h"
 
 
 namespace cg3d
@@ -15,11 +16,16 @@ namespace cg3d
         basicScene =  (BasicScene *)_scene;
         number_of_bones = basicScene->snake->bones.size() - 1;
         Visitor::Run(basicScene, camera);
+        Eigen::Vector3f snake_head = basicScene->snake->get_snake_head();
+        Eigen::Vector3d max = basicScene->level1->GetMeshList()[0]->data[0].vertices.colwise().maxCoeff();
+        Eigen::Vector3d min = basicScene->level1->GetMeshList()[0]->data[0].vertices.colwise().minCoeff();
+        if(!(snake_head[0] < max[0] && snake_head[0] > min[0] && snake_head[1] < max[1] && snake_head[1] > min[1] && snake_head[2] < max[2] && snake_head[2] > min[2])){
+            //alarm the snake not in the map!!
+            int i = 0;
+        }
     }
-
     void AnimationVisitor::Visit(Model* model)
     {
-
         if(basicScene->animate && model->name == std::string("snake")){
             basicScene->snake->skinning(basicScene->snake->direction);
         }
