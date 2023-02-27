@@ -169,17 +169,17 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
         basicScene->snake->reset_sake();
         basicScene->resetCameras();
         basicScene->getStatistics()->restart = false;
-        if(basicScene->getData()->back_to_main.size()==0) {
-            basicScene->getStatistics()->menu_flags[MainMenu_OP] = true;
+        int size = basicScene->getData()->back_to_main.size();
+        if( size ==0) {
+//            basicScene->getStatistics()->menu_flags[MainMenu_OP] = true;
         }else{
-            int next = basicScene->getData()->back_to_main.front();
-            basicScene->getData()->back_to_main.pop_back();
-            basicScene->getStatistics()->menu_flags[next];
+//            int next = basicScene->getData()->back_to_main.front();
+//            basicScene->getData()->back_to_main.pop_back();
+//            basicScene->getStatistics()->menu_flags[next] = true;
         }
-        basicScene->start_time = 0.0;
+//        basicScene->start_time = 0.0;
     }
-
-    if(basicScene->getStatistics()->won){
+    else if(basicScene->getStatistics()->won){
         basicScene->animate = false;
         basicScene->getStatistics()->won = false;
         basicScene->getStatistics()->menu_flags[WinMenu_OP] = true;

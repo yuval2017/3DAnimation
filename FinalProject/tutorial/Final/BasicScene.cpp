@@ -1583,3 +1583,7 @@ void BasicScene::AddViewportCallback(Viewport* _viewport)
           "\tsuch as extra life,double score, more speed etc.\n"
           "\tGood Luck!");
 }
+
+Data *BasicScene::getData() {
+    return data;
+}
