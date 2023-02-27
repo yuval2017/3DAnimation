@@ -58,7 +58,7 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
             frogs_not_in_use.push_back(frog);
             basicScene->GetRoot()->AddChild(frog);
             frog->isHidden = true;
-            frog->Scale(0.5);
+            frog->Scale(frog_scale);
 
             std::shared_ptr<Model> mouse = factory->CreateModel(GREY_MATERIAL, MOUSE,
                                                                 std::string(EATING_OBJECT) + std::string(TIMING) +
@@ -69,7 +69,7 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
             mouses_not_in_use.push_back(mouse);
             basicScene->GetRoot()->AddChild(mouse);
             mouse->isHidden = true;
-            mouse->Scale(0.5);
+            mouse->Scale(mouse_scale);
 
 
             std::shared_ptr<Model> coin = factory->CreateModel(GOLD_MATERIAL, COIN,
@@ -82,6 +82,7 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
             coins_not_in_use.push_back(coin);
             basicScene->GetRoot()->AddChild(coin);
             coin->isHidden = true;
+            coin->Scale(coin_scale);
         }
         //don't need to init it anymore
         is_visitor_inited = true;
@@ -425,6 +426,7 @@ shared_ptr<Model> ObjectsAnimationVisitor::createFrog(){
         frog->Rotate(M_PI, Movable::Axis::Z);
         frogs_in_use.push_back(frog);
         basicScene->GetRoot()->AddChild(frog);
+        frog->Scale(frog_scale);
     }
     return frog;
 }
@@ -435,6 +437,7 @@ shared_ptr<Model> ObjectsAnimationVisitor::createBrick(){
         cube->SetTreeAndCube(ModelsFactory::getInstance()->bounding_boxes[CUBE],ModelsFactory::getInstance()->trees[CUBE]);
         basicScene->GetRoot()->AddChild(cube);
         bricks_in_use.push_back(cube);
+        cube->Scale(brick_scale);
     }
     return cube;
 
@@ -449,6 +452,7 @@ shared_ptr<Model> ObjectsAnimationVisitor::createSphere(){
                                ModelsFactory::getInstance()->trees[SPHERE]);
         basicScene->GetRoot()->AddChild(sphere);
         special_bezier_in_use.push_back(sphere);
+        sphere->Scale(sphere_scale);
     }
     return sphere;
 }
@@ -465,6 +469,7 @@ shared_ptr<Model> ObjectsAnimationVisitor::createMouse(){
         mouse->SetTreeAndCube(ModelsFactory::getInstance()->bounding_boxes[MOUSE],ModelsFactory::getInstance()->trees[MOUSE]);
         mouses_in_use.push_back(mouse);
         basicScene->GetRoot()->AddChild(mouse);
+        mouse->Scale(mouse_scale);
     }
     return mouse;
 }
@@ -482,6 +487,7 @@ shared_ptr<Model> ObjectsAnimationVisitor::createCoin(){
         coin->Rotate(-M_PI / 2.0f, Movable::Axis::X);
         coins_in_use.push_back(coin);
         basicScene->GetRoot()->AddChild(coin);
+        coin->Scale(coin_scale);
     }
     return coin;
 }
@@ -543,6 +549,11 @@ void ObjectsAnimationVisitor::generatePointsInMapLevel(std::vector<Eigen::Vector
 
 void ObjectsAnimationVisitor::CreateLevel1(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords) {
     basicScene->level1->isHidden = false;
+    frog_scale = 0.5f;
+    mouse_scale = 0.5f;
+    coin_scale = 1.0f;
+    brick_scale = 2.0f;
+    sphere_scale = 1.0f;
     int n = 100;
     init_point_givers();
     generatePointsInMapLevel(coords, n);
@@ -561,6 +572,11 @@ void ObjectsAnimationVisitor::CreateLevel1(std::vector<shared_ptr<Model>> &model
 }
 void ObjectsAnimationVisitor::CreateLevel2(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords) {
     basicScene->level2->isHidden =false;
+    frog_scale = 0.3f;
+    mouse_scale = 0.3f;
+    coin_scale = 0.5f;
+    brick_scale = 3.0f;
+    sphere_scale = 1.5f;
     init_point_givers();
     int n = 150;
     for (const std::shared_ptr<Model> &frog: frogs_not_in_use){
@@ -585,6 +601,11 @@ void ObjectsAnimationVisitor::CreateLevel2(std::vector<shared_ptr<Model>> &model
 
 void ObjectsAnimationVisitor::CreateLevel3(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords) {
     basicScene->level3->isHidden =false;
+    frog_scale = 0.1f;
+    mouse_scale = 0.1f;
+    coin_scale = 0.3f;
+    brick_scale = 4.0f;
+    sphere_scale = 2.0f;
     init_point_givers();
     int n = 200;
     generatePointsInMapLevel(coords, n);

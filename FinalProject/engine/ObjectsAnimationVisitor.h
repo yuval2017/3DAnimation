@@ -95,7 +95,11 @@ namespace cg3d {
         int num_of_points = 45;
         int num_of_models = 15;
         Calculates* calculates;
-
+        float frog_scale = 0.5f;
+        float mouse_scale = 0.5f;
+        float coin_scale = 1.0f;
+        float brick_scale = 2.0f;
+        float sphere_scale = 1.f0;
         Eigen::Vector3f get_point( std::queue<Eigen::Vector3f> &coords);
     };
 }
