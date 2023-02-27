@@ -86,17 +86,17 @@ namespace cg3d {
 
         // Generate 3 points every sec1, sec2, sec3 seconds for len1, len2, len3 seconds
         double sec1 = 5.0; // generate frog points every 2 seconds
-        double len1 = 20.0; // frog points should disappear after 10 seconds
+        double len1 = 40.0; // frog points should disappear after 10 seconds
         double sec2 = 5.0; // generate mouse points every 3 seconds
-        double len2 = 20.0; // mouse points should disappear after 7 seconds
-        double sec3 = 5.0; // generate cube points every 5 seconds
-        double len3 = 20.0; // cube points should disappear after 5 seconds
+        double len2 = 30.0; // mouse points should disappear after 7 seconds
+        double sec3 = 7.0; // generate cube points every 5 seconds
+        double len3 = 30.0; // cube points should disappear after 5 seconds
         int min_dist = 4;
         int num_of_points = 45;
         int num_of_models = 15;
         Calculates* calculates;
-        float frog_scale = 0.5f;
-        float mouse_scale = 0.5f;
+        float frog_scale = 0.8f;
+        float mouse_scale = 0.7f;
         float coin_scale = 1.0f;
         float brick_scale = 2.0f;
         float sphere_scale = 1.0f;

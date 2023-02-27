@@ -597,9 +597,9 @@ basicScene->snake->speed=1;
 void ObjectsAnimationVisitor::CreateLevel2(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords) {
     basicScene->currLevelMap = basicScene->level2;
     basicScene->level2->isHidden =false;
-    frog_scale = 0.3f;
-    mouse_scale = 0.3f;
-    coin_scale = 0.5f;
+    frog_scale = 0.6f;
+    mouse_scale = 0.7f;
+    coin_scale = 0.8f;
     brick_scale = 3.0f;
     sphere_scale = 1.5f;
     init_point_givers();
@@ -635,9 +635,9 @@ void ObjectsAnimationVisitor::CreateLevel2(std::vector<shared_ptr<Model>> &model
 void ObjectsAnimationVisitor::CreateLevel3(std::vector<shared_ptr<Model>> &models, std::vector<Eigen::Vector3f> &coords) {
     basicScene->currLevelMap = basicScene->level3;
     basicScene->level3->isHidden =false;
-    frog_scale = 0.1f;
-    mouse_scale = 0.1f;
-    coin_scale = 0.3f;
+    frog_scale = 0.5f;
+    mouse_scale = 0.5f;
+    coin_scale = 0.4f;
     brick_scale = 4.0f;
     sphere_scale = 2.0f;
     init_point_givers();
