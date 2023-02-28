@@ -256,6 +256,7 @@ void Snake::reset_bones(){
     bones[0]->SetCenter(Eigen::Vector3f(0,0,-(joint_length/2.0f)));
     bones[0]->Translate((joint_length/2.0f),cg3d::Movable::Axis::Z);
     bones[0]->Translate(-(number_of_joints)*joint_length,cg3d::Movable::Axis::Z);
+    bones[0]->isHidden = true;
     for(int i = 1;i < number_of_joints; i++)
     {
         bones.push_back(ModelsFactory::getInstance()->CreateModel(PHONG_MATERIAL, CYL, "bone " + std::to_string(i)));
