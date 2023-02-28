@@ -224,7 +224,9 @@ void ObjectsAnimationVisitor::removeFormerlevel(int index){
             Eigen::Vector3f to_scale = {1/bz->scale_factor[0], 1/bz->scale_factor[1], 1/bz->scale_factor[2]};
             bz->Scale(to_scale);
             bz->Translate(-bz->GetPosition());
+
         }
+        bz->stopper.reset();
         bz->isHidden = true;
         bezier_not_in_use.push_back(bz);
     }
@@ -243,6 +245,7 @@ void ObjectsAnimationVisitor::clearAllAliveObjects(std::vector<std::shared_ptr<M
         Eigen::Vector3f to_scale = {1/model->scale_factor[0], 1/model->scale_factor[1], 1/model->scale_factor[2]};
         model->Scale(to_scale);
         model->Translate(-model->GetPosition());
+        model->stopper.reset();
     }
     objects_in_use.clear();
 }

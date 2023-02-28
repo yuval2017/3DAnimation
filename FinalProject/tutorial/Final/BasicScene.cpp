@@ -75,12 +75,15 @@ void BasicScene::init_cameras(float fov, int width, int height,float near, float
     cameras[2]->Rotate(M_PI, Movable::Axis::Y);
     cameras[2]->RotateByDegree(-15.f, Movable::Axis::X);
 
-    //Set over-view
-    snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[3]);
-    cameras[3]->Translate(Eigen::Vector3f(-5.f, 10.f, -50.f));
-    cameras[3]->Rotate(M_PI, Movable::Axis::Y);
-    cameras[3]->RotateByDegree(-15.f, Movable::Axis::X);
 
+    //Set over-view
+    cameras[3]->Translate(-50, Axis::Z);
+    cameras[3]->Translate(50, Axis::Y);
+    cameras[3]->Rotate(-M_PI/4, Axis::Y);
+//    snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[3]);
+//    cameras[3]->Translate(Eigen::Vector3f(0.f, 10.f, -50.f));
+//    cameras[3]->Rotate(M_PI, Movable::Axis::Y);
+//    cameras[3]->RotateByDegree(-15.f, Movable::Axis::Y);
     camera = cameras[3];
 
 }
@@ -92,7 +95,7 @@ void BasicScene::resetCameras(){
 
     snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[2]);
 
-    snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[3]);
+    //snake->GetSnakeBones()[snake->GetSnakeBones().size()-1]->AddChild(cameras[3]);
 }
 void BasicScene::initProperties( int width, int height){
     windowFlags = ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar |
@@ -347,6 +350,8 @@ void BasicScene::loadingMenu() {
             std::this_thread::sleep_for(std::chrono::seconds(1));
             statistics->menu_flags[LoadingMenu_OP] = false;
             statistics->menu_flags[MainMenu_OP] =true;
+            soundManager->play_game_music();
+//            soundManager->play_sound(std::string(THIRD_MUSIC));
         }
         for(int i= 0; i<100 ; i++){
             ImGui::Spacing();
@@ -484,7 +489,7 @@ void BasicScene::PausedMenu()
         ImGui::Text("%d", statistics->level);
         ImGui::Text("Snake speed: ");
         ImGui::SameLine(ImGui::GetWindowWidth()/2);
-        ImGui::Text("%d", std::round(statistics->speed));
+        ImGui::Text("%f", std::round(statistics->speed));
         for(int i = 0; i< 3 ; i++){
             ImGui::Spacing();
         }
@@ -526,6 +531,7 @@ void BasicScene::PausedMenu()
             std::cout << "Surrender button pressed in pause menu." << endl;
             statistics->menu_flags[PauseMenu_OP] = false;
             soundManager->play_sound(std::to_string(BOO_SOUND));
+            soundManager->play_sound(std::string(THIRD_MUSIC));
             data->back_to_main.clear();
             data->add_total_money(statistics->score/10);
             data->back_to_main.push_back(LoadingMenu_OP);
@@ -751,6 +757,7 @@ void BasicScene::NextLevelMenu() {
             if (ImGui::Button("Back to main", ImVec2(200, 0))) {
                 std::cout << "Back button pressed in next level menu." << endl;
                 soundManager->play_sound(std::to_string(BOO_SOUND));
+                soundManager->play_sound(std::string(THIRD_MUSIC));
                 data->back_to_main.clear();
                 animate = false;
                 data->add_total_money(statistics->score / 10);
@@ -847,6 +854,7 @@ void BasicScene::WinMenu() {
                 statistics->menu_flags[WinMenu_OP] =false;
                 data->add_total_money(statistics->score/10);
                 data->back_to_main.push_back(LoadingMenu_OP);
+                soundManager->play_sound(std::string(THIRD_MUSIC));
                 statistics->restart = true;
 
             }
@@ -916,8 +924,6 @@ void BasicScene::LoseMenu() {
                 statistics->menu_flags[GameOverMenu_OP] = false;
                 data->back_to_main.push_back(LoadingMenu_OP);
                 animate = true;
-                statistics->restart =true;
-
             }
 
         }
@@ -976,6 +982,7 @@ void BasicScene::LoseMenu() {
                 statistics->objectCollisionStopper.reset();
                 statistics->selfCollisionStopper.reset();
                 data->back_to_main.push_back(LoadingMenu_OP);
+                soundManager->play_sound(std::string(THIRD_MUSIC));
                 statistics->restart = true;
 
             }
@@ -1121,7 +1128,10 @@ void BasicScene::LeadersMenu() {
 
     if (statistics->menu_flags[LeadersMenu_OP]) {
         animate = false;
-        setWindow("Leader Board",backgroundLeadersTexture,ImVec4(0.0f,0.5f, 0.0f,1.0f));
+        ImVec4 black = ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+        ImGui::PushStyleColor(ImGuiCol_Text, black);
+        setWindow("Leader Board",backgroundLeadersTexture,black);
+        ImGui::PopStyleColor();
         ImGui::PushFont(regularFont);
         this->highScores->loadHighScores();
         std::vector<std::string> names = highScores->extractPlayerNames();

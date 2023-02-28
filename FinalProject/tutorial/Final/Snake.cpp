@@ -199,15 +199,15 @@ void Snake::skinning(Eigen::Vector3d t) {
     }
     ikRotateHelper(number_of_joints-1, p[number_of_joints]);
 
-//    Eigen::MatrixXd VN;
-//    igl::per_vertex_normals(U, snake->GetMesh()->data[0].faces, VN);
-//    snake->setMeshData(snake->name,
-//                    U,
-//                    snake->GetMeshList()[0]->data[0].faces,
-//                    VN,
-//                    snake->GetMeshList()[0]->data[0].textureCoords);
-//
-//
+    Eigen::MatrixXd VN;
+    igl::per_vertex_normals(U, snake->GetMesh()->data[0].faces, VN);
+    snake->setMeshData(snake->name,
+                    U,
+                    snake->GetMeshList()[0]->data[0].faces,
+                    VN,
+                    snake->GetMeshList()[0]->data[0].textureCoords);
+
+
 
 
     for (int i = 0; i < number_of_joints + 1; i++) {
@@ -256,6 +256,7 @@ void Snake::reset_bones(){
     bones[0]->SetCenter(Eigen::Vector3f(0,0,-(joint_length/2.0f)));
     bones[0]->Translate((joint_length/2.0f),cg3d::Movable::Axis::Z);
     bones[0]->Translate(-(number_of_joints)*joint_length,cg3d::Movable::Axis::Z);
+    bones[0]->isHidden = true;
     for(int i = 1;i < number_of_joints; i++)
     {
         bones.push_back(ModelsFactory::getInstance()->CreateModel(PHONG_MATERIAL, CYL, "bone " + std::to_string(i)));
@@ -267,6 +268,7 @@ void Snake::reset_bones(){
         bones[i]->SetCenter(Eigen::Vector3f(0,0,-(joint_length)));
         //bones[i-1]->AddChild(bones[i]);
         bones[i]->GetTree();
+        bones[i]->isHidden = true;
     }
 }
 void Snake::reset_sake() {

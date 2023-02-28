@@ -1,6 +1,6 @@
 {
-    "double_score": 0,
-    "life_bought": 0,
+    "double_score": 1,
+    "life_bought": 1,
     "object_collision": 0,
     "scoreLevel1": {
         "0": 10,
@@ -14,6 +14,6 @@
         "0": 20,
         "1": 20
     },
-    "self_collision": 0,
-    "total_money": 419
+    "self_collision": 2,
+    "total_money": 421
 }
