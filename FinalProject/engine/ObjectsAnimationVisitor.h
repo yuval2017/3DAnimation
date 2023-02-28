@@ -37,7 +37,7 @@ namespace cg3d {
         shared_ptr<Model> createCoin();
         shared_ptr<Model> createSphere();
         shared_ptr<Model> createBrick();
-        shared_ptr<Model> createBezier();
+        shared_ptr<Model> createFrogBezier();
         //remove
         void removeFrog(const shared_ptr<Model>& frog);
         void removeMouse(const shared_ptr<Model>& mouse);
@@ -51,24 +51,24 @@ namespace cg3d {
         void get_map_max_min(Eigen::Vector3f &max, Eigen::Vector3f &min);
 
     private:
-        std::vector<std::shared_ptr<Model>> checkForRemove(std::vector<std::shared_ptr<Model>> objects_in_use);
+        std::vector<std::shared_ptr<Model>> checkForRemove(const std::vector<std::shared_ptr<Model>>& objects_in_use);
+        void rescaleObjects();
         void GetCurrMapMaxLength(float &length_x, float &length_y, float &length_z);
         std::shared_ptr<Material> material;
         std::shared_ptr<Program> program;
         BasicScene *basicScene;
         bool is_visitor_inited = false;
         float generate_random_number(float min, float max);
-        void init_point_givers();
+        void init_point_givers(float div_map);
         Stopper* stopperFrog;
         Stopper* stopperMouse;
         Stopper* stopperCoin;
         Stopper* snakeSpeed;
         Stopper* stopperSpecialBezier;
         Stopper *stopperBezier;
-        int sec_between_specialbezier = 10;
-        int sec_bezier = 10;
-        int len_bezier = 70;
+
         std::queue<Eigen::Vector3f > frogPoints;
+        std::queue<Eigen::Vector3f > bezierPoints;
         std::queue<Eigen::Vector3f > mousePoints;
         std::queue<Eigen::Vector3f > coinPoints;
         std::vector<std::shared_ptr<Model>> frogs_not_in_use;
@@ -90,15 +90,16 @@ namespace cg3d {
 
 
         // Generate 3 points every sec1, sec2, sec3 seconds for len1, len2, len3 seconds
-        double sec1 = 5.0; // generate frog points every 2 seconds
-        double len1 = 40.0; // frog points should disappear after 10 seconds
-        double sec2 = 5.0; // generate mouse points every 3 seconds
-        double len2 = 30.0; // mouse points should disappear after 7 seconds
-        double sec3 = 7.0; // generate cube points every 5 seconds
-        double len3 = 30.0; // cube points should disappear after 5 seconds
-        int min_dist = 4;
-        int num_of_points = 45;
-        int num_of_models = 15;
+        int sec1 = 5; // generate frog points every 2 seconds
+        int len1 = 70; // frog points should disappear after 10 seconds
+        int sec2 = 5; // generate mouse points every 3 seconds
+        int len2 = 70; // mouse points should disappear after 7 seconds
+        int sec3 = 7; // generate cube points every 5 seconds
+        int len3 = 30; // cube points should disappear after 5 seconds
+        int sec_between_specialbezier = 10;
+        int sec_bezier = 10;
+        int len_bezier = 100;
+        int number_of_points = 45;
         Calculates* calculates;
         float frog_scale = 0.8f;
         float mouse_scale = 0.7f;

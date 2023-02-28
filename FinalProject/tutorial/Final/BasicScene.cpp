@@ -23,9 +23,9 @@ void BasicScene::Init(float fov, int width, int height, float near, float far) {
     initProperties(width, height);
     this->statistics->menu_flags[LoadingMenu_OP] = true;
     done = 0;
+    init_helpers();
     init_objects();
     init_cameras(fov,width,height,near,far);
-    init_helpers();
     setFonts();
     setStartPos();
     setImage();
@@ -300,7 +300,7 @@ void BasicScene::init_helpers(){
 
     this->highScores = new HighScores();
     this->soundManager = SoundManager::getInstance();
-    soundManager->play_game_music();
+    soundManager->stop_game_music();
     this->animate = false;
     init_flags[2]= true;
     done++;

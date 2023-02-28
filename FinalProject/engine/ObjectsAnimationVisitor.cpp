@@ -27,7 +27,7 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
 
 
     //The init part.
-    if (!is_visitor_inited && basicScene->init_flags[0]) {
+    if (!is_visitor_inited) {
         float x_length;
         float y_length;
         float z_length;
@@ -88,41 +88,50 @@ void ObjectsAnimationVisitor::Run(Scene *scene, Camera *camera) {
 
 
 
-            std::shared_ptr<Model> coin2 = factory->CreateModel(GOLD_MATERIAL, COIN,
-                                                               std::string(EATING_OBJECT) + std::string(TIMING) +
-                                                               std::string(COIN_NAME));
-            coin2->material->program->name = "gold";
-            coin2->SetTreeAndCube(ModelsFactory::getInstance()->bounding_boxes[COIN],
-                                 ModelsFactory::getInstance()->trees[COIN]);
-            coin2->Rotate(-M_PI / 2.0f, Movable::Axis::X);
-            bezier_not_in_use.push_back(coin2);
-            basicScene->GetRoot()->AddChild(coin2);
-            coin2->isHidden = true;
+            std::shared_ptr<Model> frog2 =  factory->CreateModel(GREEN_MATERIAL, FROG,
+                                                                 std::string(EATING_OBJECT) + std::string(TIMING) +
+                                                                 std::string(FROG_NAME));
+            frog2->SetTreeAndCube(ModelsFactory::getInstance()->bounding_boxes[FROG],
+                                 ModelsFactory::getInstance()->trees[FROG]);
+            frog2->Rotate(-M_PI / 2.0f, Movable::Axis::X);
+            frog2->Rotate(M_PI/2.0f, Movable::Axis::Z);
+            bezier_not_in_use.push_back(frog2);
+            basicScene->GetRoot()->AddChild(frog2);
+            frog2->Scale(0.5);
+            frog2->isHidden = true;
+            frog2->bezier = nullptr;
+
+
+            std::shared_ptr<Model> mouse2 = factory->CreateModel(GREY_MATERIAL, MOUSE,
+                                                                std::string(EATING_OBJECT) + std::string(TIMING) +
+                                                                std::string(MOUSE_NAME));
+            mouse2->Rotate(-M_PI / 2.0f, Movable::Axis::X);
+            mouse2->SetTreeAndCube(ModelsFactory::getInstance()->bounding_boxes[MOUSE],
+                                  ModelsFactory::getInstance()->trees[MOUSE]);
+            basicScene->GetRoot()->AddChild(mouse2);
+            bezier_not_in_use.push_back(mouse2);
+            mouse2->isHidden = true;
+            mouse2->bezier = nullptr;
         }
+        CreateLevel1(models, coords);
+        basicScene->init_flags[1] = true;
+        basicScene->done++;
         //don't need to init it anymore
         is_visitor_inited = true;
-        program = std::make_shared<Program>("../tutorial/shaders/phongShader");
+//        program = std::make_shared<Program>("../tutorial/shaders/phongShader");
         //material1
-        material = std::make_shared<Material>("material", program); // empty material
-        material->AddTexture(0, "textures/box0.bmp", 2);
+//        material = std::make_shared<Material>("material", program); // empty material
+//        material->AddTexture(0, "textures/box0.bmp", 2);
         //initiating the system length for the objects positions.
 
         //generating the Bezier objects.
 
         //init the first level.
-        CreateLevel1(models, coords);
-        basicScene->init_flags[1] = true;
-        basicScene->done++;
+
 
     } else {
         if (basicScene->animate) {
-            if(!(stopperBezier->is_countdown_running())){
-                std::shared_ptr<Model> coin = createBezier();
-                Eigen::Vector3f pos = get_point(coinPoints);
-                setModelBezier(pos, coin.get());
-                stopperBezier->start(sec_bezier);
-                coin->stopper.start(len_bezier);
-            }
+
             if(!(stopperSpecialBezier->is_countdown_running())){
 
                 std::shared_ptr<Model> sphere = createSphere();
@@ -204,6 +213,7 @@ void ObjectsAnimationVisitor::removeFormerlevel(int index){
             basicScene->GetRoot()->RemoveChild(bz->bezier);
             Eigen::Vector3f to_scale = {1/bz->scale_factor[0], 1/bz->scale_factor[1], 1/bz->scale_factor[2]};
             bz->Scale(to_scale);
+            bz->Translate(-bz->GetPosition());
         }
         bz->isHidden = true;
         special_bezier_not_in_use.push_back(bz);
@@ -213,6 +223,7 @@ void ObjectsAnimationVisitor::removeFormerlevel(int index){
             basicScene->GetRoot()->RemoveChild(bz->bezier);
             Eigen::Vector3f to_scale = {1/bz->scale_factor[0], 1/bz->scale_factor[1], 1/bz->scale_factor[2]};
             bz->Scale(to_scale);
+            bz->Translate(-bz->GetPosition());
         }
         bz->isHidden = true;
         bezier_not_in_use.push_back(bz);
@@ -231,6 +242,7 @@ void ObjectsAnimationVisitor::clearAllAliveObjects(std::vector<std::shared_ptr<M
         model->stopper.reset();
         Eigen::Vector3f to_scale = {1/model->scale_factor[0], 1/model->scale_factor[1], 1/model->scale_factor[2]};
         model->Scale(to_scale);
+        model->Translate(-model->GetPosition());
     }
     objects_in_use.clear();
 }
@@ -285,7 +297,7 @@ void ObjectsAnimationVisitor::Visit(Model *model) {
 
     }
 }
-std::vector<std::shared_ptr<Model>>  ObjectsAnimationVisitor::checkForRemove(std::vector<std::shared_ptr<Model>> objects_in_use) {
+std::vector<std::shared_ptr<Model>>  ObjectsAnimationVisitor::checkForRemove(const std::vector<std::shared_ptr<Model>>& objects_in_use) {
     std::vector<std::shared_ptr<Model>> objects_to_remove;
     for (const std::shared_ptr<Model> &model: objects_in_use) {
         if (!model->stopper.is_countdown_running()) {
@@ -295,6 +307,33 @@ std::vector<std::shared_ptr<Model>>  ObjectsAnimationVisitor::checkForRemove(std
     return objects_to_remove;
 }
 void ObjectsAnimationVisitor::Visit(Scene *scene) {
+
+    std::vector<std::shared_ptr<Model>> to_remove;
+    for(const std::shared_ptr<Model>& model: bezier_in_use) {
+        if (model->stopper.is_countdown_running()) {
+            if (model->t <= 1 && !model->moveBackwards) {
+                moveAccordingToBeizerCurve(model.get());
+                model->t += 0.04 * model->bezier_speed;
+            } else {
+                if (!model->moveBackwards)
+                    model->moveBackwards = true;
+                if (model->moveBackwards) {
+                    moveAccordingToBeizerCurve(model.get());
+                    model->t -= 0.04 * model->bezier_speed;
+                    if (model->t <= 0)
+                        model->moveBackwards = false;
+                }
+            }
+        } else{
+            to_remove.push_back(model);
+        }
+    }
+    for(const std::shared_ptr<Model>& model: to_remove){
+
+        basicScene->GetRoot()->RemoveChild(model->bezier);
+        removeBezier(model);
+    }
+
     if(basicScene->animate) {
         std::vector<std::shared_ptr<Model>> frogs_to_remove = checkForRemove(frogs_in_use);
         for(const std::shared_ptr<Model>& frog: frogs_to_remove){
@@ -315,7 +354,11 @@ void ObjectsAnimationVisitor::Visit(Scene *scene) {
         for(const std::shared_ptr<Model>& coin: coins_to_remove){
             removeCoin(coin);
         }
-
+        if(!(stopperBezier->is_countdown_running())){
+            std::shared_ptr<Model> frog = createFrogBezier();
+            stopperBezier->start(sec_bezier);
+            frog->stopper.start(len_bezier);
+        }
         if (!(stopperFrog->is_countdown_running())) {
             std::shared_ptr<Model> frog = createFrog();
             Eigen::Vector3f pos = get_point(frogPoints);
@@ -379,33 +422,6 @@ void ObjectsAnimationVisitor::Visit(Scene *scene) {
             model->t = 0.0f;
         }
     }
-    std::vector<std::shared_ptr<Model>> to_remove;
-    for(const std::shared_ptr<Model>& model: bezier_in_use) {
-        if (model->stopper.is_countdown_running()) {
-            if (model->t <= 1 && !model->moveBackwards) {
-                moveAccordingToBeizerCurve(model.get());
-                model->t += 0.04 * model->bezier_speed;
-            } else {
-                if (!model->moveBackwards)
-                    model->moveBackwards = true;
-                if (model->moveBackwards) {
-                    moveAccordingToBeizerCurve(model.get());
-                    model->t -= 0.04 * model->bezier_speed;
-                    if (model->t <= 0)
-                        model->moveBackwards = false;
-                }
-            }
-        } else{
-            to_remove.push_back(model);
-        }
-    }
-    for(const std::shared_ptr<Model>& model: bezier_in_use){
-        if(model->bezier != nullptr){
-            basicScene->GetRoot()->RemoveChild(model->bezier);
-        }
-        removeBezier(model);
-    }
-
 }
 void ObjectsAnimationVisitor::setModelBezier(Eigen::Vector3f vectors,Model *model){
     Calculates::getInstance()->generateRandomBeizierCurve(std::move(vectors),model->MG_Result);
@@ -540,28 +556,34 @@ shared_ptr<Model> ObjectsAnimationVisitor::createCoin(){
     }
     return coin;
 }
-shared_ptr<Model> ObjectsAnimationVisitor::createBezier(){
-    shared_ptr<Model> coin = addModelToGame(bezier_in_use, bezier_not_in_use);
-    if(coin == nullptr) {
+shared_ptr<Model> ObjectsAnimationVisitor::createFrogBezier(){
+    shared_ptr<Model> frog = addModelToGame(bezier_in_use, bezier_not_in_use);
+    if(frog == nullptr) {
         ModelsFactory *factory = ModelsFactory::getInstance();
-        coin = factory->CreateModel(GOLD_MATERIAL, COIN,
-                                    std::string(EATING_OBJECT) + std::string(TIMING) +
-                                    std::string(COIN_NAME));
-        coin->material->program->name = "gold";
-        coin->SetTreeAndCube(ModelsFactory::getInstance()->bounding_boxes[COIN],
-                             ModelsFactory::getInstance()->trees[COIN]);
-        coin->Rotate(-M_PI / 2.0f, Movable::Axis::X);
-        bezier_in_use.push_back(coin);
-        basicScene->GetRoot()->AddChild(coin);
-        coin->Scale(coin_scale);
+        frog =  factory->CreateModel(GREEN_MATERIAL, FROG,
+                                                                    std::string(EATING_OBJECT) + std::string(TIMING) +
+                                                                    std::string(FROG_NAME));
+        frog->SetTreeAndCube(ModelsFactory::getInstance()->bounding_boxes[FROG],
+                             ModelsFactory::getInstance()->trees[FROG]);
+        frog->Rotate(-M_PI / 2.0f, Movable::Axis::X);
+        frog->Rotate(M_PI/2.0f, Movable::Axis::Z);
+        frog->Scale(0.5);
+        bezier_in_use.push_back(frog);
+        basicScene->GetRoot()->AddChild(frog);
+        frog->bezier = nullptr;
+
+        frog->Scale(frog_scale);
     }
-    return coin;
+    Eigen::Vector3f pos = get_point(bezierPoints);
+    setModelBezier(pos, frog.get());
+    frog->Translate(pos);
+    return frog;
 }
 std::shared_ptr<Model> ObjectsAnimationVisitor::addModelToGame(std::vector<std::shared_ptr<Model>> &objects_in_use, std::vector<std::shared_ptr<Model>> &objects_not_in_use){
     std::shared_ptr<Model> model = nullptr;
     if(!objects_not_in_use.empty()){
         model = objects_not_in_use.front();
-        objects_not_in_use.pop_back();
+        objects_not_in_use.erase(objects_not_in_use.begin());
         model->isHidden = false;
         objects_in_use.push_back(model);
     }
@@ -603,7 +625,6 @@ void ObjectsAnimationVisitor::removeModelFromGame(std::vector<std::shared_ptr<Mo
 }
 
 void ObjectsAnimationVisitor::generatePointsInMapLevel(std::vector<Eigen::Vector3f> &coords, int n){
-    init_point_givers();
     coords.clear();
     coords.resize(0);
     Eigen::Vector3d max = basicScene->currLevelMap->GetMeshList()[0]->data[0].vertices.colwise().maxCoeff();
@@ -626,36 +647,19 @@ void ObjectsAnimationVisitor::CreateLevel1(std::vector<shared_ptr<Model>> &model
     coin_scale = 1.0f;
     brick_scale = 2.0f;
     sphere_scale = 1.0f;
-    int n = 100;
-    init_point_givers();
-    for (const std::shared_ptr<Model> &frog: frogs_not_in_use){
-        frog->Scale(frog_scale);
-    }
-    for (const std::shared_ptr<Model> &mouse: mouses_not_in_use){
-        mouse->Scale(mouse_scale);
-    }
-    for (const std::shared_ptr<Model> &coin: coins_not_in_use){
-        coin->Scale(coin_scale);
-    }
-    for (const std::shared_ptr<Model> &sphere: special_bezier_in_use){
-        sphere->Scale(sphere_scale);
-    }
-    for (const std::shared_ptr<Model> &brick: bricks_not_in_use){
-        brick->Scale(brick_scale);
-    }
-    for (const std::shared_ptr<Model> &brick: bezier_not_in_use){
-        brick->Scale(coin_scale);
-    }
+    int n = 50;
+    init_point_givers(2);
+    rescaleObjects();
     generatePointsInMapLevel(coords, n);
     for (int i = 0; i < n; i++) {
         Eigen::Vector3f position = coords[i];
         coords.push_back(position);
         shared_ptr<Model> cube = createBrick();
-        cube->Translate(position);
+        cube->Translate(position - cube->GetPosition());
     }
     shared_ptr<Model> tree = ModelsFactory::getInstance()->CreateModel2(TREE_MATERIAL, TREE_PATH,
                                                                         std::string(COLLISION_OBJECT) + " tree");
-    basicScene->AddChild(tree);
+    basicScene->GetRoot()->AddChild(tree);
     tree->SetTreeAndCube(ModelsFactory::getInstance()->bounding_boxes[TREE], ModelsFactory::getInstance()->trees[TREE]);
     tree->Translate({10.0, 0, 10.0});
 
@@ -671,32 +675,15 @@ void ObjectsAnimationVisitor::CreateLevel2(std::vector<shared_ptr<Model>> &model
     coin_scale = 0.8f;
     brick_scale = 3.0f;
     sphere_scale = 1.5f;
-    init_point_givers();
-    int n = 150;
-    for (const std::shared_ptr<Model> &frog: frogs_not_in_use){
-        frog->Scale(frog_scale);
-    }
-    for (const std::shared_ptr<Model> &mouse: mouses_not_in_use){
-        mouse->Scale(mouse_scale);
-    }
-    for (const std::shared_ptr<Model> &coin: coins_not_in_use){
-        coin->Scale(coin_scale);
-    }
-    for (const std::shared_ptr<Model> &sphere: special_bezier_in_use){
-        sphere->Scale(sphere_scale);
-    }
-    for (const std::shared_ptr<Model> &brick: bricks_not_in_use){
-        brick->Scale(brick_scale);
-    }
-    for (const std::shared_ptr<Model> &brick: bezier_not_in_use){
-        brick->Scale(coin_scale);
-    }
+    init_point_givers(4);
+    int n = 75;
+    rescaleObjects();
     generatePointsInMapLevel(coords, n);
     for (int i = 0; i < n; i++) {
         Eigen::Vector3f position = coords[i];
         coords.push_back(position);
         std::shared_ptr<Model> cube = createBrick();
-        cube->Translate(position);
+        cube->Translate(position - cube->GetPosition());
     }
     basicScene->getStatistics()->speed=1.5;
     basicScene->snake->speed=1.5;
@@ -712,8 +699,21 @@ void ObjectsAnimationVisitor::CreateLevel3(std::vector<shared_ptr<Model>> &model
     coin_scale = 0.4f;
     brick_scale = 4.0f;
     sphere_scale = 2.0f;
-    init_point_givers();
-    int n = 200;
+    init_point_givers(4);
+    int n = 100;
+    rescaleObjects();
+    generatePointsInMapLevel(coords, n);
+    for (int i = 0; i < n; i++) {
+        Eigen::Vector3f position = coords[i];
+        coords.push_back(position);
+        std::shared_ptr<Model> cube = createBrick();
+        cube->Translate(position - cube->GetPosition());
+    }
+    basicScene->getStatistics()->speed=2;
+    basicScene->snake->speed=2;
+}
+
+void ObjectsAnimationVisitor::rescaleObjects(){
     for (const std::shared_ptr<Model> &frog: frogs_not_in_use){
         frog->Scale(frog_scale);
     }
@@ -730,19 +730,9 @@ void ObjectsAnimationVisitor::CreateLevel3(std::vector<shared_ptr<Model>> &model
         brick->Scale(brick_scale);
     }
     for (const std::shared_ptr<Model> &brick: bezier_not_in_use){
-        brick->Scale(coin_scale);
+        brick->Scale(frog_scale);
     }
-    generatePointsInMapLevel(coords, n);
-    for (int i = 0; i < n; i++) {
-        Eigen::Vector3f position = coords[i];
-        coords.push_back(position);
-        std::shared_ptr<Model> cube = createBrick();
-        cube->Translate(position);
-    }
-    basicScene->getStatistics()->speed=2;
-    basicScene->snake->speed=2;
 }
-
 
 void ObjectsAnimationVisitor::GetCurrMapMaxLength(float &length_x, float &length_y, float &length_z){
     Eigen::Vector3d max = basicScene->currLevelMap->GetMeshList()[0]->data[0].vertices.colwise().maxCoeff();
@@ -753,29 +743,34 @@ void ObjectsAnimationVisitor::GetCurrMapMaxLength(float &length_x, float &length
 }
 
 
-void ObjectsAnimationVisitor::init_point_givers() {
+void ObjectsAnimationVisitor::init_point_givers(float div_map) {
     std::queue<Eigen::Vector3f> empty_junk1, empty_junk2, empty_junk3;
     std::swap( frogPoints, empty_junk1);
     std::swap( mousePoints, empty_junk2);
     std::swap( coinPoints, empty_junk3);
-    float dist = basicScene->currLevelMap->scale_factor[0]/2;
+    float dist = basicScene->currLevelMap->scale_factor[0]/div_map;
     int half = dist/2;
     Eigen::Vector3f min_to_gen, max_to_gen;
     get_map_max_min(max_to_gen, min_to_gen);
-    for (int i = 0; i < num_of_models; i++) {
-        Eigen::Vector3f frog_point, mouse_point, coin_point;
+    for (int i = 0; i < number_of_points; i++) {
+        Eigen::Vector3f frog_point, mouse_point, coin_point, bezier_point;
         if (i % 2 == 0){
             frog_point = Calculates::getInstance()->generateRandomPoint(max_to_gen,min_to_gen,{0.0f,0.0f,0.0f},5 ,half);
             mouse_point = Calculates::getInstance()->generateRandomPoint(max_to_gen,min_to_gen,{0.0f,0.0f,0.0f},5 ,half);
             coin_point = Calculates::getInstance()->generateRandomPoint(max_to_gen,min_to_gen,{0.0f,0.0f,0.0f},5 ,half);
+            bezier_point = Calculates::getInstance()->generateRandomPoint(max_to_gen,min_to_gen,{0.0f,0.0f,0.0f},5 ,half);
+
         }else{
             frog_point = Calculates::getInstance()->generateRandomPoint(max_to_gen,min_to_gen,{0.0f,0.0f,0.0f},half ,dist);
             mouse_point = Calculates::getInstance()->generateRandomPoint(max_to_gen,min_to_gen,{0.0f,0.0f,0.0f},half ,dist);
             coin_point = Calculates::getInstance()->generateRandomPoint(max_to_gen,min_to_gen,{0.0f,0.0f,0.0f},half ,dist);
+            bezier_point = Calculates::getInstance()->generateRandomPoint(max_to_gen,min_to_gen,{0.0f,0.0f,0.0f},half ,dist);
+
         }
         frogPoints.push(frog_point);
         mousePoints.push(mouse_point);
         coinPoints.push(coin_point);
+        bezierPoints.push(bezier_point);
     }
 
 }

@@ -91,7 +91,6 @@ private:
     int screen_width;
     int screen_height;
     int channels;
-
     void SettingsMenu();
     void setStartPos();
     void setWindow(const char* header,GLuint texture, ImVec4 color);
