@@ -199,15 +199,15 @@ void Snake::skinning(Eigen::Vector3d t) {
     }
     ikRotateHelper(number_of_joints-1, p[number_of_joints]);
 
-//    Eigen::MatrixXd VN;
-//    igl::per_vertex_normals(U, snake->GetMesh()->data[0].faces, VN);
-//    snake->setMeshData(snake->name,
-//                    U,
-//                    snake->GetMeshList()[0]->data[0].faces,
-//                    VN,
-//                    snake->GetMeshList()[0]->data[0].textureCoords);
-//
-//
+    Eigen::MatrixXd VN;
+    igl::per_vertex_normals(U, snake->GetMesh()->data[0].faces, VN);
+    snake->setMeshData(snake->name,
+                    U,
+                    snake->GetMeshList()[0]->data[0].faces,
+                    VN,
+                    snake->GetMeshList()[0]->data[0].textureCoords);
+
+
 
 
     for (int i = 0; i < number_of_joints + 1; i++) {
@@ -243,7 +243,7 @@ void Snake::reset_bones(){
 
 
     bones.resize(0);
-
+    scaleFactor = 0.5;
     bones.push_back(ModelsFactory::getInstance()->CreateModel(BRICKS_MATERIAL, CYL, "bone 0"));
     //calculate joint length after scale
     bones[0]->Scale(scaleFactor,cg3d::Movable::Axis::Z);
@@ -267,6 +267,7 @@ void Snake::reset_bones(){
         bones[i]->SetCenter(Eigen::Vector3f(0,0,-(joint_length)));
         //bones[i-1]->AddChild(bones[i]);
         bones[i]->GetTree();
+        bones[i]->isHidden = true;
     }
 }
 void Snake::reset_sake() {
@@ -305,7 +306,7 @@ void Snake::initSnake(){
 
     Eigen::MatrixXd vertices = snake->GetMeshList()[0]->data[0].vertices;
     Eigen::Vector3d translate = Eigen::Vector3d(0.0f,0.0f,-number_of_joints*(joint_length/2));
-    Eigen::Vector3d scale = Eigen::Vector3d(1.0f,1.0f,number_of_joints);
+    Eigen::Vector3d scale = Eigen::Vector3d(1.0f,1.0f,number_of_joints*scaleFactor);
     Eigen::Affine3d Tout{Eigen::Affine3d::Identity()}, Tin{Eigen::Affine3d::Identity()};
     Tout.pretranslate(translate);
     Tin.scale(scale);
