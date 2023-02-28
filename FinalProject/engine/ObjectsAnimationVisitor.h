@@ -52,7 +52,7 @@ namespace cg3d {
 
     private:
         std::vector<std::shared_ptr<Model>> checkForRemove(const std::vector<std::shared_ptr<Model>>& objects_in_use);
-        void rescaleObjects();
+        void rescaleObjects(float bez_speed);
         void GetCurrMapMaxLength(float &length_x, float &length_y, float &length_z);
         std::shared_ptr<Material> material;
         std::shared_ptr<Program> program;

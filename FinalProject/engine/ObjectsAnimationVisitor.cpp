@@ -649,7 +649,7 @@ void ObjectsAnimationVisitor::CreateLevel1(std::vector<shared_ptr<Model>> &model
     sphere_scale = 1.0f;
     int n = 50;
     init_point_givers(2);
-    rescaleObjects();
+    rescaleObjects(1);
     generatePointsInMapLevel(coords, n);
     for (int i = 0; i < n; i++) {
         Eigen::Vector3f position = coords[i];
@@ -677,7 +677,7 @@ void ObjectsAnimationVisitor::CreateLevel2(std::vector<shared_ptr<Model>> &model
     sphere_scale = 1.5f;
     init_point_givers(4);
     int n = 75;
-    rescaleObjects();
+    rescaleObjects(2);
     generatePointsInMapLevel(coords, n);
     for (int i = 0; i < n; i++) {
         Eigen::Vector3f position = coords[i];
@@ -701,7 +701,7 @@ void ObjectsAnimationVisitor::CreateLevel3(std::vector<shared_ptr<Model>> &model
     sphere_scale = 2.0f;
     init_point_givers(4);
     int n = 100;
-    rescaleObjects();
+    rescaleObjects(3);
     generatePointsInMapLevel(coords, n);
     for (int i = 0; i < n; i++) {
         Eigen::Vector3f position = coords[i];
@@ -713,7 +713,7 @@ void ObjectsAnimationVisitor::CreateLevel3(std::vector<shared_ptr<Model>> &model
     basicScene->snake->speed=2;
 }
 
-void ObjectsAnimationVisitor::rescaleObjects(){
+void ObjectsAnimationVisitor::rescaleObjects(float bez_speed){
     for (const std::shared_ptr<Model> &frog: frogs_not_in_use){
         frog->Scale(frog_scale);
     }
@@ -725,12 +725,14 @@ void ObjectsAnimationVisitor::rescaleObjects(){
     }
     for (const std::shared_ptr<Model> &sphere: special_bezier_in_use){
         sphere->Scale(sphere_scale);
+        sphere->bezier_speed = bez_speed;
     }
     for (const std::shared_ptr<Model> &brick: bricks_not_in_use){
         brick->Scale(brick_scale);
     }
-    for (const std::shared_ptr<Model> &brick: bezier_not_in_use){
-        brick->Scale(frog_scale);
+    for (const std::shared_ptr<Model> &bez: bezier_not_in_use){
+        bez->Scale(frog_scale);
+        bez->bezier_speed = bez_speed;
     }
 }
 

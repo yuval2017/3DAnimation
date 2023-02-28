@@ -54,7 +54,7 @@ public:
     float t = 0;
     Eigen::Vector3f GetPosition();
     std::shared_ptr <Model> bezier;
-    float bezier_speed = 1;
+    float bezier_speed = 1.0f;
     Stopper stopper;
     //add to eigen
     std::shared_ptr<Model> cube;
